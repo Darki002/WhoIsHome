@@ -1,18 +1,12 @@
 package ch.darki.whoishome.core.notifications
 
 import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.TaskStackBuilder
-import ch.darki.whoishome.R
-import ch.darki.whoishome.mainActivity.MainActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
-class NewEventMessageService : FirebaseMessagingService() {
+class NewEventNotificationService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
