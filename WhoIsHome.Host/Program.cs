@@ -13,13 +13,14 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseDeveloperExceptionPage();
 }
 
 app.UseRouting();
 app.MapControllers();
+app.UseAuthorization();
 app.UseHttpsRedirection();
 
 app.Run();
