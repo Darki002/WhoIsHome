@@ -14,7 +14,7 @@ public class PersonController : ControllerBase
         return new PersonModel
         {
             Id = id,
-            DisplayName = "Llyn",
+            Name = "Llyn",
             Email = "llyn@gmx.net"
         };
     }
@@ -22,7 +22,7 @@ public class PersonController : ControllerBase
     [HttpPost]
     public ActionResult<PersonModel> CreatePerson(PersonModel person)
     {
-        Console.WriteLine(person.DisplayName);
+        Console.WriteLine(person.Name);
         return Ok(person);
     }
 }

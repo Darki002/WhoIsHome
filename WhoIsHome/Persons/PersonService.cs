@@ -1,6 +1,6 @@
 namespace WhoIsHome.Persons;
 
-public class PersonService
+public class PersonService : IPersonService
 {
     
 }
