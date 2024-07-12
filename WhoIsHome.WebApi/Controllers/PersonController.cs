@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using WhoIsHome.Persons;
 using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class PersonController : ControllerBase
+public class PersonController(IPersonService personService) : ControllerBase
 {
     [HttpGet("{id}")]
     public ActionResult<PersonModel> GetPerson(string id)
@@ -22,7 +23,13 @@ public class PersonController : ControllerBase
     [HttpPost]
     public ActionResult<PersonModel> CreatePerson(PersonModel person)
     {
-        Console.WriteLine(person.Name);
-        return Ok(person);
+        var result = personService.TryCreate(person.Name, person.Email);
+
+        if (result.IsErr)
+        {
+            BadRequest(result.Err.Unwrap());
+        }
+        
+        return Ok(result.Unwrap());
     }
 }

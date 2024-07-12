@@ -1,6 +1,8 @@
+using Galaxus.Functional;
+
 namespace WhoIsHome.Persons;
 
 public interface IPersonService
 {
-    bool TryCreate(string name, string email);
+    Result<Person, string> TryCreate(string name, string email);
 }

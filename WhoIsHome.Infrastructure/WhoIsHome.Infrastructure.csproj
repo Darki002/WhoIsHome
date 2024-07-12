@@ -10,4 +10,8 @@
       <ProjectReference Include="..\WhoIsHome\WhoIsHome.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Galaxus.Functional" Version="4.2.1" />
+    </ItemGroup>
+
 </Project>
