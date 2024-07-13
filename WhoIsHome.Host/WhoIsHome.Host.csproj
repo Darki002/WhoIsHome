@@ -15,7 +15,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\WhoIsHome.Infrastructure\WhoIsHome.Infrastructure.csproj" />
       <ProjectReference Include="..\WhoIsHome.WebApi\WhoIsHome.WebApi.csproj" />
     </ItemGroup>
 

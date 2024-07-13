@@ -1,13 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
-using WhoIsHome.Persons;
+using Microsoft.Extensions.Configuration;
 
 namespace WhoIsHome;
 
 public static class ServiceProviderConfig
 {
-    public static IServiceCollection AddWhoIsHomeServices(this IServiceCollection services)
+    public static IServiceCollection AddWhoIsHomeServices(this IServiceCollection services, IConfiguration builderConfiguration)
     {
-        services.AddSingleton<IPersonService, PersonService>();
+        var projectId = builderConfiguration["Firebase:Firestore:Project_id"];
+        services.AddFirestoreDb(f => f.ProjectId = projectId);
         return services;
     } 
 }

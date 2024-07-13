@@ -15,21 +15,36 @@ public class PersonController(IPersonService personService) : ControllerBase
         return new PersonModel
         {
             Id = id,
-            Name = "Llyn",
+            DisplayName = "Llyn",
             Email = "llyn@gmx.net"
         };
     }
+    
+    [HttpGet]
+    public async Task<ActionResult<PersonModel>> GetPersonByEmailAsync(string email)
+    {
+         var result = await personService.GetPersonByMailAsync(email);
+         
+         if (result.IsErr)
+         {
+             BadRequest(result.Err.Unwrap());
+         }
+
+         var model = PersonModel.From(result.Unwrap());
+         return Ok(model);
+    }
 
     [HttpPost]
-    public ActionResult<PersonModel> CreatePerson(PersonModel person)
+    public async Task<ActionResult<PersonModel>> CreatePersonAsync(PersonModel person)
     {
-        var result = personService.TryCreate(person.Name, person.Email);
+        var result = await personService.TryCreateAsync(person.DisplayName, person.Email);
 
         if (result.IsErr)
         {
             BadRequest(result.Err.Unwrap());
         }
         
-        return Ok(result.Unwrap());
+        var model = PersonModel.From(result.Unwrap());
+        return Ok(model);
     }
 }

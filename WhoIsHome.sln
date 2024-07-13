@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.WebApi", "WhoIsHo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome", "WhoIsHome\WhoIsHome.csproj", "{01BCA085-14A7-484C-B8B7-22246747271E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.Infrastructure", "WhoIsHome.Infrastructure\WhoIsHome.Infrastructure.csproj", "{BDC47194-6B67-47B0-B0D2-841E9460683C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +24,5 @@ Global
 		{01BCA085-14A7-484C-B8B7-22246747271E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01BCA085-14A7-484C-B8B7-22246747271E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01BCA085-14A7-484C-B8B7-22246747271E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BDC47194-6B67-47B0-B0D2-841E9460683C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDC47194-6B67-47B0-B0D2-841E9460683C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BDC47194-6B67-47B0-B0D2-841E9460683C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BDC47194-6B67-47B0-B0D2-841E9460683C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

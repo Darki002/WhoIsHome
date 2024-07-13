@@ -1,5 +1,4 @@
 using WhoIsHome;
-using WhoIsHome.Infrastructure;
 using WhoIsHome.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,8 +10,7 @@ builder.Services.AddControllers();
 // Add Services
 builder.Services
     .AddWebApi()
-    .AddWhoIsHomeServices()
-    .AddInfrastructure();
+    .AddWhoIsHomeServices(builder.Configuration);
 
 var app = builder.Build();
 
