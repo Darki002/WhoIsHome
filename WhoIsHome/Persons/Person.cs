@@ -8,14 +8,23 @@ public class Person
     public string DisplayName { get; private set;  }
     public MailAddress Email { get; private set; }
 
+    private Person() {}
+    
     internal Person(string name, MailAddress email)
     {
         DisplayName = name;
         Email = email;
     }
 
-    public void SetId(string id)
+    public static Person FromDb(PersonDbModel dbModel)
     {
-        Id = id;
+        var mailAddress = new MailAddress(dbModel.Email);
+
+        return new Person
+        {
+            Id = dbModel.Id,
+            DisplayName = dbModel.DisplayName,
+            Email = mailAddress
+        };
     }
 }

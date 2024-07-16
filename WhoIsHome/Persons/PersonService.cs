@@ -4,11 +4,9 @@ using Google.Cloud.Firestore;
 
 namespace WhoIsHome.Persons;
 
-public class PersonService(FirestoreDbBuilder dbBuilder) : IPersonService
+public class PersonService(FirestoreDb firestoreDb) : IPersonService
 {
     private const string Collection = "person";
-    
-    private FirestoreDbBuilder dbBuilder = dbBuilder;
 
     public async Task<Result<Person, string>> TryCreateAsync(string name, string email)
     {
@@ -23,9 +21,6 @@ public class PersonService(FirestoreDbBuilder dbBuilder) : IPersonService
         }
         
         var person = new Person(name, mailAddress);
-
-        var db = await dbBuilder.BuildAsync();
-        
         Console.WriteLine(person);
 
         return person;
@@ -33,22 +28,20 @@ public class PersonService(FirestoreDbBuilder dbBuilder) : IPersonService
 
     public async Task<Result<Person, string>> GetPersonByMailAsync(string email)
     {
-        if (!MailAddress.TryCreate(email, out var mailAddress))
+        if (!MailAddress.TryCreate(email, out _))
         {
             return "Invalid Mail Address Format.";
         }
-        
-        var db = await dbBuilder.BuildAsync();
 
-        var result = await db.Collection(Collection).Where(Filter.EqualTo("email", email)).GetSnapshotAsync();
+        var result = await firestoreDb.Collection(Collection).Where(Filter.EqualTo("email", email)).GetSnapshotAsync();
         var personDoc = result.Documents.Single();
-        var person = personDoc.ConvertTo<Person>();
+        var personDbModel = personDoc.ConvertTo<PersonDbModel>();
 
-        if (person is null)
+        if (personDbModel is null)
         {
-            return $"Can't convert {personDoc} to type ${nameof(Person)}";
+            return $"Can't convert {personDoc} to type ${nameof(PersonDbModel)}";
         }
 
-        return person;
+        return Person.FromDb(personDbModel);
     }
 }
