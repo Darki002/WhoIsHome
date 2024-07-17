@@ -1,3 +1,4 @@
+using Galaxus.Functional;
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Persons;
 using WhoIsHome.WebApi.Models;
@@ -9,39 +10,31 @@ namespace WhoIsHome.WebApi.Controllers;
 public class PersonController(IPersonService personService) : ControllerBase
 {
     [HttpGet("{id}")]
-    public ActionResult<PersonModel> GetPerson(string id)
+    public async Task<IActionResult> GetPerson(string id)
     {
-        Console.WriteLine("Hi Get");
-        return new PersonModel
-        {
-            Id = id,
-            DisplayName = "Llyn",
-            Email = "llyn@gmx.net"
-        };
+        var result = await personService.GetPersonAsync(id);
+        return BuildResponse(result);
     }
     
     [HttpGet]
-    public async Task<ActionResult<PersonModel>> GetPersonByEmailAsync(string email)
+    public async Task<IActionResult> GetPersonByEmailAsync(string email)
     {
          var result = await personService.GetPersonByMailAsync(email);
-         
-         if (result.IsErr)
-         {
-             BadRequest(result.Err.Unwrap());
-         }
-
-         var model = PersonModel.From(result.Unwrap());
-         return Ok(model);
+         return BuildResponse(result);
     }
 
     [HttpPost]
-    public async Task<ActionResult<PersonModel>> CreatePersonAsync(PersonModel person)
+    public async Task<IActionResult> CreatePersonAsync(PersonModel person)
     {
         var result = await personService.TryCreateAsync(person.DisplayName, person.Email);
+        return BuildResponse(result);
+    }
 
+    private IActionResult BuildResponse(Result<Person, string> result)
+    {
         if (result.IsErr)
         {
-            BadRequest(result.Err.Unwrap());
+            return BadRequest(result.Err.Unwrap());
         }
         
         var model = PersonModel.From(result.Unwrap());

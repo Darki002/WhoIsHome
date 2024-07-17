@@ -16,7 +16,7 @@ public class PersonModel
         {
             Id = person.Id ?? string.Empty,
             DisplayName = person.DisplayName,
-            Email = person.Email.Address
+            Email = person.Email
         };
     }
 }
