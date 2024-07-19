@@ -26,7 +26,7 @@ public abstract class ServiceBase<TDbModel>(FirestoreDb firestoreDb) where TDbMo
 
         if (dbModel is null)
         {
-            return $"Can't convert {documentSnapshot} to type ${typeof(TDbModel).Name}";
+            return $"Can't convert DB Document to type ${typeof(TDbModel).Name}";
         }
 
         return dbModel;
