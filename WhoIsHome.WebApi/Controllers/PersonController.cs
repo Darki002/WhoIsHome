@@ -12,21 +12,21 @@ public class PersonController(IPersonService personService) : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPerson(string id)
     {
-        var result = await personService.GetPersonAsync(id);
+        var result = await personService.GetAsync(id);
         return BuildResponse(result);
     }
     
     [HttpGet]
     public async Task<IActionResult> GetPersonByEmailAsync(string email)
     {
-         var result = await personService.GetPersonByMailAsync(email);
+         var result = await personService.GetByMailAsync(email);
          return BuildResponse(result);
     }
 
     [HttpPost]
     public async Task<IActionResult> CreatePersonAsync(PersonModel person)
     {
-        var result = await personService.TryCreateAsync(person.DisplayName, person.Email);
+        var result = await personService.CreateAsync(person.DisplayName, person.Email);
         return BuildResponse(result);
     }
 

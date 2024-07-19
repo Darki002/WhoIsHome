@@ -8,7 +8,7 @@ public class PersonService(FirestoreDb firestoreDb) : IPersonService
 {
     private const string Collection = "person";
 
-    public async Task<Result<Person, string>> GetPersonAsync(string id)
+    public async Task<Result<Person, string>> GetAsync(string id)
     {
         var result = await firestoreDb.Collection(Collection)
             .WhereEqualTo("id", id)
@@ -21,7 +21,7 @@ public class PersonService(FirestoreDb firestoreDb) : IPersonService
             : ConvertDocument(personDoc);
     }
 
-    public async Task<Result<Person, string>> GetPersonByMailAsync(string email)
+    public async Task<Result<Person, string>> GetByMailAsync(string email)
     {
         if (!MailAddress.TryCreate(email, out _))
         {
@@ -39,7 +39,7 @@ public class PersonService(FirestoreDb firestoreDb) : IPersonService
             : ConvertDocument(personDoc);
     }
     
-    public async Task<Result<Person, string>> TryCreateAsync(string name, string email)
+    public async Task<Result<Person, string>> CreateAsync(string name, string email)
     {
         var person = ConvertToModel(name, email);
         if (person.IsErr) return person.Err.Unwrap();
