@@ -1,7 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using WhoIsHome.Events;
-using WhoIsHome.Persons;
+using WhoIsHome.Services.Events;
+using WhoIsHome.Services.Persons;
+using WhoIsHome.Services.RepeatedEvents;
 
 namespace WhoIsHome;
 
@@ -14,6 +15,7 @@ public static class ServiceProviderConfig
 
         services.AddTransient<IPersonService, PersonService>();
         services.AddTransient<IEventService, EventService>();
+        services.AddTransient<IRepeatedEventService, RepeatedEventService>();
         
         return services;
     } 

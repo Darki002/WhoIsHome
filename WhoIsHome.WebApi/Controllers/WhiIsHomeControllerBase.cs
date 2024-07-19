@@ -6,7 +6,7 @@ namespace WhoIsHome.WebApi.Controllers;
 
 public abstract class WhiIsHomeControllerBase<T, TModel> : ControllerBase
 {
-    protected IActionResult BuildResponse(Result<T, string> result, Func<T, TModel> convert)
+    protected ActionResult<TModel> BuildResponse(Result<T, string> result, Func<T, TModel> convert)
     {
         if (result.IsErr)
         {

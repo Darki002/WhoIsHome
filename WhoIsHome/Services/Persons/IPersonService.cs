@@ -1,6 +1,6 @@
 using Galaxus.Functional;
 
-namespace WhoIsHome.Persons;
+namespace WhoIsHome.Services.Persons;
 
 public interface IPersonService
 {

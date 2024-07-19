@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using WhoIsHome.Events;
+using WhoIsHome.Services.Events;
 using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi.Controllers;
@@ -9,14 +9,14 @@ namespace WhoIsHome.WebApi.Controllers;
 public class EventController(IEventService eventService) : WhiIsHomeControllerBase<Event, EventModel>
 {
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetEvent(string id, CancellationToken cancellationToken)
+    public async Task<ActionResult<EventModel>> GetEvent(string id, CancellationToken cancellationToken)
     {
         var result = await eventService.GetAsync(id, cancellationToken);
         return BuildResponse(result, EventModel.From);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateEvent([FromBody] NewEventModel eventModel, CancellationToken cancellationToken)
+    public async Task<ActionResult<EventModel>> CreateEvent([FromBody] NewEventModel eventModel, CancellationToken cancellationToken)
     {
         var result = await eventService.CreateAsync(
             eventName: eventModel.EventName,
@@ -32,7 +32,7 @@ public class EventController(IEventService eventService) : WhiIsHomeControllerBa
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateEvent([FromBody] EventModel eventModel, CancellationToken cancellationToken)
+    public async Task<ActionResult<EventModel>> UpdateEvent([FromBody] EventModel eventModel, CancellationToken cancellationToken)
     {
         var result = await eventService.UpdateAsync(
             id: eventModel.Id,

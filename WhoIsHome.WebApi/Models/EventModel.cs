@@ -1,4 +1,4 @@
-using WhoIsHome.Events;
+using WhoIsHome.Services.Events;
 
 namespace WhoIsHome.WebApi.Models;
 

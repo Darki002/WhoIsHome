@@ -1,16 +1,15 @@
 using Galaxus.Functional;
 using Google.Cloud.Firestore;
-using Newtonsoft.Json;
-using WhoIsHome.Persons;
+using WhoIsHome.Services.Persons;
 
-namespace WhoIsHome.Events;
+namespace WhoIsHome.Services.RepeatedEvents;
 
 [FirestoreData]
-public class Event
+public class RepeatedEvent
 {
     [FirestoreDocumentId]
     public string? Id { get; set; }
-
+    
     [FirestoreProperty] 
     public string EventName { get; set; } = null!;
 
@@ -18,7 +17,10 @@ public class Event
     public Person Person { get; set; } = null!;
     
     [FirestoreProperty]
-    public Timestamp Date { get; set; }
+    public Timestamp StartDate { get; set; }
+    
+    [FirestoreProperty]
+    public Timestamp EndDate { get; set; }
     
     [FirestoreProperty]
     public Timestamp StartTime { get; set; }
@@ -31,11 +33,12 @@ public class Event
     
     [FirestoreProperty]
     public Timestamp DinnerAt { get; set; }
-
-    public static Result<Event, string> TryCreate(
+    
+    public static Result<RepeatedEvent, string> TryCreate(
         string eventName,
         Person person,
-        DateTime date,
+        DateTime startDate,
+        DateTime endDate,
         DateTime startTime,
         DateTime endTime,
         bool relevantForDinner,
@@ -45,18 +48,24 @@ public class Event
         {
             return $"{nameof(StartTime)} must be before {nameof(EndTime)}.";
         }
+        
+        if (startDate >= endDate)
+        {
+            return $"{nameof(StartDate)} must be before {nameof(EndDate)}.";
+        }
 
         if (eventName.Length is <= 0 or >= 30)
         {
             return $"{nameof(EventName)} must be between 1 and 30 characters long.";
         }
 
-        return new Event
+        return new RepeatedEvent
         {
             Id = null,
             EventName = eventName,
             Person = person,
-            Date = Timestamp.FromDateTime(date),
+            StartDate = Timestamp.FromDateTime(startDate),
+            EndDate = Timestamp.FromDateTime(endDate),
             StartTime = Timestamp.FromDateTime(startTime),
             EndTime = Timestamp.FromDateTime(endTime),
             RelevantForDinner = relevantForDinner,
@@ -66,7 +75,8 @@ public class Event
 
     public Result<Dictionary<string, object>, string> TryUpdate(
         string eventName,
-        DateTime date,
+        DateTime startDate,
+        DateTime endDate,
         DateTime startTime,
         DateTime endTime,
         bool relevantForDinner,
@@ -77,9 +87,14 @@ public class Event
             return $"{nameof(StartTime)} must be before {nameof(EndTime)}.";
         }
 
-        if (date < DateTime.Today)
+        if (startTime < DateTime.Today)
         {
-            return "New Date can't be in the past.";
+            return "New Start Date can't be in the past.";
+        }
+        
+        if (startDate >= endDate)
+        {
+            return $"{nameof(StartDate)} must be before {nameof(EndDate)}.";
         }
 
         if (eventName.Length is <= 0 or >= 30)
@@ -88,7 +103,8 @@ public class Event
         }
 
         EventName = eventName;
-        Date = Timestamp.FromDateTime(date);
+        StartDate = Timestamp.FromDateTime(startDate);
+        EndDate = Timestamp.FromDateTime(endDate);
         StartTime = Timestamp.FromDateTime(startTime);
         EndTime = Timestamp.FromDateTime(endTime);
         RelevantForDinner = relevantForDinner;
@@ -97,7 +113,8 @@ public class Event
         return new Dictionary<string, object>
         {
             { nameof(EventName), EventName },
-            { nameof(Date), Date },
+            { nameof(StartDate), StartDate },
+            { nameof(EndDate), EndDate },
             { nameof(StartTime), StartTime },
             { nameof(EndTime), EndTime },
             { nameof(RelevantForDinner), RelevantForDinner },

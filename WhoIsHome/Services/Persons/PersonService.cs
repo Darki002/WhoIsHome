@@ -2,7 +2,7 @@ using System.Net.Mail;
 using Galaxus.Functional;
 using Google.Cloud.Firestore;
 
-namespace WhoIsHome.Persons;
+namespace WhoIsHome.Services.Persons;
 
 public class PersonService(FirestoreDb firestoreDb) : ServiceBase<Person>(firestoreDb), IPersonService
 {

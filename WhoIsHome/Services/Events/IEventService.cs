@@ -1,6 +1,6 @@
 using Galaxus.Functional;
 
-namespace WhoIsHome.Events;
+namespace WhoIsHome.Services.Events;
 
 public interface IEventService
 {

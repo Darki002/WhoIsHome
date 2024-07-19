@@ -1,8 +1,8 @@
 using Galaxus.Functional;
 using Google.Cloud.Firestore;
-using WhoIsHome.Persons;
+using WhoIsHome.Services.Persons;
 
-namespace WhoIsHome.Events;
+namespace WhoIsHome.Services.Events;
 
 public class EventService(FirestoreDb firestoreDb, IPersonService personService) : ServiceBase<Event>(firestoreDb), IEventService
 {
