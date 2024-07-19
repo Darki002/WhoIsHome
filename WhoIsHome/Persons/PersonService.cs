@@ -11,7 +11,7 @@ public class PersonService(FirestoreDb firestoreDb) : IPersonService
     public async Task<Result<Person, string>> GetPersonAsync(string id)
     {
         var result = await firestoreDb.Collection(Collection)
-            .Where(Filter.EqualTo("id", id))
+            .WhereEqualTo("id", id)
             .GetSnapshotAsync();
 
         var personDoc = result.Documents.SingleOrDefault();
@@ -29,7 +29,7 @@ public class PersonService(FirestoreDb firestoreDb) : IPersonService
         }
 
         var result = await firestoreDb.Collection(Collection)
-            .Where(Filter.EqualTo("email", email))
+            .WhereEqualTo("email", email)
             .GetSnapshotAsync();
 
         var personDoc = result.Documents.SingleOrDefault();
@@ -43,6 +43,17 @@ public class PersonService(FirestoreDb firestoreDb) : IPersonService
     {
         var person = ConvertToModel(name, email);
         if (person.IsErr) return person.Err.Unwrap();
+
+        var existingPerson = await firestoreDb
+            .Collection(Collection)
+            .WhereEqualTo("email", email)
+            .Count()
+            .GetSnapshotAsync();
+
+        if (existingPerson.Count > 0)
+        {
+            return $"Person with email {email} already exists";
+        }
 
         var docRef = await firestoreDb.Collection(Collection).AddAsync(person.Unwrap());
         var personDoc = await docRef.GetSnapshotAsync();
