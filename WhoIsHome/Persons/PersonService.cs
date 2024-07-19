@@ -8,7 +8,7 @@ public class PersonService(FirestoreDb firestoreDb) : ServiceBase<Person>(firest
 {
     protected override string Collection { get; } = "person";
 
-    public async Task<Result<Person, string>> GetByMailAsync(string email)
+    public async Task<Result<Person, string>> GetByMailAsync(string email, CancellationToken cancellationToken)
     {
         if (!MailAddress.TryCreate(email, out _))
         {
@@ -17,7 +17,7 @@ public class PersonService(FirestoreDb firestoreDb) : ServiceBase<Person>(firest
 
         var result = await FirestoreDb.Collection(Collection)
             .WhereEqualTo("email", email)
-            .GetSnapshotAsync();
+            .GetSnapshotAsync(cancellationToken);
 
         var personDoc = result.Documents.SingleOrDefault();
         
@@ -26,7 +26,7 @@ public class PersonService(FirestoreDb firestoreDb) : ServiceBase<Person>(firest
             : ConvertDocument(personDoc);
     }
     
-    public async Task<Result<Person, string>> CreateAsync(string name, string email)
+    public async Task<Result<Person, string>> CreateAsync(string name, string email, CancellationToken cancellationToken)
     {
         var person = Person.TryCreate(name, email);
         if (person.IsErr) return person.Err.Unwrap();
@@ -35,15 +35,15 @@ public class PersonService(FirestoreDb firestoreDb) : ServiceBase<Person>(firest
             .Collection(Collection)
             .WhereEqualTo("email", email)
             .Count()
-            .GetSnapshotAsync();
+            .GetSnapshotAsync(cancellationToken);
 
         if (existingPerson.Count > 0)
         {
             return $"Person with email {email} already exists";
         }
 
-        var docRef = await FirestoreDb.Collection(Collection).AddAsync(person.Unwrap());
-        var personDoc = await docRef.GetSnapshotAsync();
+        var docRef = await FirestoreDb.Collection(Collection).AddAsync(person.Unwrap(), cancellationToken);
+        var personDoc = await docRef.GetSnapshotAsync(cancellationToken);
         return ConvertDocument(personDoc);
     }
 }

@@ -4,7 +4,7 @@ namespace WhoIsHome.WebApi.Models;
 
 public class EventModel
 {
-    public string? Id { get; set; }
+    public string Id { get; set; }
 
     public string EventName { get; set; } = null!;
 
@@ -24,7 +24,7 @@ public class EventModel
     {
         return new EventModel
         {
-            Id = evenDbModel.Id,
+            Id = evenDbModel.Id!,
             EventName = evenDbModel.EventName,
             Person = PersonModel.From(evenDbModel.Person),
             Date = evenDbModel.Date.ToDateTime(),

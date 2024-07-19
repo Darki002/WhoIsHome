@@ -9,11 +9,11 @@ public abstract class ServiceBase<TDbModel>(FirestoreDb firestoreDb) where TDbMo
     
     protected abstract string Collection { get; }
     
-    public async Task<Result<TDbModel, string>> GetAsync(string id)
+    public async Task<Result<TDbModel, string>> GetAsync(string id, CancellationToken cancellationToken)
     {
         var result = await FirestoreDb.Collection(Collection)
             .Document(id)
-            .GetSnapshotAsync();
+            .GetSnapshotAsync(cancellationToken);
 
         return result is null 
             ? $"Can't find {typeof(TDbModel).Name} with Id {id}" 

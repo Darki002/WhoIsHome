@@ -1,5 +1,6 @@
 using Galaxus.Functional;
 using Google.Cloud.Firestore;
+using Newtonsoft.Json;
 using WhoIsHome.Persons;
 
 namespace WhoIsHome.Events;
@@ -60,6 +61,47 @@ public class Event
             EndTime = Timestamp.FromDateTime(endTime),
             RelevantForDinner = relevantForDinner,
             DinnerAt = Timestamp.FromDateTime(dinnerAt)
+        };
+    }
+
+    public Result<Dictionary<string, object>, string> TryUpdate(
+        string eventName,
+        DateTime date,
+        DateTime startTime,
+        DateTime endTime,
+        bool relevantForDinner,
+        DateTime dinnerAt)
+    {
+        if (startTime >= endTime)
+        {
+            return $"{nameof(StartTime)} must be before {nameof(EndTime)}.";
+        }
+
+        if (date < DateTime.Today)
+        {
+            return "New Date can't be in the past.";
+        }
+
+        if (eventName.Length is <= 0 or >= 30)
+        {
+            return $"{nameof(EventName)} must be between 1 and 30 characters long.";
+        }
+
+        EventName = eventName;
+        Date = Timestamp.FromDateTime(date);
+        StartTime = Timestamp.FromDateTime(startTime);
+        EndTime = Timestamp.FromDateTime(endTime);
+        RelevantForDinner = relevantForDinner;
+        DinnerAt = Timestamp.FromDateTime(dinnerAt);
+        
+        return new Dictionary<string, object>
+        {
+            { nameof(EventName), EventName },
+            { nameof(Date), Date },
+            { nameof(StartTime), StartTime },
+            { nameof(EndTime), EndTime },
+            { nameof(RelevantForDinner), RelevantForDinner },
+            { nameof(DinnerAt), DinnerAt }
         };
     }
 }
