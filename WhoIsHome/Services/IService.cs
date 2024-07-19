@@ -7,7 +7,9 @@ public interface IService<TDbModel>
 {
     Task<Result<TDbModel, string>> GetAsync(string id, CancellationToken cancellationToken);
 
-    IReadOnlyCollection<TDbModel?> QueryMany(Func<CollectionReference, QuerySnapshot> query);
+    Task<IReadOnlyCollection<TDbModel?>> QueryManyAsync(CancellationToken cancellationToken,
+        Func<CollectionReference, Task<QuerySnapshot>> query);
 
-    TDbModel? QuerySingle(Func<CollectionReference, DocumentSnapshot?> query);
+    Task<TDbModel?> QuerySingleAsync(CancellationToken cancellationToken,
+        Func<CollectionReference, Task<QuerySnapshot>> query);
 }

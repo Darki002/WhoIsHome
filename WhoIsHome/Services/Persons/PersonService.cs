@@ -8,6 +8,26 @@ public class PersonService(FirestoreDb firestoreDb) : ServiceBase<Person>(firest
 {
     protected override string Collection { get; } = "person";
 
+    public async Task<Result<IReadOnlyCollection<Person>, string>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        var query = await FirestoreDb.Collection(Collection)
+            .GetSnapshotAsync(cancellationToken);
+
+        var result = new List<Person>();
+        
+        foreach (var snapshot in query)
+        {
+            var model = ConvertDocument(snapshot);
+            if (model.IsErr)
+            {
+                return model.Err.Unwrap();
+            }
+            result.Add(model.Unwrap());
+        }
+
+        return result;
+    }
+
     public async Task<Result<Person, string>> GetByMailAsync(string email, CancellationToken cancellationToken)
     {
         if (!MailAddress.TryCreate(email, out _))
