@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using WhoIsHome.Events;
 using WhoIsHome.Persons;
 
 namespace WhoIsHome;
@@ -12,6 +13,7 @@ public static class ServiceProviderConfig
         services.AddFirestoreDb(f => f.ProjectId = projectId);
 
         services.AddTransient<IPersonService, PersonService>();
+        services.AddTransient<IEventService, EventService>();
         
         return services;
     } 
