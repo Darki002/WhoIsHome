@@ -2,10 +2,8 @@ using Galaxus.Functional;
 
 namespace WhoIsHome.Services.RepeatedEvents;
 
-public interface IRepeatedEventService
+public interface IRepeatedEventService : IService<RepeatedEvent>
 {
-    Task<Result<RepeatedEvent, string>> GetAsync(string id, CancellationToken cancellationToken);
-
     Task<Result<RepeatedEvent, string>> CreateAsync(
         string eventName,
         string personId,

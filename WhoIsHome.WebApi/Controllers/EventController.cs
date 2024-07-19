@@ -6,15 +6,8 @@ namespace WhoIsHome.WebApi.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class EventController(IEventService eventService) : WhiIsHomeControllerBase<Event, EventModel>
+public class EventController(IEventService eventService) : WhoIsHomeControllerBase<Event, EventModel>(eventService)
 {
-    [HttpGet("{id}")]
-    public async Task<ActionResult<EventModel>> GetEvent(string id, CancellationToken cancellationToken)
-    {
-        var result = await eventService.GetAsync(id, cancellationToken);
-        return BuildResponse(result, EventModel.From);
-    }
-
     [HttpPost]
     public async Task<ActionResult<EventModel>> CreateEvent([FromBody] NewEventModel eventModel, CancellationToken cancellationToken)
     {
@@ -28,7 +21,7 @@ public class EventController(IEventService eventService) : WhiIsHomeControllerBa
             dinnerAt: eventModel.DinnerAt,
             cancellationToken: cancellationToken);
         
-        return BuildResponse(result, EventModel.From);
+        return BuildResponse(result);
     }
 
     [HttpPut]
@@ -44,6 +37,8 @@ public class EventController(IEventService eventService) : WhiIsHomeControllerBa
             dinnerAt: eventModel.DinnerAt,
             cancellationToken: cancellationToken);
         
-        return BuildResponse(result, EventModel.From);
+        return BuildResponse(result);
     }
+
+    protected override EventModel ConvertToModel(Event data) => EventModel.From(data);
 }

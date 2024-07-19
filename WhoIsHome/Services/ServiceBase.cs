@@ -1,9 +1,9 @@
 using Galaxus.Functional;
 using Google.Cloud.Firestore;
 
-namespace WhoIsHome;
+namespace WhoIsHome.Services;
 
-public abstract class ServiceBase<TDbModel>(FirestoreDb firestoreDb) where TDbModel : class
+public abstract class ServiceBase<TDbModel>(FirestoreDb firestoreDb) : IService<TDbModel> where TDbModel : class
 {
     protected readonly FirestoreDb FirestoreDb = firestoreDb;
     
