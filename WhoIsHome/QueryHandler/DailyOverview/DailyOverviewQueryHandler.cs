@@ -26,10 +26,12 @@ public class DailyOverviewQueryHandler(
         
         foreach (var person in persons)
         {
+            // Won't work. We have to get them all. In case there is one that has RelevantForDinner but no DinnerAt -> NotAtHome at all
             var latestDinnerAtEvent = await eventService.QuerySingleAsync(cancellationToken,  async collectionRef =>
             {
                 return await collectionRef
                     .WhereEqualTo("person:id", person.Id)
+                    .WhereEqualTo("RelevantForDinner", true)
                     .WhereGreaterThanOrEqualTo("date", today)
                     .WhereLessThan("date", tomorrow)
                     .OrderByDescending("dinnerAt")
@@ -41,11 +43,13 @@ public class DailyOverviewQueryHandler(
             {
                 return await collectionRef
                     .WhereEqualTo("person:id", person.Id)
+                    .WhereEqualTo("RelevantForDinner", true)
                     .WhereLessThanOrEqualTo("firstDate", today)
                     .WhereGreaterThanOrEqualTo("lastDate", today)
                     .GetSnapshotAsync(cancellationToken);
             });
 
+            // Won't work. We have to get them all. In case there is one that has RelevantForDinner but no DinnerAt -> NotAtHome at all
             var latestRepeatedEvent = repeatedEvents
                 .Where(re => re != null)
                 .Where(re => re!.IsToday)

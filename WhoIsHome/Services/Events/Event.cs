@@ -31,6 +31,8 @@ public class Event
     [FirestoreProperty]
     public Timestamp? DinnerAt { get; set; }
 
+    public bool IsAtHome => RelevantForDinner && DinnerAt != null;
+
     public static Result<Event, string> TryCreate(
         string eventName,
         Person person,

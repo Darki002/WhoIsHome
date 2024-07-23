@@ -28,7 +28,7 @@ public class PersonPresence
         return new PersonPresence
         {
             Person = person,
-            IsAtHome = @event.RelevantForDinner && @event.DinnerAt != null,
+            IsAtHome = @event.IsAtHome,
             DinnerAt = dinnerAtTime
         };
     }
@@ -40,7 +40,7 @@ public class PersonPresence
         return new PersonPresence
         {
             Person = person,
-            IsAtHome = repeatedEvent.RelevantForDinner && repeatedEvent.DinnerAt != null,
+            IsAtHome = repeatedEvent.IsAtHome,
             DinnerAt = dinnerAtTime
         };
     }

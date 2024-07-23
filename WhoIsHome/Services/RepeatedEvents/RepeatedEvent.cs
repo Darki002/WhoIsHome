@@ -34,6 +34,8 @@ public class RepeatedEvent
     [FirestoreProperty]
     public Timestamp? DinnerAt { get; set; }
 
+    public bool IsAtHome => RelevantForDinner && DinnerAt != null;
+    
     public bool IsToday => DateTime.Now.DayOfWeek != StartDate.ToDateTime().DayOfWeek;
     
     public static Result<RepeatedEvent, string> TryCreate(
@@ -112,7 +114,7 @@ public class RepeatedEvent
         RelevantForDinner = relevantForDinner;
         DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(dinnerAt.Value) : null;
         
-        return new Dictionary<string, object>
+        return new Dictionary<string, object?>
         {
             { nameof(EventName), EventName },
             { nameof(StartDate), StartDate },
