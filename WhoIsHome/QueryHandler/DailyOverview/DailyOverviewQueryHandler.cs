@@ -1,3 +1,4 @@
+using System.Net;
 using Galaxus.Functional;
 using Google.Cloud.Firestore;
 using WhoIsHome.Services.Events;
@@ -22,9 +23,11 @@ public class DailyOverviewQueryHandler(
         var today = Timestamp.FromDateTime(DateTime.Today);
         var tomorrow = Timestamp.FromDateTime(DateTime.Today.AddDays(1));
 
+        var result = new List<PersonPresence>();
+        
         foreach (var person in persons)
         {
-            var latestDinnerAtEvent = eventService.QuerySingleAsync(cancellationToken,  async collectionRef =>
+            var latestDinnerAtEvent = await eventService.QuerySingleAsync(cancellationToken,  async collectionRef =>
             {
                 return await collectionRef
                     .WhereEqualTo("person:id", person.Id)
@@ -35,7 +38,7 @@ public class DailyOverviewQueryHandler(
                     .GetSnapshotAsync(cancellationToken);
             });
             
-            var todayRepeatedEvents = repeatedEventService.QueryManyAsync(cancellationToken,  async collectionRef =>
+            var repeatedEvents = await repeatedEventService.QueryManyAsync(cancellationToken,  async collectionRef =>
             {
                 return await collectionRef
                     .WhereEqualTo("person:id", person.Id)
@@ -43,8 +46,41 @@ public class DailyOverviewQueryHandler(
                     .WhereGreaterThanOrEqualTo("lastDate", today)
                     .GetSnapshotAsync(cancellationToken);
             });
+
+            var latestRepeatedEvent = repeatedEvents
+                .Where(re => re != null)
+                .Where(re => re!.IsToday)
+                .MaxBy(re => re!.DinnerAt);
+
+            var personPresence = GetPersonPresence(latestDinnerAtEvent, latestRepeatedEvent, person);
+            result.Add(personPresence);
         }
 
-        return null!;
+        return result;
+    }
+
+    private static PersonPresence GetPersonPresence(Event? e, RepeatedEvent? re, Person person)
+    {
+        if (e == null && re == null)
+        {
+            return PersonPresence.Empty(person);
+        }
+        
+        if (EventIsBeforeRepeatedEventOrNoRepeatedEventIsGiven(e, re))
+        {
+            return PersonPresence.From(e!, person);
+        }
+    
+        if (re != null)
+        {
+            return PersonPresence.From(re, person);
+        }
+
+        return PersonPresence.Empty(person);
+    }
+
+    private static bool EventIsBeforeRepeatedEventOrNoRepeatedEventIsGiven(Event? e, RepeatedEvent? re)
+    {
+        return e != null && (re == null || e.DinnerAt >= re.DinnerAt);
     }
 }

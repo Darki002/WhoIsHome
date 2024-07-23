@@ -29,7 +29,7 @@ public class Event
     public bool RelevantForDinner { get; set; }
     
     [FirestoreProperty]
-    public Timestamp DinnerAt { get; set; }
+    public Timestamp? DinnerAt { get; set; }
 
     public static Result<Event, string> TryCreate(
         string eventName,
@@ -38,7 +38,7 @@ public class Event
         DateTime startTime,
         DateTime endTime,
         bool relevantForDinner,
-        DateTime dinnerAt)
+        DateTime? dinnerAt)
     {
         if (startTime >= endTime)
         {
@@ -59,17 +59,17 @@ public class Event
             StartTime = Timestamp.FromDateTime(startTime),
             EndTime = Timestamp.FromDateTime(endTime),
             RelevantForDinner = relevantForDinner,
-            DinnerAt = Timestamp.FromDateTime(dinnerAt)
+            DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(dinnerAt.Value) : null
         };
     }
 
-    public Result<Dictionary<string, object>, string> TryUpdate(
+    public Result<Dictionary<string, object?>, string> TryUpdate(
         string eventName,
         DateTime date,
         DateTime startTime,
         DateTime endTime,
         bool relevantForDinner,
-        DateTime dinnerAt)
+        DateTime? dinnerAt)
     {
         if (startTime >= endTime)
         {
@@ -91,9 +91,9 @@ public class Event
         StartTime = Timestamp.FromDateTime(startTime);
         EndTime = Timestamp.FromDateTime(endTime);
         RelevantForDinner = relevantForDinner;
-        DinnerAt = Timestamp.FromDateTime(dinnerAt);
+        DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(dinnerAt.Value) : null;
         
-        return new Dictionary<string, object>
+        return new Dictionary<string, object?>
         {
             { nameof(EventName), EventName },
             { nameof(Date), Date },

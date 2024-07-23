@@ -12,7 +12,7 @@ public interface IRepeatedEventService : IService<RepeatedEvent>
         DateTime startTime,
         DateTime endTime,
         bool relevantForDinner,
-        DateTime dinnerAt,
+        DateTime? dinnerAt,
         CancellationToken cancellationToken);
 
     Task<Result<RepeatedEvent, string>> UpdateAsync(
@@ -23,6 +23,6 @@ public interface IRepeatedEventService : IService<RepeatedEvent>
         DateTime startTime,
         DateTime endTime,
         bool relevantForDinner,
-        DateTime dinnerAt,
+        DateTime? dinnerAt,
         CancellationToken cancellationToken);
 }

@@ -18,7 +18,7 @@ public class EventModel
     
     public bool RelevantForDinner { get; set; }
     
-    public DateTime DinnerAt { get; set; }
+    public DateTime? DinnerAt { get; set; }
     
     public static EventModel From(Event evenDbModel)
     {
@@ -31,7 +31,7 @@ public class EventModel
             StartTime = evenDbModel.StartTime.ToDateTime(),
             EndTime = evenDbModel.EndTime.ToDateTime(),
             RelevantForDinner = evenDbModel.RelevantForDinner,
-            DinnerAt = evenDbModel.DinnerAt.ToDateTime()
+            DinnerAt = evenDbModel.DinnerAt?.ToDateTime()
         };
     }
 }

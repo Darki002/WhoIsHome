@@ -14,5 +14,5 @@ public class NewEventModel
     
     public bool RelevantForDinner { get; set; }
     
-    public DateTime DinnerAt { get; set; }
+    public DateTime? DinnerAt { get; set; }
 }

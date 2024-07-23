@@ -11,7 +11,7 @@ public interface IEventService : IService<Event>
         DateTime startTime,
         DateTime endTime,
         bool relevantForDinner,
-        DateTime dinnerAt,
+        DateTime? dinnerAt,
         CancellationToken cancellationToken);
 
     Task<Result<Event, string>> UpdateAsync(
@@ -21,6 +21,6 @@ public interface IEventService : IService<Event>
         DateTime startTime,
         DateTime endTime,
         bool relevantForDinner,
-        DateTime dinnerAt,
+        DateTime? dinnerAt,
         CancellationToken cancellationToken);
 }

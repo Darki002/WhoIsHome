@@ -20,7 +20,7 @@ public class RepeatedEventModel
     
     public bool RelevantForDinner { get; set; }
     
-    public DateTime DinnerAt { get; set; }
+    public DateTime? DinnerAt { get; set; }
     
     public static RepeatedEventModel From(RepeatedEvent evenDbModel)
     {
@@ -34,7 +34,7 @@ public class RepeatedEventModel
             StartTime = evenDbModel.StartTime.ToDateTime(),
             EndTime = evenDbModel.EndTime.ToDateTime(),
             RelevantForDinner = evenDbModel.RelevantForDinner,
-            DinnerAt = evenDbModel.DinnerAt.ToDateTime()
+            DinnerAt = evenDbModel.DinnerAt?.ToDateTime()
         };
     }
 }

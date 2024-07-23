@@ -15,7 +15,7 @@ public class EventService(FirestoreDb firestoreDb, IPersonService personService)
         DateTime startTime, 
         DateTime endTime,
         bool relevantForDinner, 
-        DateTime dinnerAt, 
+        DateTime? dinnerAt, 
         CancellationToken cancellationToken)
     { 
         var person = await personService.GetAsync(personId, cancellationToken);
@@ -42,7 +42,7 @@ public class EventService(FirestoreDb firestoreDb, IPersonService personService)
         DateTime startTime, 
         DateTime endTime,
         bool relevantForDinner, 
-        DateTime dinnerAt, 
+        DateTime? dinnerAt, 
         CancellationToken cancellationToken)
     {
         var result = await GetAsync(id, cancellationToken);

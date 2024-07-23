@@ -32,7 +32,9 @@ public class RepeatedEvent
     public bool RelevantForDinner { get; set; }
     
     [FirestoreProperty]
-    public Timestamp DinnerAt { get; set; }
+    public Timestamp? DinnerAt { get; set; }
+
+    public bool IsToday => DateTime.Now.DayOfWeek != StartDate.ToDateTime().DayOfWeek;
     
     public static Result<RepeatedEvent, string> TryCreate(
         string eventName,
@@ -42,7 +44,7 @@ public class RepeatedEvent
         DateTime startTime,
         DateTime endTime,
         bool relevantForDinner,
-        DateTime dinnerAt)
+        DateTime? dinnerAt)
     {
         if (startTime >= endTime)
         {
@@ -69,18 +71,18 @@ public class RepeatedEvent
             StartTime = Timestamp.FromDateTime(startTime),
             EndTime = Timestamp.FromDateTime(endTime),
             RelevantForDinner = relevantForDinner,
-            DinnerAt = Timestamp.FromDateTime(dinnerAt)
+            DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(dinnerAt.Value) : null
         };
     }
 
-    public Result<Dictionary<string, object>, string> TryUpdate(
+    public Result<Dictionary<string, object?>, string> TryUpdate(
         string eventName,
         DateTime startDate,
         DateTime endDate,
         DateTime startTime,
         DateTime endTime,
         bool relevantForDinner,
-        DateTime dinnerAt)
+        DateTime? dinnerAt)
     {
         if (startTime >= endTime)
         {
@@ -108,7 +110,7 @@ public class RepeatedEvent
         StartTime = Timestamp.FromDateTime(startTime);
         EndTime = Timestamp.FromDateTime(endTime);
         RelevantForDinner = relevantForDinner;
-        DinnerAt = Timestamp.FromDateTime(dinnerAt);
+        DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(dinnerAt.Value) : null;
         
         return new Dictionary<string, object>
         {
