@@ -1,4 +1,3 @@
-using System.Net;
 using Galaxus.Functional;
 using Google.Cloud.Firestore;
 using WhoIsHome.Services.Events;
