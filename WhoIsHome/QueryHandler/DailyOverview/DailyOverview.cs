@@ -5,25 +5,25 @@ using WhoIsHome.Services.RepeatedEvents;
 
 namespace WhoIsHome.QueryHandler.DailyOverview;
 
-public class PersonPresence
+public class DailyOverview
 {
-    public required Person Person { get; set; }
+    public required Person Person { get; init; }
 
-    public bool IsAtHome { get; set; } = true;
+    public bool IsAtHome { get; init; } = true;
 
-    public TimeOnly? DinnerAt { get; set; }
+    public TimeOnly? DinnerAt { get; init; }
 
-    public static PersonPresence Empty(Person person)
+    public static DailyOverview Empty(Person person)
     {
-        return new PersonPresence
+        return new DailyOverview
         {
             Person = person
         };
     }
 
-    public static PersonPresence NotAtHome(Person person)
+    public static DailyOverview NotAtHome(Person person)
     {
-        return new PersonPresence
+        return new DailyOverview
         {
             Person = person,
             IsAtHome = false,
@@ -31,11 +31,11 @@ public class PersonPresence
         };
     }
 
-    public static PersonPresence From(Event @event, Person person)
+    public static DailyOverview From(Event @event, Person person)
     {
         var dinnerAtTime = TryGetTimeOnly(@event.DinnerAt);
         
-        return new PersonPresence
+        return new DailyOverview
         {
             Person = person,
             IsAtHome = @event.IsAtHome,
@@ -43,11 +43,11 @@ public class PersonPresence
         };
     }
 
-    public static PersonPresence From(RepeatedEvent repeatedEvent, Person person)
+    public static DailyOverview From(RepeatedEvent repeatedEvent, Person person)
     {
         var dinnerAtTime = TryGetTimeOnly(repeatedEvent.DinnerAt);
         
-        return new PersonPresence
+        return new DailyOverview
         {
             Person = person,
             IsAtHome = repeatedEvent.IsAtHome,

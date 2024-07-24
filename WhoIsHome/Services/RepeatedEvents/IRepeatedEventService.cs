@@ -25,4 +25,6 @@ public interface IRepeatedEventService : IService<RepeatedEvent>
         bool relevantForDinner,
         DateTime? dinnerAt,
         CancellationToken cancellationToken);
+
+    Task<Result<IReadOnlyList<RepeatedEvent>, string>> GetByPersonIdAsync(string personId, CancellationToken cancellationToken);
 }

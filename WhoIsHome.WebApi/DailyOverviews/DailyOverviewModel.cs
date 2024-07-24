@@ -2,7 +2,7 @@ using WhoIsHome.WebApi.ModelControllers.Models;
 
 namespace WhoIsHome.WebApi.DailyOverviews;
 
-public record DailyOverview
+public record DailyOverviewModel
 {
     public required PersonModel Person { get; set; }
 

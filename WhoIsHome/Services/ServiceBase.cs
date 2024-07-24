@@ -26,25 +26,14 @@ public abstract class ServiceBase<TDbModel>(FirestoreDb firestoreDb) : IService<
         var collectionRef = FirestoreDb.Collection(Collection);
         var snapshots = await query(collectionRef);
 
-        var result = new List<TDbModel?>();
-
-        foreach (var snapshot in snapshots)
+        var result = ConvertAllDocument(snapshots);
+        
+        if (result.IsErr)
         {
-            if (snapshot is null)
-            {
-                continue;
-            }
-
-            var model = ConvertDocument(snapshot);
-            if (model.IsErr)
-            {
-                throw new InvalidOperationException(model.Err.Unwrap());
-            }
-
-            result.Add(model.Unwrap());
+            throw new InvalidOperationException(result.Err.Unwrap());
         }
-
-        return result;
+        
+        return result.Unwrap();
     }
 
     public async Task<TDbModel?> QuerySingleAsync(CancellationToken cancellationToken,
@@ -72,5 +61,19 @@ public abstract class ServiceBase<TDbModel>(FirestoreDb firestoreDb) : IService<
         }
 
         return dbModel;
+    }
+    
+    protected Result<IReadOnlyList<TDbModel>, string> ConvertAllDocument(IReadOnlyList<DocumentSnapshot> documentSnapshots)
+    {
+        var models = documentSnapshots
+            .Select(d => d.ConvertTo<TDbModel>())
+            .ToList();
+
+        if (models.Any(m => m is null))
+        {
+            return $"Can't convert DB Document to type ${typeof(TDbModel).Name}";
+        }
+
+        return models;
     }
 }

@@ -5,20 +5,20 @@ using WhoIsHome.WebApi.ModelControllers.Models;
 namespace WhoIsHome.WebApi.DailyOverviews;
 
 public class DailyOverviewController(DailyOverviewQueryHandler queryHandler) 
-    : WhoIsHomeControllerBase<IReadOnlyCollection<PersonPresence>, IReadOnlyCollection<DailyOverview>>
+    : WhoIsHomeControllerBase<IReadOnlyCollection<DailyOverview>, IReadOnlyCollection<DailyOverviewModel>>
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyCollection<DailyOverview>>> GetAsync(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyCollection<DailyOverviewModel>>> GetAsync(CancellationToken cancellationToken)
     {
         var result = await queryHandler.HandleAsync(cancellationToken);
         return BuildResponse(result);
     }
 
-    protected override IReadOnlyCollection<DailyOverview> ConvertToModel(IReadOnlyCollection<PersonPresence> data)
+    protected override IReadOnlyCollection<DailyOverviewModel> ConvertToModel(IReadOnlyCollection<DailyOverview> data)
     {
         return data
             .Select(presence => 
-                new DailyOverview
+                new DailyOverviewModel
                 {
                     Person = PersonModel.From(presence.Person), 
                     IsAtHome = presence.IsAtHome, 

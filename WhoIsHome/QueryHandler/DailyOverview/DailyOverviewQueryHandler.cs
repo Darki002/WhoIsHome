@@ -11,18 +11,16 @@ public class DailyOverviewQueryHandler(
     IEventService eventService,
     IRepeatedEventService repeatedEventService)
 {
-    public async Task<Result<IReadOnlyCollection<PersonPresence>, string>> HandleAsync(CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyCollection<DailyOverview>, string>> HandleAsync(CancellationToken cancellationToken)
     {
         var personsResult = await personService.GetAllAsync(cancellationToken);
-
         if (personsResult.IsErr) return personsResult.Err.Unwrap();
-
         var persons = personsResult.Unwrap();
         
         var today = Timestamp.FromDateTime(DateTime.UtcNow.Date);
         var tomorrow = Timestamp.FromDateTime(DateTime.UtcNow.Date.AddDays(1));
 
-        var result = new List<PersonPresence>();
+        var result = new List<DailyOverview>();
         
         foreach (var person in persons)
         {
@@ -38,7 +36,7 @@ public class DailyOverviewQueryHandler(
 
             if (events.Any(e => !e?.IsAtHome ?? false))
             {
-                result.Add(PersonPresence.NotAtHome(person));
+                result.Add(DailyOverview.NotAtHome(person));
                 continue;
             }
             
@@ -54,7 +52,7 @@ public class DailyOverviewQueryHandler(
             
             if (repeatedEvents.Any(re => !re?.IsAtHome ?? false))
             {
-                result.Add(PersonPresence.NotAtHome(person));
+                result.Add(DailyOverview.NotAtHome(person));
                 continue;
             }
 
@@ -75,24 +73,24 @@ public class DailyOverviewQueryHandler(
         return result;
     }
 
-    private static PersonPresence GetPersonPresence(Event? e, RepeatedEvent? re, Person person)
+    private static DailyOverview GetPersonPresence(Event? e, RepeatedEvent? re, Person person)
     {
         if (e == null && re == null)
         {
-            return PersonPresence.Empty(person);
+            return DailyOverview.Empty(person);
         }
         
         if (EventIsBeforeRepeatedEventOrNoRepeatedEventIsGiven(e, re))
         {
-            return PersonPresence.From(e!, person);
+            return DailyOverview.From(e!, person);
         }
     
         if (re != null)
         {
-            return PersonPresence.From(re, person);
+            return DailyOverview.From(re, person);
         }
 
-        return PersonPresence.Empty(person);
+        return DailyOverview.Empty(person);
     }
 
     private static bool EventIsBeforeRepeatedEventOrNoRepeatedEventIsGiven(Event? e, RepeatedEvent? re)
