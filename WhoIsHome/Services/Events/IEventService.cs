@@ -23,4 +23,6 @@ public interface IEventService : IService<Event>
         bool relevantForDinner,
         DateTime? dinnerAt,
         CancellationToken cancellationToken);
+
+    Task<Result<IReadOnlyList<Event>, string>> GetByPersonIdAsync(string personId, CancellationToken cancellationToken);
 }

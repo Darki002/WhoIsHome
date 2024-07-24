@@ -18,5 +18,16 @@ public abstract class WhoIsHomeControllerBase<T, TModel> : ControllerBase where 
         return Ok(model);
     }
     
+    protected ActionResult<IReadOnlyList<TModel>> BuildResponse(Result<IReadOnlyList<T>, string> result)
+    {
+        if (result.IsErr)
+        {
+            return BadRequest(result.Err.Unwrap());
+        }
+
+        var model = result.Unwrap().Select(ConvertToModel).ToList();
+        return Ok(model);
+    }
+    
     protected abstract TModel ConvertToModel(T data);
 }

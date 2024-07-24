@@ -38,5 +38,12 @@ public class EventController(IEventService eventService) : ModelControllerBase<E
         return BuildResponse(result);
     }
 
+    [HttpGet("list/{personId}")]
+    public async Task<ActionResult<IReadOnlyList<EventModel>>> GetByPerson(string personId, CancellationToken cancellationToken)
+    {
+        var result = await eventService.GetByPersonIdAsync(personId, cancellationToken);
+        return BuildResponse(result);
+    }
+
     protected override EventModel ConvertToModel(Event data) => EventModel.From(data);
 }

@@ -65,4 +65,25 @@ public class EventService(FirestoreDb firestoreDb, IPersonService personService)
         var snapshot = await docRef.GetSnapshotAsync(cancellationToken);
         return ConvertDocument(snapshot);
     }
+
+    public async Task<Result<IReadOnlyList<Event>, string>> GetByPersonIdAsync(string personId, CancellationToken cancellationToken)
+    {
+        var snapshot = await FirestoreDb.Collection(Collection)
+            .WhereEqualTo("person:id", personId)
+            .GetSnapshotAsync(cancellationToken);
+
+        var result = new List<Event>();
+        
+        foreach (var ds in snapshot)
+        {
+            var convert = ConvertDocument(ds);
+            if (convert.IsErr)
+            {
+                return convert.Err.Unwrap();
+            }
+            result.Add(convert.Unwrap());
+        }
+
+        return result;
+    }
 }
