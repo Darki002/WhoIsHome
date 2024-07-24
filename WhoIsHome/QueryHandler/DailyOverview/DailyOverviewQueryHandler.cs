@@ -26,18 +26,21 @@ public class DailyOverviewQueryHandler(
         
         foreach (var person in persons)
         {
-            // Won't work. We have to get them all. In case there is one that has RelevantForDinner but no DinnerAt -> NotAtHome at all
-            var latestDinnerAtEvent = await eventService.QuerySingleAsync(cancellationToken,  async collectionRef =>
+            var events = await eventService.QueryManyAsync(cancellationToken,  async collectionRef =>
             {
                 return await collectionRef
                     .WhereEqualTo("person:id", person.Id)
                     .WhereEqualTo("RelevantForDinner", true)
                     .WhereGreaterThanOrEqualTo("date", today)
                     .WhereLessThan("date", tomorrow)
-                    .OrderByDescending("dinnerAt")
-                    .Limit(1)
                     .GetSnapshotAsync(cancellationToken);
             });
+
+            if (events.Any(e => !e?.IsAtHome ?? false))
+            {
+                result.Add(PersonPresence.NotAtHome(person));
+                continue;
+            }
             
             var repeatedEvents = await repeatedEventService.QueryManyAsync(cancellationToken,  async collectionRef =>
             {
@@ -48,14 +51,24 @@ public class DailyOverviewQueryHandler(
                     .WhereGreaterThanOrEqualTo("lastDate", today)
                     .GetSnapshotAsync(cancellationToken);
             });
+            
+            if (repeatedEvents.Any(re => !re?.IsAtHome ?? false))
+            {
+                result.Add(PersonPresence.NotAtHome(person));
+                continue;
+            }
 
-            // Won't work. We have to get them all. In case there is one that has RelevantForDinner but no DinnerAt -> NotAtHome at all
+            var latestEvent = events
+                .Where(re => re != null)
+                .Where(re => re!.IsToday)
+                .MaxBy(re => re!.DinnerAt);
+            
             var latestRepeatedEvent = repeatedEvents
                 .Where(re => re != null)
                 .Where(re => re!.IsToday)
                 .MaxBy(re => re!.DinnerAt);
 
-            var personPresence = GetPersonPresence(latestDinnerAtEvent, latestRepeatedEvent, person);
+            var personPresence = GetPersonPresence(latestEvent, latestRepeatedEvent, person);
             result.Add(personPresence);
         }
 

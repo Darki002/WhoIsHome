@@ -33,6 +33,8 @@ public class Event
 
     public bool IsAtHome => RelevantForDinner && DinnerAt != null;
 
+    public bool IsToday => Date.ToDateTime() == DateTime.Today;
+
     public static Result<Event, string> TryCreate(
         string eventName,
         Person person,
@@ -57,7 +59,7 @@ public class Event
             Id = null,
             EventName = eventName,
             Person = person,
-            Date = Timestamp.FromDateTime(date),
+            Date = Timestamp.FromDateTime(date.Date),
             StartTime = Timestamp.FromDateTime(startTime),
             EndTime = Timestamp.FromDateTime(endTime),
             RelevantForDinner = relevantForDinner,
@@ -89,7 +91,7 @@ public class Event
         }
 
         EventName = eventName;
-        Date = Timestamp.FromDateTime(date);
+        Date = Timestamp.FromDateTime(date.Date);
         StartTime = Timestamp.FromDateTime(startTime);
         EndTime = Timestamp.FromDateTime(endTime);
         RelevantForDinner = relevantForDinner;

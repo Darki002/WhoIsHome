@@ -68,8 +68,8 @@ public class RepeatedEvent
             Id = null,
             EventName = eventName,
             Person = person,
-            StartDate = Timestamp.FromDateTime(startDate),
-            EndDate = Timestamp.FromDateTime(endDate),
+            StartDate = Timestamp.FromDateTime(startDate.Date),
+            EndDate = Timestamp.FromDateTime(endDate.Date),
             StartTime = Timestamp.FromDateTime(startTime),
             EndTime = Timestamp.FromDateTime(endTime),
             RelevantForDinner = relevantForDinner,
@@ -107,8 +107,8 @@ public class RepeatedEvent
         }
 
         EventName = eventName;
-        StartDate = Timestamp.FromDateTime(startDate);
-        EndDate = Timestamp.FromDateTime(endDate);
+        StartDate = Timestamp.FromDateTime(startDate.Date);
+        EndDate = Timestamp.FromDateTime(endDate.Date);
         StartTime = Timestamp.FromDateTime(startTime);
         EndTime = Timestamp.FromDateTime(endTime);
         RelevantForDinner = relevantForDinner;

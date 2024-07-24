@@ -7,7 +7,7 @@ namespace WhoIsHome.QueryHandler.DailyOverview;
 
 public class PersonPresence
 {
-    public Person Person { get; set; }
+    public required Person Person { get; set; }
 
     public bool IsAtHome { get; set; } = true;
 
@@ -18,6 +18,16 @@ public class PersonPresence
         return new PersonPresence
         {
             Person = person
+        };
+    }
+
+    public static PersonPresence NotAtHome(Person person)
+    {
+        return new PersonPresence
+        {
+            Person = person,
+            IsAtHome = false,
+            DinnerAt = null
         };
     }
 
