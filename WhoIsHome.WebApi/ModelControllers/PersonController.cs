@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Services.Persons;
+using WhoIsHome.WebApi.ModelControllers;
 using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class PersonController(IPersonService personService) : WhoIsHomeControllerBase<Person, PersonModel>(personService)
+public class PersonController(IPersonService personService) : ModelControllerBase<Person, PersonModel>(personService)
 {
     [HttpGet]
     public async Task<ActionResult<PersonModel>> GetPersonByEmailAsync(string email, CancellationToken cancellationToken)

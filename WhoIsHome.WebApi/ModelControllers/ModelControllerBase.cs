@@ -2,9 +2,9 @@ using Galaxus.Functional;
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Services;
 
-namespace WhoIsHome.WebApi.Controllers;
+namespace WhoIsHome.WebApi.ModelControllers;
 
-public abstract class WhoIsHomeControllerBase<T, TModel>(IService<T> service) : ControllerBase where T : class
+public abstract class ModelControllerBase<T, TModel>(IService<T> service) : ControllerBase where T : class
 {
     [HttpGet("{id}")]
     public async Task<ActionResult<TModel>> GetEvent(string id, CancellationToken cancellationToken)

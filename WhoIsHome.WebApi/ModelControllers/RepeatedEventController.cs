@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Services.RepeatedEvents;
+using WhoIsHome.WebApi.ModelControllers;
 using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class RepeatedEventController(IRepeatedEventService repeatedEventService) : WhoIsHomeControllerBase<RepeatedEvent, RepeatedEventModel>(repeatedEventService)
+public class RepeatedEventController(IRepeatedEventService repeatedEventService) : ModelControllerBase<RepeatedEvent, RepeatedEventModel>(repeatedEventService)
 {
     [HttpPost]
     public async Task<ActionResult<RepeatedEventModel>> CreateEvent([FromBody] NewRepeatedEventModel eventModel, CancellationToken cancellationToken)

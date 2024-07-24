@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Services.Events;
+using WhoIsHome.WebApi.ModelControllers;
 using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class EventController(IEventService eventService) : WhoIsHomeControllerBase<Event, EventModel>(eventService)
+public class EventController(IEventService eventService) : ModelControllerBase<Event, EventModel>(eventService)
 {
     [HttpPost]
     public async Task<ActionResult<EventModel>> CreateEvent([FromBody] NewEventModel eventModel, CancellationToken cancellationToken)
