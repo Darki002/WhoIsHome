@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Services.Persons;
-using WhoIsHome.WebApi.ModelControllers;
-using WhoIsHome.WebApi.Models;
+using WhoIsHome.WebApi.ModelControllers.Models;
 
-namespace WhoIsHome.WebApi.Controllers;
+namespace WhoIsHome.WebApi.ModelControllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]

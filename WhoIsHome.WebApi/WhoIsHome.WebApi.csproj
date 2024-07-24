@@ -15,8 +15,4 @@
       <ProjectReference Include="..\WhoIsHome\WhoIsHome.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Controllers\" />
-    </ItemGroup>
-
 </Project>

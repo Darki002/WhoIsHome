@@ -1,6 +1,6 @@
 using WhoIsHome.Services.Persons;
 
-namespace WhoIsHome.WebApi.Models;
+namespace WhoIsHome.WebApi.ModelControllers.Models;
 
 public class PersonModel
 {

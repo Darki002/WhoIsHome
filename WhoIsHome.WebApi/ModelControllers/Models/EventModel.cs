@@ -1,8 +1,8 @@
-using WhoIsHome.Services.RepeatedEvents;
+using WhoIsHome.Services.Events;
 
-namespace WhoIsHome.WebApi.Models;
+namespace WhoIsHome.WebApi.ModelControllers.Models;
 
-public class RepeatedEventModel
+public class EventModel
 {
     public string Id { get; set; } = null!;
 
@@ -10,9 +10,7 @@ public class RepeatedEventModel
 
     public PersonModel Person { get; set; } = null!;
     
-    public DateTime StartDate { get; set; }
-    
-    public DateTime EndDate { get; set; }
+    public DateTime Date { get; set; }
     
     public DateTime StartTime { get; set; }
     
@@ -22,15 +20,14 @@ public class RepeatedEventModel
     
     public DateTime? DinnerAt { get; set; }
     
-    public static RepeatedEventModel From(RepeatedEvent evenDbModel)
+    public static EventModel From(Event evenDbModel)
     {
-        return new RepeatedEventModel
+        return new EventModel
         {
             Id = evenDbModel.Id!,
             EventName = evenDbModel.EventName,
             Person = PersonModel.From(evenDbModel.Person),
-            StartDate = evenDbModel.StartDate.ToDateTime(),
-            EndDate = evenDbModel.EndDate.ToDateTime(),
+            Date = evenDbModel.Date.ToDateTime(),
             StartTime = evenDbModel.StartTime.ToDateTime(),
             EndTime = evenDbModel.EndTime.ToDateTime(),
             RelevantForDinner = evenDbModel.RelevantForDinner,
