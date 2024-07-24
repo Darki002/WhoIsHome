@@ -4,8 +4,6 @@ using WhoIsHome.WebApi.ModelControllers.Models;
 
 namespace WhoIsHome.WebApi.ModelControllers;
 
-[ApiController]
-[Route("api/v1/[controller]")]
 public class PersonController(IPersonService personService) : ModelControllerBase<Person, PersonModel>(personService)
 {
     [HttpGet]

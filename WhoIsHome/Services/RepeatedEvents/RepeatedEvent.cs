@@ -36,7 +36,7 @@ public class RepeatedEvent
 
     public bool IsAtHome => RelevantForDinner && DinnerAt != null;
     
-    public bool IsToday => DateTime.Now.DayOfWeek != StartDate.ToDateTime().DayOfWeek;
+    public bool IsToday => DateTime.UtcNow.DayOfWeek != StartDate.ToDateTime().DayOfWeek;
     
     public static Result<RepeatedEvent, string> TryCreate(
         string eventName,
@@ -91,7 +91,7 @@ public class RepeatedEvent
             return $"{nameof(StartTime)} must be before {nameof(EndTime)}.";
         }
 
-        if (startTime < DateTime.Today)
+        if (startTime < DateTime.UtcNow.Date)
         {
             return "New Start Date can't be in the past.";
         }

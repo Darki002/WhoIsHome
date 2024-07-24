@@ -4,8 +4,6 @@ using WhoIsHome.WebApi.ModelControllers.Models;
 
 namespace WhoIsHome.WebApi.ModelControllers;
 
-[ApiController]
-[Route("api/v1/[controller]")]
 public class EventController(IEventService eventService) : ModelControllerBase<Event, EventModel>(eventService)
 {
     [HttpPost]

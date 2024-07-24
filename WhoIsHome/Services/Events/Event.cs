@@ -33,7 +33,7 @@ public class Event
 
     public bool IsAtHome => RelevantForDinner && DinnerAt != null;
 
-    public bool IsToday => Date.ToDateTime() == DateTime.Today;
+    public bool IsToday => Date.ToDateTime() == DateTime.UtcNow.Date;
 
     public static Result<Event, string> TryCreate(
         string eventName,
@@ -80,7 +80,7 @@ public class Event
             return $"{nameof(StartTime)} must be before {nameof(EndTime)}.";
         }
 
-        if (date < DateTime.Today)
+        if (date < DateTime.UtcNow.Date)
         {
             return "New Date can't be in the past.";
         }
