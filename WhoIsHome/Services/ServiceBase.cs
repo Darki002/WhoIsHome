@@ -20,7 +20,7 @@ public abstract class ServiceBase<TDbModel>(FirestoreDb firestoreDb) : IService<
             : ConvertDocument(result);
     }
 
-    public async Task<IReadOnlyCollection<TDbModel?>> QueryManyAsync(CancellationToken cancellationToken,
+    public async Task<IReadOnlyCollection<TDbModel>> QueryManyAsync(CancellationToken cancellationToken,
         Func<CollectionReference, Task<QuerySnapshot>> query)
     {
         var collectionRef = FirestoreDb.Collection(Collection);
@@ -36,7 +36,7 @@ public abstract class ServiceBase<TDbModel>(FirestoreDb firestoreDb) : IService<
         return result.Unwrap();
     }
 
-    public async Task<TDbModel?> QuerySingleAsync(CancellationToken cancellationToken,
+    public async Task<TDbModel> QuerySingleAsync(CancellationToken cancellationToken,
         Func<CollectionReference, Task<QuerySnapshot>> query)
     {
         var collectionRef = FirestoreDb.Collection(Collection);
@@ -49,6 +49,16 @@ public abstract class ServiceBase<TDbModel>(FirestoreDb firestoreDb) : IService<
         }
 
         return model.Unwrap();
+    }
+    
+    public async Task<Result<IReadOnlyList<TDbModel>, string>> GetByPersonIdAsync(string personId, CancellationToken cancellationToken)
+    {
+        var snapshot = await FirestoreDb.Collection(Collection)
+            .WherePersonIs(personId)
+            .GetSnapshotAsync(cancellationToken);
+
+        var result = ConvertAllDocument(snapshot);
+        return result.IsErr ? result.Err.Unwrap() : result;
     }
 
     protected Result<TDbModel, string> ConvertDocument(DocumentSnapshot documentSnapshot)

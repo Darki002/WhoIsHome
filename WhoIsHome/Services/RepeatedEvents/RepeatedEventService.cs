@@ -69,14 +69,4 @@ public class RepeatedEventService(FirestoreDb firestoreDb, IPersonService person
         var snapshot = await docRef.GetSnapshotAsync(cancellationToken);
         return ConvertDocument(snapshot);
     }
-
-    public async Task<Result<IReadOnlyList<RepeatedEvent>, string>> GetByPersonIdAsync(string personId, CancellationToken cancellationToken)
-    {
-        var snapshot = await FirestoreDb.Collection(Collection)
-            .WhereEqualTo("person:id", personId)
-            .GetSnapshotAsync(cancellationToken);
-
-        var result = ConvertAllDocument(snapshot);
-        return result.IsErr ? result.Err.Unwrap() : result;
-    }
 }

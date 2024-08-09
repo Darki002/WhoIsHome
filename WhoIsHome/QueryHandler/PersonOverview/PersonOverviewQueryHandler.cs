@@ -1,4 +1,5 @@
 using Galaxus.Functional;
+using Google.Cloud.Firestore;
 using WhoIsHome.Services.Events;
 using WhoIsHome.Services.Persons;
 using WhoIsHome.Services.RepeatedEvents;
@@ -16,13 +17,23 @@ public class PersonOverviewQueryHandler(
         if (personResult.IsErr) return personResult.Err.Unwrap();
         var person = personResult.Unwrap()!;
 
-        var events = await eventService.GetByPersonIdAsync(personId, cancellationToken);
-        var repeatedEvents = await repeatedEventService.GetByPersonIdAsync(personId, cancellationToken);
+        var today = Timestamp.FromDateTime(DateTime.UtcNow.Date);
+        
+        var events = await eventService.QueryManyAsync(cancellationToken, query =>
+        {
+            return query.WherePersonIs(personId)
+                .WhereGreaterThanOrEqualTo("Date", today)
+                .GetSnapshotAsync(cancellationToken);
+        });
+        
+        var repeatedEvents = await repeatedEventService.QueryManyAsync(cancellationToken, query =>
+        {
+            return query.WherePersonIs(personId)
+                .WhereGreaterThanOrEqualTo("EndDate", today)
+                .GetSnapshotAsync(cancellationToken);
+        });
 
-        if (events.IsErr) return events.Err.Unwrap();
-        if (repeatedEvents.IsErr) return repeatedEvents.Err.Unwrap();
-
-        var result = events.Unwrap()
+        var result = events
             .Select(e => new PersonOverviewEvent
             {
                 Id = e.Id!,
@@ -34,7 +45,7 @@ public class PersonOverviewQueryHandler(
             .ToList();
         
         result.AddRange(
-            repeatedEvents.Unwrap()
+            repeatedEvents
                 .Select(re => (Event: re, NextOccurrence: re.GetNextOccurrence()))
                 .Where(re => re.NextOccurrence.HasValue)
                 .Select(re => new PersonOverviewEvent
