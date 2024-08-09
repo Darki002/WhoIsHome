@@ -19,6 +19,15 @@ public abstract class ServiceBase<TDbModel>(FirestoreDb firestoreDb) : IService<
             ? $"Can't find {typeof(TDbModel).Name} with Id {id}"
             : ConvertDocument(result);
     }
+    
+    public async Task<Result<Unit, string>> DeleteAsync(string id, CancellationToken cancellationToken)
+    {
+        var result = await FirestoreDb.Collection(Collection)
+            .Document(id)
+            .DeleteAsync(cancellationToken: cancellationToken);
+
+        return Unit.Value;
+    }
 
     public async Task<IReadOnlyCollection<TDbModel>> QueryManyAsync(CancellationToken cancellationToken,
         Func<CollectionReference, Task<QuerySnapshot>> query)
@@ -50,7 +59,7 @@ public abstract class ServiceBase<TDbModel>(FirestoreDb firestoreDb) : IService<
 
         return model.Unwrap();
     }
-    
+
     public async Task<Result<IReadOnlyList<TDbModel>, string>> GetByPersonIdAsync(string personId, CancellationToken cancellationToken)
     {
         var snapshot = await FirestoreDb.Collection(Collection)
