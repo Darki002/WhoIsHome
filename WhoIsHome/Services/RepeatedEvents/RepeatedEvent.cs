@@ -125,4 +125,21 @@ public class RepeatedEvent
             { nameof(DinnerAt), DinnerAt }
         };
     }
+
+    public DateTime? GetNextOccurrence()
+    {
+        throw new NotImplementedException();
+        
+        if (EndDate.ToDateTime() < DateTime.UtcNow)
+        {
+            return null;
+        }
+        
+        if (StartDate.ToDateTime() > DateTime.UtcNow)
+        {
+            return StartDate.ToDateTime();
+        }
+
+        return null;
+    }
 }
