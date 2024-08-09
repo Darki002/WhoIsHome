@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using WhoIsHome.QueryHandler.DailyOverview;
+using WhoIsHome.QueryHandler.PersonOverview;
 using WhoIsHome.Services.Events;
 using WhoIsHome.Services.Persons;
 using WhoIsHome.Services.RepeatedEvents;
@@ -19,6 +20,7 @@ public static class ServiceProviderConfig
         services.AddTransient<IRepeatedEventService, RepeatedEventService>();
 
         services.AddTransient<DailyOverviewQueryHandler>();
+        services.AddTransient<PersonOverviewQueryHandler>();
         
         return services;
     } 

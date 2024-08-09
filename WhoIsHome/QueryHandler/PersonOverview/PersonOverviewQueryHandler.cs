@@ -40,7 +40,8 @@ public class PersonOverviewQueryHandler(
                 EventName = e.EventName,
                 Date = e.Date.ToDateTime(),
                 StartTime = e.StartTime.ToDateTime(),
-                EndTime = e.EndTime.ToDateTime()
+                EndTime = e.EndTime.ToDateTime(),
+                EventType = EventType.Event
             })
             .ToList();
         
@@ -54,7 +55,8 @@ public class PersonOverviewQueryHandler(
                     EventName = re.Event.EventName,
                     Date = re.NextOccurrence!.Value,
                     StartTime = re.Event.StartTime.ToDateTime(),
-                    EndTime = re.Event.EndTime.ToDateTime()
+                    EndTime = re.Event.EndTime.ToDateTime(),
+                    EventType = EventType.RepeatedEvent
                 })
             );
 
