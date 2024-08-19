@@ -53,12 +53,12 @@ public class RepeatedEvent
             Id = null,
             EventName = eventName,
             Person = person,
-            StartDate = Timestamp.FromDateTime(startDate.ToDateTime(TimeOnly.MinValue)),
-            EndDate = Timestamp.FromDateTime(endDate.ToDateTime(TimeOnly.MinValue)),
-            StartTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(startTime)),
-            EndTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(endTime)),
+            StartDate = Timestamp.FromDateTime(startDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc)),
+            EndDate = Timestamp.FromDateTime(endDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc)),
+            StartTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(startTime, DateTimeKind.Utc)),
+            EndTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(endTime, DateTimeKind.Utc)),
             RelevantForDinner = relevantForDinner,
-            DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(dinnerAt.Value)) : null
+            DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(dinnerAt.Value, DateTimeKind.Utc)) : null
         };
     }
 
@@ -80,12 +80,12 @@ public class RepeatedEvent
         if (eventName.Length is <= 0 or >= 30) return $"{nameof(EventName)} must be between 1 and 30 characters long.";
 
         EventName = eventName;
-        StartDate = Timestamp.FromDateTime(startDate.ToDateTime(TimeOnly.MinValue));
-        EndDate = Timestamp.FromDateTime(endDate.ToDateTime(TimeOnly.MinValue));
-        StartTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(startTime));
-        EndTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(endTime));
+        StartDate = Timestamp.FromDateTime(startDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc));
+        EndDate = Timestamp.FromDateTime(endDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc));
+        StartTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(startTime, DateTimeKind.Utc));
+        EndTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(endTime, DateTimeKind.Utc));
         RelevantForDinner = relevantForDinner;
-        DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(dinnerAt.Value)) : null;
+        DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(dinnerAt.Value, DateTimeKind.Utc)) : null;
 
         return new Dictionary<string, object?>
         {
