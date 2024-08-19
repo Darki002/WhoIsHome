@@ -10,17 +10,17 @@ public class RepeatedEventModel
 
     public PersonModel Person { get; set; } = null!;
     
-    public DateTime StartDate { get; set; }
+    public DateOnly StartDate { get; set; }
     
-    public DateTime EndDate { get; set; }
+    public DateOnly EndDate { get; set; }
     
-    public DateTime StartTime { get; set; }
+    public TimeOnly StartTime { get; set; }
     
-    public DateTime EndTime { get; set; }
+    public TimeOnly EndTime { get; set; }
     
     public bool RelevantForDinner { get; set; }
     
-    public DateTime? DinnerAt { get; set; }
+    public TimeOnly? DinnerAt { get; set; }
     
     public static RepeatedEventModel From(RepeatedEvent evenDbModel)
     {
@@ -29,12 +29,14 @@ public class RepeatedEventModel
             Id = evenDbModel.Id!,
             EventName = evenDbModel.EventName,
             Person = PersonModel.From(evenDbModel.Person),
-            StartDate = evenDbModel.StartDate.ToDateTime(),
-            EndDate = evenDbModel.EndDate.ToDateTime(),
-            StartTime = evenDbModel.StartTime.ToDateTime(),
-            EndTime = evenDbModel.EndTime.ToDateTime(),
+            StartDate = DateOnly.FromDateTime(evenDbModel.StartDate.ToDateTime()),
+            EndDate = DateOnly.FromDateTime(evenDbModel.EndDate.ToDateTime()),
+            StartTime = TimeOnly.FromDateTime(evenDbModel.StartTime.ToDateTime()),
+            EndTime = TimeOnly.FromDateTime(evenDbModel.EndTime.ToDateTime()),
             RelevantForDinner = evenDbModel.RelevantForDinner,
-            DinnerAt = evenDbModel.DinnerAt?.ToDateTime()
+            DinnerAt = evenDbModel.DinnerAt.HasValue
+                ? TimeOnly.FromDateTime(evenDbModel.DinnerAt!.Value.ToDateTime())
+                : null
         };
     }
 }

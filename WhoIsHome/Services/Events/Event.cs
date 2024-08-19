@@ -38,11 +38,11 @@ public class Event
     public static Result<Event, string> TryCreate(
         string eventName,
         Person person,
-        DateTime date,
-        DateTime startTime,
-        DateTime endTime,
+        DateOnly date,
+        TimeOnly startTime,
+        TimeOnly endTime,
         bool relevantForDinner,
-        DateTime? dinnerAt)
+        TimeOnly? dinnerAt)
     {
         if (startTime >= endTime)
         {
@@ -59,28 +59,28 @@ public class Event
             Id = null,
             EventName = eventName,
             Person = person,
-            Date = Timestamp.FromDateTime(date.Date),
-            StartTime = Timestamp.FromDateTime(startTime),
-            EndTime = Timestamp.FromDateTime(endTime),
+            Date = Timestamp.FromDateTime(date.ToDateTime(TimeOnly.MinValue)),
+            StartTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(startTime)),
+            EndTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(endTime)),
             RelevantForDinner = relevantForDinner,
-            DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(dinnerAt.Value) : null
+            DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(dinnerAt.Value)) : null
         };
     }
 
     public Result<Dictionary<string, object?>, string> TryUpdate(
         string eventName,
-        DateTime date,
-        DateTime startTime,
-        DateTime endTime,
+        DateOnly date,
+        TimeOnly startTime,
+        TimeOnly endTime,
         bool relevantForDinner,
-        DateTime? dinnerAt)
+        TimeOnly? dinnerAt)
     {
         if (startTime >= endTime)
         {
             return $"{nameof(StartTime)} must be before {nameof(EndTime)}.";
         }
 
-        if (date < DateTime.UtcNow.Date)
+        if (date < DateOnly.FromDateTime(DateTime.UtcNow))
         {
             return "New Date can't be in the past.";
         }
@@ -91,11 +91,11 @@ public class Event
         }
 
         EventName = eventName;
-        Date = Timestamp.FromDateTime(date.Date);
-        StartTime = Timestamp.FromDateTime(startTime);
-        EndTime = Timestamp.FromDateTime(endTime);
+        Date = Timestamp.FromDateTime(date.ToDateTime(TimeOnly.MinValue));
+        StartTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(startTime));
+        EndTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(endTime));
         RelevantForDinner = relevantForDinner;
-        DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(dinnerAt.Value) : null;
+        DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(dinnerAt.Value)) : null;
         
         return new Dictionary<string, object?>
         {

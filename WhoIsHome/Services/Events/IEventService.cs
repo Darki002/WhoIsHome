@@ -7,21 +7,21 @@ public interface IEventService : IService<Event>
     Task<Result<Event, string>> CreateAsync(
         string eventName,
         string personId,
-        DateTime date,
-        DateTime startTime,
-        DateTime endTime,
+        DateOnly date,
+        TimeOnly startTime,
+        TimeOnly endTime,
         bool relevantForDinner,
-        DateTime? dinnerAt,
+        TimeOnly? dinnerAt,
         CancellationToken cancellationToken);
 
     Task<Result<Event, string>> UpdateAsync(
         string id,
         string eventName,
-        DateTime date,
-        DateTime startTime,
-        DateTime endTime,
+        DateOnly date,
+        TimeOnly startTime,
+        TimeOnly endTime,
         bool relevantForDinner,
-        DateTime? dinnerAt,
+        TimeOnly? dinnerAt,
         CancellationToken cancellationToken);
 
     Task<Result<IReadOnlyList<Event>, string>> GetByPersonIdAsync(string personId, CancellationToken cancellationToken);

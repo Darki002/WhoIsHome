@@ -33,16 +33,18 @@ public class RepeatedEvent
     public static Result<RepeatedEvent, string> TryCreate(
         string eventName,
         Person person,
-        DateTime startDate,
-        DateTime endDate,
-        DateTime startTime,
-        DateTime endTime,
+        DateOnly startDate,
+        DateOnly endDate,
+        TimeOnly startTime,
+        TimeOnly endTime,
         bool relevantForDinner,
-        DateTime? dinnerAt)
+        TimeOnly? dinnerAt)
     {
         if (startTime >= endTime) return $"{nameof(StartTime)} must be before {nameof(EndTime)}.";
 
         if (startDate >= endDate) return $"{nameof(StartDate)} must be before {nameof(EndDate)}.";
+        
+        if (startDate < DateOnly.FromDateTime(DateTime.UtcNow)) return "New Date can't be in the past.";
 
         if (eventName.Length is <= 0 or >= 30) return $"{nameof(EventName)} must be between 1 and 30 characters long.";
 
@@ -51,39 +53,39 @@ public class RepeatedEvent
             Id = null,
             EventName = eventName,
             Person = person,
-            StartDate = Timestamp.FromDateTime(startDate.Date),
-            EndDate = Timestamp.FromDateTime(endDate.Date),
-            StartTime = Timestamp.FromDateTime(startTime),
-            EndTime = Timestamp.FromDateTime(endTime),
+            StartDate = Timestamp.FromDateTime(startDate.ToDateTime(TimeOnly.MinValue)),
+            EndDate = Timestamp.FromDateTime(endDate.ToDateTime(TimeOnly.MinValue)),
+            StartTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(startTime)),
+            EndTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(endTime)),
             RelevantForDinner = relevantForDinner,
-            DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(dinnerAt.Value) : null
+            DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(dinnerAt.Value)) : null
         };
     }
 
     public Result<Dictionary<string, object?>, string> TryUpdate(
         string eventName,
-        DateTime startDate,
-        DateTime endDate,
-        DateTime startTime,
-        DateTime endTime,
+        DateOnly startDate,
+        DateOnly endDate,
+        TimeOnly startTime,
+        TimeOnly endTime,
         bool relevantForDinner,
-        DateTime? dinnerAt)
+        TimeOnly? dinnerAt)
     {
         if (startTime >= endTime) return $"{nameof(StartTime)} must be before {nameof(EndTime)}.";
 
-        if (startTime < DateTime.UtcNow.Date) return "New Start Date can't be in the past.";
+        if (startDate < DateOnly.FromDateTime(DateTime.UtcNow)) return "New Start Date can't be in the past.";
 
         if (startDate >= endDate) return $"{nameof(StartDate)} must be before {nameof(EndDate)}.";
 
         if (eventName.Length is <= 0 or >= 30) return $"{nameof(EventName)} must be between 1 and 30 characters long.";
 
         EventName = eventName;
-        StartDate = Timestamp.FromDateTime(startDate.Date);
-        EndDate = Timestamp.FromDateTime(endDate.Date);
-        StartTime = Timestamp.FromDateTime(startTime);
-        EndTime = Timestamp.FromDateTime(endTime);
+        StartDate = Timestamp.FromDateTime(startDate.ToDateTime(TimeOnly.MinValue));
+        EndDate = Timestamp.FromDateTime(endDate.ToDateTime(TimeOnly.MinValue));
+        StartTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(startTime));
+        EndTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(endTime));
         RelevantForDinner = relevantForDinner;
-        DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(dinnerAt.Value) : null;
+        DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(dinnerAt.Value)) : null;
 
         return new Dictionary<string, object?>
         {

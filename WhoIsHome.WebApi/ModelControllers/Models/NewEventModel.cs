@@ -6,13 +6,13 @@ public class NewEventModel
 
     public string PersonId { get; set; } = null!;
     
-    public DateTime Date { get; set; }
+    public DateOnly Date { get; set; }
     
-    public DateTime StartTime { get; set; }
+    public TimeOnly StartTime { get; set; }
     
-    public DateTime EndTime { get; set; }
+    public TimeOnly EndTime { get; set; }
     
     public bool RelevantForDinner { get; set; }
     
-    public DateTime? DinnerAt { get; set; }
+    public TimeOnly? DinnerAt { get; set; }
 }

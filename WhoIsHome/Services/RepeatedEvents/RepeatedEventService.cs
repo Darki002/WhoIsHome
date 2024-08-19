@@ -11,12 +11,12 @@ public class RepeatedEventService(FirestoreDb firestoreDb, IPersonService person
     public async Task<Result<RepeatedEvent, string>> CreateAsync(
         string eventName, 
         string personId, 
-        DateTime startDate,
-        DateTime endDate,
-        DateTime startTime, 
-        DateTime endTime,
-        bool relevantForDinner, 
-        DateTime? dinnerAt, 
+        DateOnly startDate,
+        DateOnly endDate,
+        TimeOnly startTime,
+        TimeOnly endTime,
+        bool relevantForDinner,
+        TimeOnly? dinnerAt,
         CancellationToken cancellationToken)
     { 
         var person = await personService.GetAsync(personId, cancellationToken);
@@ -40,12 +40,12 @@ public class RepeatedEventService(FirestoreDb firestoreDb, IPersonService person
     public async Task<Result<RepeatedEvent, string>> UpdateAsync(
         string id,
         string eventName, 
-        DateTime startDate,
-        DateTime endDate,
-        DateTime startTime, 
-        DateTime endTime,
-        bool relevantForDinner, 
-        DateTime? dinnerAt, 
+        DateOnly startDate,
+        DateOnly endDate,
+        TimeOnly startTime,
+        TimeOnly endTime,
+        bool relevantForDinner,
+        TimeOnly? dinnerAt,
         CancellationToken cancellationToken)
     {
         var result = await GetAsync(id, cancellationToken);

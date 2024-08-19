@@ -9,17 +9,17 @@ public class EventModel
     public string EventName { get; set; } = null!;
 
     public PersonModel Person { get; set; } = null!;
-    
-    public DateTime Date { get; set; }
-    
-    public DateTime StartTime { get; set; }
-    
-    public DateTime EndTime { get; set; }
-    
+
+    public DateOnly Date { get; set; }
+
+    public TimeOnly StartTime { get; set; }
+
+    public TimeOnly EndTime { get; set; }
+
     public bool RelevantForDinner { get; set; }
-    
-    public DateTime? DinnerAt { get; set; }
-    
+
+    public TimeOnly? DinnerAt { get; set; }
+
     public static EventModel From(Event evenDbModel)
     {
         return new EventModel
@@ -27,11 +27,13 @@ public class EventModel
             Id = evenDbModel.Id!,
             EventName = evenDbModel.EventName,
             Person = PersonModel.From(evenDbModel.Person),
-            Date = evenDbModel.Date.ToDateTime(),
-            StartTime = evenDbModel.StartTime.ToDateTime(),
-            EndTime = evenDbModel.EndTime.ToDateTime(),
+            Date = DateOnly.FromDateTime(evenDbModel.Date.ToDateTime()),
+            StartTime = TimeOnly.FromDateTime(evenDbModel.StartTime.ToDateTime()),
+            EndTime = TimeOnly.FromDateTime(evenDbModel.EndTime.ToDateTime()),
             RelevantForDinner = evenDbModel.RelevantForDinner,
-            DinnerAt = evenDbModel.DinnerAt?.ToDateTime()
+            DinnerAt = evenDbModel.DinnerAt.HasValue
+                ? TimeOnly.FromDateTime(evenDbModel.DinnerAt!.Value.ToDateTime())
+                : null
         };
     }
 }
