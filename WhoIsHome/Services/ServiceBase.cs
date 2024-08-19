@@ -22,10 +22,10 @@ public abstract class ServiceBase<TDbModel>(FirestoreDb firestoreDb) : IService<
     
     public async Task<Result<Unit, string>> DeleteAsync(string id, CancellationToken cancellationToken)
     {
-        var result = await FirestoreDb.Collection(Collection)
+        _ = await FirestoreDb.Collection(Collection)
             .Document(id)
             .DeleteAsync(cancellationToken: cancellationToken);
-
+        
         return Unit.Value;
     }
 
