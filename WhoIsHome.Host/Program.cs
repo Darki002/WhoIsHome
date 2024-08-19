@@ -1,6 +1,7 @@
 using WhoIsHome;
 
 var builder = WebApplication.CreateBuilder(args);
+DotNetEnv.Env.Load();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

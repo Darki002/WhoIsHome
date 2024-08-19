@@ -12,7 +12,7 @@ public static class ServiceProviderConfig
 {
     public static IServiceCollection AddWhoIsHomeServices(this IServiceCollection services, IConfiguration builderConfiguration)
     {
-        var projectId = builderConfiguration["Firebase:Firestore:Project_id"];
+        var projectId = Environment.GetEnvironmentVariable("PROJECT_ID");
         services.AddFirestoreDb(f => f.ProjectId = projectId);
 
         services.AddTransient<IPersonService, PersonService>();
