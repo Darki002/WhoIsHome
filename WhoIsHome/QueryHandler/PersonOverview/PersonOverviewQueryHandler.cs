@@ -17,7 +17,7 @@ public class PersonOverviewQueryHandler(
         if (personResult.IsErr) return personResult.Err.Unwrap();
         var person = personResult.Unwrap()!;
 
-        var today = Timestamp.FromDateTime(DateTime.UtcNow.Date);
+        var today = Timestamp.FromDateTime(DateTime.Now.Date);
         
         var events = await eventService.QueryManyAsync(cancellationToken, query =>
         {
@@ -38,9 +38,9 @@ public class PersonOverviewQueryHandler(
             {
                 Id = e.Id!,
                 EventName = e.EventName,
-                Date = e.Date.ToDateTime(),
-                StartTime = e.StartTime.ToDateTime(),
-                EndTime = e.EndTime.ToDateTime(),
+                Date = e.Date.ToDateOnly(),
+                StartTime = e.StartTime.ToTimeOnly(),
+                EndTime = e.EndTime.ToTimeOnly(),
                 EventType = EventType.Event
             })
             .ToList();
@@ -54,8 +54,8 @@ public class PersonOverviewQueryHandler(
                     Id = re.Event.Id!,
                     EventName = re.Event.EventName,
                     Date = re.NextOccurrence!.Value,
-                    StartTime = re.Event.StartTime.ToDateTime(),
-                    EndTime = re.Event.EndTime.ToDateTime(),
+                    StartTime = re.Event.StartTime.ToTimeOnly(),
+                    EndTime = re.Event.EndTime.ToTimeOnly(),
                     EventType = EventType.RepeatedEvent
                 })
             );

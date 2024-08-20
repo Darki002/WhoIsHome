@@ -55,10 +55,5 @@ public class DailyOverview
         };
     }
     
-    private static TimeOnly? TryGetTimeOnly(Timestamp? timestamp)
-    {
-        return timestamp != null 
-            ? TimeOnly.FromDateTime(timestamp!.Value.ToDateTime()) 
-            : null;
-    }
+    private static TimeOnly? TryGetTimeOnly(int? timestamp) => timestamp?.ToTimeOnly();
 }

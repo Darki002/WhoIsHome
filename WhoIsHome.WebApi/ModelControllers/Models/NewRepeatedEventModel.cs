@@ -26,14 +26,12 @@ public class NewRepeatedEventModel
         {
             EventName = evenDbModel.EventName,
             PersonId = evenDbModel.Person.Id!,
-            StartDate = DateOnly.FromDateTime(evenDbModel.StartDate.ToDateTime()),
-            EndDate = DateOnly.FromDateTime(evenDbModel.EndDate.ToDateTime()),
-            StartTime = TimeOnly.FromDateTime(evenDbModel.StartTime.ToDateTime()),
-            EndTime = TimeOnly.FromDateTime(evenDbModel.EndTime.ToDateTime()),
+            StartDate = evenDbModel.StartDate.ToDateOnly(),
+            EndDate = evenDbModel.EndDate.ToDateOnly(),
+            StartTime = evenDbModel.StartTime.ToTimeOnly(),
+            EndTime = evenDbModel.EndTime.ToTimeOnly(),
             RelevantForDinner = evenDbModel.RelevantForDinner,
-            DinnerAt = evenDbModel.DinnerAt.HasValue
-                ? TimeOnly.FromDateTime(evenDbModel.DinnerAt!.Value.ToDateTime())
-                : null
+            DinnerAt = evenDbModel.DinnerAt?.ToTimeOnly()
         };
     }
 }

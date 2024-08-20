@@ -20,20 +20,20 @@ public class Event
     public Timestamp Date { get; set; }
     
     [FirestoreProperty]
-    public Timestamp StartTime { get; set; }
+    public int StartTime { get; set; }
     
     [FirestoreProperty]
-    public Timestamp EndTime { get; set; }
+    public int EndTime { get; set; }
     
     [FirestoreProperty]
     public bool RelevantForDinner { get; set; }
     
     [FirestoreProperty]
-    public Timestamp? DinnerAt { get; set; }
+    public int? DinnerAt { get; set; }
 
     public bool IsAtHome => RelevantForDinner && DinnerAt != null;
 
-    public bool IsToday => Date.ToDateTime() == DateTime.UtcNow.Date;
+    public bool IsToday => Date.ToDateTime() == DateTime.Now.Date;
 
     public static Result<Event, string> TryCreate(
         string eventName,
@@ -53,17 +53,17 @@ public class Event
         {
             return $"{nameof(EventName)} must be between 1 and 30 characters long.";
         }
-
+        
         return new Event
         {
             Id = null,
             EventName = eventName,
             Person = person,
-            Date = Timestamp.FromDateTime(date.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc)),
-            StartTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(startTime, DateTimeKind.Utc)),
-            EndTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(endTime, DateTimeKind.Utc)),
+            Date = date.ToTimespan(),
+            StartTime = startTime.ToSeconds(),
+            EndTime = endTime.ToSeconds(),
             RelevantForDinner = relevantForDinner,
-            DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(dinnerAt.Value, DateTimeKind.Utc)) : null
+            DinnerAt = dinnerAt?.ToSeconds()
         };
     }
 
@@ -80,7 +80,7 @@ public class Event
             return $"{nameof(StartTime)} must be before {nameof(EndTime)}.";
         }
 
-        if (date < DateOnly.FromDateTime(DateTime.UtcNow))
+        if (date < DateOnly.FromDateTime(DateTime.Now))
         {
             return "New Date can't be in the past.";
         }
@@ -91,11 +91,11 @@ public class Event
         }
 
         EventName = eventName;
-        Date = Timestamp.FromDateTime(date.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc));
-        StartTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(startTime, DateTimeKind.Utc));
-        EndTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(endTime, DateTimeKind.Utc));
+        Date = date.ToTimespan();
+        StartTime = startTime.ToSeconds();
+        EndTime = endTime.ToSeconds();
         RelevantForDinner = relevantForDinner;
-        DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(dinnerAt.Value, DateTimeKind.Utc)) : null;
+        DinnerAt = dinnerAt?.ToSeconds();
         
         return new Dictionary<string, object?>
         {

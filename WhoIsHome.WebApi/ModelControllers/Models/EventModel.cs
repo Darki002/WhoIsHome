@@ -27,13 +27,11 @@ public class EventModel
             Id = evenDbModel.Id!,
             EventName = evenDbModel.EventName,
             Person = PersonModel.From(evenDbModel.Person),
-            Date = DateOnly.FromDateTime(evenDbModel.Date.ToDateTime()),
-            StartTime = TimeOnly.FromDateTime(evenDbModel.StartTime.ToDateTime()),
-            EndTime = TimeOnly.FromDateTime(evenDbModel.EndTime.ToDateTime()),
+            Date = evenDbModel.Date.ToDateOnly(),
+            StartTime = evenDbModel.StartTime.ToTimeOnly(),
+            EndTime = evenDbModel.EndTime.ToTimeOnly(),
             RelevantForDinner = evenDbModel.RelevantForDinner,
-            DinnerAt = evenDbModel.DinnerAt.HasValue
-                ? TimeOnly.FromDateTime(evenDbModel.DinnerAt!.Value.ToDateTime())
-                : null
+            DinnerAt = evenDbModel.DinnerAt?.ToTimeOnly()
         };
     }
 }

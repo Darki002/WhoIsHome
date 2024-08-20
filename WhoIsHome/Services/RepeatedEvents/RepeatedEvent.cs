@@ -17,18 +17,18 @@ public class RepeatedEvent
 
     [FirestoreProperty] public Timestamp EndDate { get; set; }
 
-    [FirestoreProperty] public Timestamp StartTime { get; set; }
+    [FirestoreProperty] public int StartTime { get; set; }
 
-    [FirestoreProperty] public Timestamp EndTime { get; set; }
+    [FirestoreProperty] public int EndTime { get; set; }
 
     [FirestoreProperty] public bool RelevantForDinner { get; set; }
 
-    [FirestoreProperty] public Timestamp? DinnerAt { get; set; }
+    [FirestoreProperty] public int? DinnerAt { get; set; }
 
     public bool IsAtHome => RelevantForDinner && DinnerAt != null;
 
-    public bool IsToday => DateTime.UtcNow.DayOfWeek != StartDate.ToDateTime().DayOfWeek &&
-                           DateTime.UtcNow.Date < EndDate.ToDateTime().Date;
+    public bool IsToday => DateTime.Now.DayOfWeek != StartDate.ToDateTime().DayOfWeek &&
+                           DateTime.Now.Date < EndDate.ToDateTime().Date;
 
     public static Result<RepeatedEvent, string> TryCreate(
         string eventName,
@@ -44,7 +44,7 @@ public class RepeatedEvent
 
         if (startDate >= endDate) return $"{nameof(StartDate)} must be before {nameof(EndDate)}.";
         
-        if (startDate < DateOnly.FromDateTime(DateTime.UtcNow)) return "New Date can't be in the past.";
+        if (startDate < DateOnly.FromDateTime(DateTime.Now)) return "New Date can't be in the past.";
 
         if (eventName.Length is <= 0 or >= 30) return $"{nameof(EventName)} must be between 1 and 30 characters long.";
 
@@ -53,12 +53,12 @@ public class RepeatedEvent
             Id = null,
             EventName = eventName,
             Person = person,
-            StartDate = Timestamp.FromDateTime(startDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc)),
-            EndDate = Timestamp.FromDateTime(endDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc)),
-            StartTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(startTime, DateTimeKind.Utc)),
-            EndTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(endTime, DateTimeKind.Utc)),
-            RelevantForDinner = relevantForDinner,
-            DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(dinnerAt.Value, DateTimeKind.Utc)) : null
+            StartDate = startDate.ToTimespan(),
+            EndDate = endDate.ToTimespan(),
+            StartTime = startTime.ToSeconds(),
+            EndTime = endTime.ToSeconds(),
+            RelevantForDinner = relevantForDinner, 
+            DinnerAt = dinnerAt?.ToSeconds()
         };
     }
 
@@ -73,19 +73,19 @@ public class RepeatedEvent
     {
         if (startTime >= endTime) return $"{nameof(StartTime)} must be before {nameof(EndTime)}.";
 
-        if (startDate < DateOnly.FromDateTime(DateTime.UtcNow)) return "New Start Date can't be in the past.";
+        if (startDate < DateOnly.FromDateTime(DateTime.Now)) return "New Start Date can't be in the past.";
 
         if (startDate >= endDate) return $"{nameof(StartDate)} must be before {nameof(EndDate)}.";
 
         if (eventName.Length is <= 0 or >= 30) return $"{nameof(EventName)} must be between 1 and 30 characters long.";
 
         EventName = eventName;
-        StartDate = Timestamp.FromDateTime(startDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc));
-        EndDate = Timestamp.FromDateTime(endDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc));
-        StartTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(startTime, DateTimeKind.Utc));
-        EndTime = Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(endTime, DateTimeKind.Utc));
+        StartDate = startDate.ToTimespan();
+        EndDate = endDate.ToTimespan();
+        StartTime = startTime.ToSeconds();
+        EndTime = endTime.ToSeconds();
         RelevantForDinner = relevantForDinner;
-        DinnerAt = dinnerAt.HasValue ? Timestamp.FromDateTime(DateOnly.MinValue.ToDateTime(dinnerAt.Value, DateTimeKind.Utc)) : null;
+        DinnerAt = dinnerAt?.ToSeconds();
 
         return new Dictionary<string, object?>
         {
@@ -99,21 +99,21 @@ public class RepeatedEvent
         };
     }
 
-    public DateTime? GetNextOccurrence()
+    public DateOnly? GetNextOccurrence()
     {
-        var utcNow = DateTime.UtcNow;
+        var now = DateTime.Now;
         var startDate = StartDate.ToDateTime();
-        var occurrence = DateTime.UtcNow.Date;
+        var occurrence = DateTime.Now.Date;
         
-        if (EndDate.ToDateTime() < utcNow) {return null;}
+        if (EndDate.ToDateTime() < now) {return null;}
 
-        if (startDate > utcNow) return StartDate.ToDateTime();
+        if (startDate > now) return StartDate.ToDateOnly();
 
-        if ((int)utcNow.DayOfWeek > (int)startDate.DayOfWeek)
+        if ((int)now.DayOfWeek > (int)startDate.DayOfWeek)
         {
-            var dist = (int)DayOfWeek.Saturday - (int)utcNow.DayOfWeek;
+            var dist = (int)DayOfWeek.Saturday - (int)now.DayOfWeek;
             occurrence = occurrence.AddDays(dist);
         }
-        return occurrence.AddDays((int)startDate.DayOfWeek - (int)utcNow.DayOfWeek);
+        return DateOnly.FromDateTime(occurrence.AddDays((int)startDate.DayOfWeek - (int)now.DayOfWeek));
     }
 }

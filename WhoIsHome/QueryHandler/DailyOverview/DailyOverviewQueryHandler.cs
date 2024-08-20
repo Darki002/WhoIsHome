@@ -17,8 +17,8 @@ public class DailyOverviewQueryHandler(
         if (personsResult.IsErr) return personsResult.Err.Unwrap();
         var persons = personsResult.Unwrap();
         
-        var today = Timestamp.FromDateTime(DateTime.UtcNow.Date);
-        var tomorrow = Timestamp.FromDateTime(DateTime.UtcNow.Date.AddDays(1));
+        var today = Timestamp.FromDateTime(DateTime.Now.Date);
+        var tomorrow = Timestamp.FromDateTime(DateTime.Now.Date.AddDays(1));
 
         var result = new List<DailyOverview>();
         
