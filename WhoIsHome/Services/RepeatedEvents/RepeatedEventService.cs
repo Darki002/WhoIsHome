@@ -31,8 +31,11 @@ public class RepeatedEventService(FirestoreDb firestoreDb, IPersonService person
             endTime: endTime,
             relevantForDinner: relevantForDinner,
             dinnerAt: dinnerAt);
+        
+        
+        if (newEvent.IsErr) return newEvent.Err.Unwrap();
 
-        var docRef = await FirestoreDb.Collection(Collection).AddAsync(newEvent, cancellationToken);
+        var docRef = await FirestoreDb.Collection(Collection).AddAsync(newEvent.Unwrap(), cancellationToken);
         var snapshot = await docRef.GetSnapshotAsync(cancellationToken);
         return ConvertDocument(snapshot);
     }

@@ -30,7 +30,9 @@ public class EventService(FirestoreDb firestoreDb, IPersonService personService)
             relevantForDinner: relevantForDinner,
             dinnerAt: dinnerAt);
 
-        var docRef = await FirestoreDb.Collection(Collection).AddAsync(newEvent, cancellationToken);
+        if (newEvent.IsErr) return newEvent.Err.Unwrap();
+
+        var docRef = await FirestoreDb.Collection(Collection).AddAsync(newEvent.Unwrap(), cancellationToken);
         var snapshot = await docRef.GetSnapshotAsync(cancellationToken);
         return ConvertDocument(snapshot);
     }
