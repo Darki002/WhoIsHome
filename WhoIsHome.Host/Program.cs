@@ -4,7 +4,10 @@ var builder = WebApplication.CreateBuilder(args);
 DotNetEnv.Env.Load();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.EnableAnnotations();
+});
 builder.Services.AddControllers();
 
 // Add Services
