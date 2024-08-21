@@ -3,7 +3,7 @@ name: Docker Image Publish
 on:
   push:
     tags: 
-      - '*'
+      - '**'
 
 env:
   # Use docker.io for Docker Hub if empty
