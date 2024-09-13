@@ -1,9 +1,18 @@
 ﻿namespace WhoIsHome.Host.Authentication;
 
-public class ApiKeyMiddleware(RequestDelegate next)
+public class ApiKeyMiddleware
 {
     private const string ApiKeyHeaderName = "X-API-KEY";
-    
+    private readonly string apiKey;
+    private readonly RequestDelegate next;
+
+    public ApiKeyMiddleware(RequestDelegate next)
+    {
+        this.next = next;
+        apiKey = Environment.GetEnvironmentVariable("API_KEY") ??
+                 throw new Exception("API_KEY not found in environment variables.");
+    }
+
     public async Task InvokeAsync(HttpContext context, IConfiguration configuration)
     {
         if (!context.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
@@ -13,9 +22,7 @@ public class ApiKeyMiddleware(RequestDelegate next)
             return;
         }
 
-        var apiKey = Environment.GetEnvironmentVariable("API_KEY");
-
-        if (apiKey is null || !apiKey.Equals(extractedApiKey))
+        if (!apiKey.Equals(extractedApiKey))
         {
             context.Response.StatusCode = 401; // Unauthorized
             await context.Response.WriteAsync("Unauthorized access.");
