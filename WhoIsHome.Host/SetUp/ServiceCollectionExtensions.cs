@@ -6,10 +6,7 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(c =>
-        {
-            c.EnableAnnotations();
-        });
+        services.AddSwagger();
         services.AddControllers();
         
         services.AddWhoIsHomeServices(configuration);
