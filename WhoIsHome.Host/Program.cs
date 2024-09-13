@@ -1,4 +1,5 @@
 using WhoIsHome;
+using WhoIsHome.Host.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 DotNetEnv.Env.Load();
@@ -22,6 +23,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseMiddleware<ApiKeyMiddleware>();
 
 app.UseRouting();
 app.MapControllers();
