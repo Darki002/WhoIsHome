@@ -14,10 +14,10 @@ public class User
     public string UserName { get; set; } = null!;
     
     [Required]
-    [MaxLength(100)]
+    [MaxLength(30)]
     public string Email { get; set; } = null!;
     
     [Required]
-    [MaxLength(30)]
+    [MaxLength(200)]
     public string Password { get; set; } = null!;
 }
