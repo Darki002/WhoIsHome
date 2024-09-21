@@ -30,10 +30,6 @@ public class OneTimeEvent : EventBase
             userId);
     }
     
-    protected override bool IsEventToday() => Date == DateOnly.FromDateTime(DateTime.Today);
-
-    public override DateOnly GetNextOccurrence() => Date;
-
     public void Update(string title, DateOnly date, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime)
     {
         ValidateBase(title, startTime, endTime, dinnerTime);
@@ -44,4 +40,8 @@ public class OneTimeEvent : EventBase
         EndTime = endTime;
         DinnerTime = DinnerTime.Update(dinnerTime.PresentsType, dinnerTime.Time);
     }
+    
+    protected override bool IsEventToday() => Date == DateOnly.FromDateTime(DateTime.Today);
+
+    public override DateOnly GetNextOccurrence() => Date;
 }

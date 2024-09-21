@@ -47,6 +47,19 @@ public class RepeatedEvent : EventBase
             userId);
     }
     
+    public void Update(string title, DateOnly firstOccurrence, DateOnly lastOccurrence, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime)
+    {
+        ValidateBase(title, startTime, endTime, dinnerTime);
+        ValidateOccurrence(firstOccurrence, lastOccurrence);
+        
+        Title = title;
+        FirstOccurrence = firstOccurrence;
+        LastOccurrence = lastOccurrence;
+        StartTime = startTime;
+        EndTime = endTime;
+        DinnerTime = DinnerTime.Update(dinnerTime.PresentsType, dinnerTime.Time);
+    }
+    
     protected override bool IsEventToday()
     {
         return DateTime.Now.DayOfWeek != FirstOccurrence.DayOfWeek &&
@@ -71,19 +84,6 @@ public class RepeatedEvent : EventBase
 
         var occurence = today.AddDays(daysLeftThisWeek).AddDays((int)FirstOccurrence.DayOfWeek);
         return occurence;
-    }
-
-    public void Update(string title, DateOnly firstOccurrence, DateOnly lastOccurrence, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime)
-    {
-        ValidateBase(title, startTime, endTime, dinnerTime);
-        ValidateOccurrence(firstOccurrence, lastOccurrence);
-        
-        Title = title;
-        FirstOccurrence = firstOccurrence;
-        LastOccurrence = lastOccurrence;
-        StartTime = startTime;
-        EndTime = endTime;
-        DinnerTime = DinnerTime.Update(dinnerTime.PresentsType, dinnerTime.Time);
     }
 
     private static void ValidateOccurrence(DateOnly firstOccurrence,  DateOnly lastOccurrence)
