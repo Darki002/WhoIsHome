@@ -1,69 +1,88 @@
-using Galaxus.Functional;
-using Google.Cloud.Firestore;
-using WhoIsHome.Services.Events;
-using WhoIsHome.Services.Persons;
-using WhoIsHome.Services.RepeatedEvents;
+using Microsoft.EntityFrameworkCore;
+using WhoIsHome.Aggregates;
+using WhoIsHome.DataAccess;
+using WhoIsHome.DataAccess.Models;
+using WhoIsHome.Shared;
 
 namespace WhoIsHome.QueryHandler.PersonOverview;
 
-public class PersonOverviewQueryHandler(
-    IPersonService personService,
-    IEventService eventService,
-    IRepeatedEventService repeatedEventService)
+public class PersonOverviewQueryHandler(WhoIsHomeContext context)
 {
-    public async Task<Result<PersonOverview, string>> HandleAsync(string personId, CancellationToken cancellationToken)
+    public async Task<PersonOverview> HandleAsync(int userId, CancellationToken cancellationToken)
     {
-        var personResult = await personService.GetAsync(personId, cancellationToken);
-        if (personResult.IsErr) return personResult.Err.Unwrap();
-        var person = personResult.Unwrap()!;
+        var today = DateOnlyHelper.Today;
 
-        var today = Timestamp.FromDateTime(DateTime.Now.Date);
-        
-        var events = await eventService.QueryManyAsync(cancellationToken, query =>
-        {
-            return query.WherePersonIs(personId)
-                .WhereGreaterThanOrEqualTo("Date", today)
-                .GetSnapshotAsync(cancellationToken);
-        });
-        
-        var repeatedEvents = await repeatedEventService.QueryManyAsync(cancellationToken, query =>
-        {
-            return query.WherePersonIs(personId)
-                .WhereGreaterThanOrEqualTo("EndDate", today)
-                .GetSnapshotAsync(cancellationToken);
-        });
+        var oneTimeEvents = (await context.OneTimeEvents
+                .Where(e => e.Date > today)
+                .Where(e => e.UserModel.Id == userId)
+                .ToListAsync(cancellationToken))
+            .ToAggregateList<OneTimeEvent, OneTimeEventModel>();
 
-        var result = events
+        var repeatedEvents = (await context.RepeatedEvents
+                .Where(e => e.LastOccurrence > today)
+                .Where(e => e.UserModel.Id == userId)
+                .ToListAsync(cancellationToken))
+            .ToAggregateList<RepeatedEvent, RepeatedEventModel>();
+
+
+        var userEvents = new List<EventBase>();
+        userEvents.AddRange(oneTimeEvents);
+        userEvents.AddRange(repeatedEvents);
+
+        var todaysEvents = userEvents.Where(e => e.IsToday)
             .Select(e => new PersonOverviewEvent
             {
-                Id = e.Id!,
-                EventName = e.EventName,
-                Date = e.Date.ToDateOnly(),
-                StartTime = e.StartTime.ToTimeOnly(),
-                EndTime = e.EndTime.ToTimeOnly(),
-                EventType = EventType.Event
+                Id = e.Id!.Value,
+                Title = e.Title,
+                Date = e.GetNextOccurrence(),
+                StartTime = e.StartTime,
+                EndTime = e.EndTime,
+                EventType = EventTypeHelper.FromType(e)
             })
             .ToList();
-        
-        result.AddRange(
-            repeatedEvents
-                .Select(re => (Event: re, NextOccurrence: re.GetNextOccurrence()))
-                .Where(re => re.NextOccurrence.HasValue)
-                .Select(re => new PersonOverviewEvent
-                {
-                    Id = re.Event.Id!,
-                    EventName = re.Event.EventName,
-                    Date = re.NextOccurrence!.Value,
-                    StartTime = re.Event.StartTime.ToTimeOnly(),
-                    EndTime = re.Event.EndTime.ToTimeOnly(),
-                    EventType = EventType.RepeatedEvent
-                })
-            );
+
+        var futureEvents = userEvents
+            .Where(e => !e.IsToday)
+            .Select(e => (Event: e, Next: e.GetNextOccurrence()))
+            .Where(e => e.Next > today)
+            .ToList();
+
+        var thisWeeksEvents = futureEvents
+            .Where(e => e.Next.IsThisWeek())
+            .Select(e => new PersonOverviewEvent
+            {
+                Id = e.Event.Id!.Value,
+                Title = e.Event.Title,
+                Date = e.Next,
+                StartTime = e.Event.StartTime,
+                EndTime = e.Event.EndTime,
+                EventType = EventTypeHelper.FromType(e.Event)
+            })
+            .ToList();
+
+        var eventsAfterThisWeek = futureEvents
+            .Where(e => !e.Next.IsThisWeek())
+            .Select(e => new PersonOverviewEvent
+            {
+                Id = e.Event.Id!.Value,
+                Title = e.Event.Title,
+                Date = e.Next,
+                StartTime = e.Event.StartTime,
+                EndTime = e.Event.EndTime,
+                EventType = EventTypeHelper.FromType(e.Event)
+            })
+            .ToList();
+
+        var user = (await context.Users
+                .SingleAsync(u => u.Id == userId, cancellationToken))
+            .ToAggregate<User>();
 
         return new PersonOverview
         {
-            Person = person,
-            Events = result
+            User = user,
+            Today = todaysEvents,
+            ThisWeek = thisWeeksEvents,
+            FutureEvents = eventsAfterThisWeek
         };
     }
 }

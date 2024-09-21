@@ -4,9 +4,9 @@ namespace WhoIsHome.WebApi.PersonOverviews;
 
 public record PersonOverviewEventModel
 {
-    public required string Id { get; init; }
+    public required int Id { get; init; }
     
-    public required string EventName { get; init; }
+    public required string Title { get; init; }
     
     public required DateOnly Date { get; init; }
     
@@ -21,7 +21,7 @@ public record PersonOverviewEventModel
         return new PersonOverviewEventModel
         {
             Id = personOverviewEvent.Id,
-            EventName = personOverviewEvent.EventName,
+            Title = personOverviewEvent.Title,
             Date = personOverviewEvent.Date,
             StartTime = personOverviewEvent.StartTime,
             EndTime = personOverviewEvent.EndTime,

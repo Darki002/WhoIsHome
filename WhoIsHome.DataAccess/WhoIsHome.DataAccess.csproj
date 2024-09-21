@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
+      <PackageReference Include="MySql.EntityFrameworkCore" Version="8.0.5" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\WhoIsHome\WhoIsHome.csproj" />
+      <ProjectReference Include="..\WhoIsHome.Shared\WhoIsHome.Shared.csproj" />
     </ItemGroup>
 
 </Project>

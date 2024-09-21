@@ -1,100 +1,66 @@
-using Galaxus.Functional;
-using Google.Cloud.Firestore;
-using WhoIsHome.Services.Events;
-using WhoIsHome.Services.Persons;
-using WhoIsHome.Services.RepeatedEvents;
+using Microsoft.EntityFrameworkCore;
+using WhoIsHome.Aggregates;
+using WhoIsHome.DataAccess;
+using WhoIsHome.DataAccess.Models;
+using WhoIsHome.Shared;
 
 namespace WhoIsHome.QueryHandler.DailyOverview;
 
-public class DailyOverviewQueryHandler(
-    IPersonService personService,
-    IEventService eventService,
-    IRepeatedEventService repeatedEventService)
+public class DailyOverviewQueryHandler(WhoIsHomeContext context)
 {
-    public async Task<Result<IReadOnlyCollection<DailyOverview>, string>> HandleAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<DailyOverview>> HandleAsync(CancellationToken cancellationToken)
     {
-        var personsResult = await personService.GetAllAsync(cancellationToken);
-        if (personsResult.IsErr) return personsResult.Err.Unwrap();
-        var persons = personsResult.Unwrap();
-        
-        var today = Timestamp.FromDateTime(DateTime.Now.Date);
-        var tomorrow = Timestamp.FromDateTime(DateTime.Now.Date.AddDays(1));
+        var users = (await context.Users.ToListAsync(cancellationToken))
+            .ToAggregateList<User, UserModel>();
+
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
+        var oneTimeEvents = (await context.OneTimeEvents
+                .Where(e => e.DinnerTimeModel.PresentsType != PresentsType.Unknown)
+                .Where(e => e.Date == today)
+                .GroupBy(e => e.UserModel.Id)
+                .ToListAsync(cancellationToken))
+            .ToDictionary(
+                g => g.Key,
+                g => g.ToAggregateList<OneTimeEvent, OneTimeEventModel>());
+
+        var repeatedEvents = (await context.RepeatedEvents
+                .Where(e => e.DinnerTimeModel.PresentsType != PresentsType.Unknown)
+                .Where(e => e.FirstOccurrence > today)
+                .Where(e => e.LastOccurrence <= today)
+                .GroupBy(e => e.UserModel.Id)
+                .ToListAsync(cancellationToken))
+            .ToDictionary(
+                g => g.Key,
+                g => g.ToAggregateList<RepeatedEvent, RepeatedEventModel>());
+
+        var eventsByUsers = new Dictionary<User, List<EventBase>>();
+
+        foreach (var user in users)
+        {
+            var userEvents = new List<EventBase>();
+            userEvents.AddRange(oneTimeEvents[user.Id!.Value]);
+            userEvents.AddRange(repeatedEvents[user.Id.Value]);
+            eventsByUsers.Add(user, userEvents);
+        }
 
         var result = new List<DailyOverview>();
         
-        foreach (var person in persons)
+        foreach (var eventByUser in eventsByUsers)
         {
-            var events = await eventService.QueryManyAsync(cancellationToken,  async collectionRef =>
-            {
-                return await collectionRef
-                    .WhereEqualTo("person:id", person.Id)
-                    .WhereEqualTo("RelevantForDinner", true)
-                    .WhereGreaterThanOrEqualTo("date", today)
-                    .WhereLessThan("date", tomorrow)
-                    .GetSnapshotAsync(cancellationToken);
-            });
+            var nextEvent = eventByUser.Value.Select(e => (Event: e, NextOccurrence: e.GetNextOccurrence()))
+                .MaxBy(e => e.NextOccurrence)
+                .Event;
 
-            if (events.Any(e => !e?.IsAtHome ?? false))
-            {
-                result.Add(DailyOverview.NotAtHome(person));
-                continue;
-            }
-            
-            var repeatedEvents = await repeatedEventService.QueryManyAsync(cancellationToken,  async collectionRef =>
-            {
-                return await collectionRef
-                    .WhereEqualTo("person:id", person.Id)
-                    .WhereEqualTo("RelevantForDinner", true)
-                    .WhereLessThanOrEqualTo("firstDate", today)
-                    .WhereGreaterThanOrEqualTo("lastDate", today)
-                    .GetSnapshotAsync(cancellationToken);
-            });
-            
-            if (repeatedEvents.Any(re => !re?.IsAtHome ?? false))
-            {
-                result.Add(DailyOverview.NotAtHome(person));
-                continue;
-            }
-
-            var latestEvent = events
-                .Where(re => re != null)
-                .Where(re => re!.IsToday)
-                .MaxBy(re => re!.DinnerAt);
-            
-            var latestRepeatedEvent = repeatedEvents
-                .Where(re => re != null)
-                .Where(re => re!.IsToday)
-                .MaxBy(re => re!.DinnerAt);
-
-            var personPresence = GetPersonPresence(latestEvent, latestRepeatedEvent, person);
+            var personPresence = GetPersonPresence(nextEvent, eventByUser.Key);
             result.Add(personPresence);
         }
 
         return result;
     }
 
-    private static DailyOverview GetPersonPresence(Event? e, RepeatedEvent? re, Person person)
+    private static DailyOverview GetPersonPresence(EventBase? eventBase, User user)
     {
-        if (e == null && re == null)
-        {
-            return DailyOverview.Empty(person);
-        }
-        
-        if (EventIsBeforeRepeatedEventOrNoRepeatedEventIsGiven(e, re))
-        {
-            return DailyOverview.From(e!, person);
-        }
-    
-        if (re != null)
-        {
-            return DailyOverview.From(re, person);
-        }
-
-        return DailyOverview.Empty(person);
-    }
-
-    private static bool EventIsBeforeRepeatedEventOrNoRepeatedEventIsGiven(Event? e, RepeatedEvent? re)
-    {
-        return e != null && (re == null || e.DinnerAt >= re.DinnerAt);
+        return eventBase == null ? DailyOverview.Empty(user) : DailyOverview.From(user, eventBase.DinnerTime);
     }
 }
