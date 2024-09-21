@@ -15,6 +15,4 @@ public class NewRepeatedEventModel
     public required TimeOnly EndTime { get; set; }
 
     public required DinnerTime DinnerTime { get; set; }
-
-    public required int UserId { get; set; }
 }
