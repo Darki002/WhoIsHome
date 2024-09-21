@@ -12,6 +12,7 @@ public static class ServiceProviderConfig
 {
     public static IServiceCollection AddWhoIsHomeServices(this IServiceCollection services, IConfiguration builderConfiguration)
     {
+        /*
         var projectId = Environment.GetEnvironmentVariable("PROJECT_ID");
         services.AddFirestoreDb(f => f.ProjectId = projectId);
 
@@ -21,6 +22,7 @@ public static class ServiceProviderConfig
 
         services.AddTransient<DailyOverviewQueryHandler>();
         services.AddTransient<PersonOverviewQueryHandler>();
+        */
         
         return services;
     } 

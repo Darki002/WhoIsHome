@@ -12,5 +12,9 @@
         <PackageReference Include="Google.Cloud.Firestore" Version="3.8.0"/>
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\WhoIsHome.DataAccess\WhoIsHome.DataAccess.csproj" />
+    </ItemGroup>
 
 </Project>

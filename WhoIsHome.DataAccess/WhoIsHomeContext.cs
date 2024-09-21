@@ -3,7 +3,7 @@ using WhoIsHome.DataAccess.Models;
 
 namespace WhoIsHome.DataAccess;
 
-public class Context : DbContext
+public class WhoIsHomeContext : DbContext
 {
     public DbSet<User> Users { get; set; }
     
