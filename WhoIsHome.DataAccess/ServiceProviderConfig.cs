@@ -5,7 +5,7 @@ namespace WhoIsHome.DataAccess;
 
 public static class ServiceProviderConfig
 {
-    public static IServiceCollection AddDataAccessServices(this IServiceCollection services, IConfiguration builderConfiguration)
+    public static IServiceCollection AddDataAccessServices(this IServiceCollection services)
     {
         services.AddDbContext<WhoIsHomeContext>();
         return services;

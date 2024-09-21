@@ -16,9 +16,11 @@ public static class ApplicationBuilderExtensions
 
         app.UseMiddleware<ApiKeyMiddleware>();
 
+        app.UseAuthentication();
+        app.UseAuthorization();
+        
         app.UseRouting();
         app.MapControllers();
-        app.UseAuthorization();
         app.UseHttpsRedirection();
     }
 }

@@ -1,3 +1,4 @@
+using WhoIsHome.Host.Authentication;
 using WhoIsHome.Host.SetUp;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 DotNetEnv.Env.Load();
 
 builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 var app = builder.Build();
 app.ConfigureApplication();

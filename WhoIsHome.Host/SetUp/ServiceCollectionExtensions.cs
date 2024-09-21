@@ -1,4 +1,6 @@
-﻿namespace WhoIsHome.Host.SetUp;
+﻿using WhoIsHome.DataAccess;
+
+namespace WhoIsHome.Host.SetUp;
 
 public static class ServiceCollectionExtensions
 {
@@ -10,6 +12,7 @@ public static class ServiceCollectionExtensions
         services.AddControllers();
         
         services.AddWhoIsHomeServices(configuration);
+        services.AddDataAccessServices();
         return services;
     }
 }
