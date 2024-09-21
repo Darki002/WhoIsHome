@@ -18,9 +18,9 @@ public class RepeatedEventModelResponse
 
     public required DinnerTime DinnerTime { get; set; }
 
-    public required int UserId { get; set; }
+    public required UserModel User { get; set; }
     
-    public static RepeatedEventModelResponse From(RepeatedEvent data)
+    public static RepeatedEventModelResponse From(RepeatedEvent data, User user)
     {
         return new RepeatedEventModelResponse
         {
@@ -31,7 +31,7 @@ public class RepeatedEventModelResponse
             StartTime = data.StartTime,
             EndTime = data.EndTime,
             DinnerTime = data.DinnerTime,
-            UserId = data.UserId
+            User = UserModel.From(user)
         };
     }
 }

@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Aggregates;
 using WhoIsHome.Services;
 using WhoIsHome.WebApi.Models.New;
-using WhoIsHome.WebApi.Models.Request;
 using WhoIsHome.WebApi.Models.Response;
+using OneTimeEventModel = WhoIsHome.WebApi.Models.Request.OneTimeEventModel;
 
 namespace WhoIsHome.WebApi.AggregatesControllers;
 
@@ -45,6 +45,6 @@ public class EventController(OneTimeEventService oneTimeEventService) : Aggregat
         
         return BuildResponse(result);
     }
-
-    protected override OneTimeEventModelResponse ConvertToModel(OneTimeEvent data) => OneTimeEventModelResponse.From(data);
+    
+    protected override OneTimeEventModelResponse ConvertToModel(OneTimeEvent data, User user) => OneTimeEventModelResponse.From(data, user);
 }

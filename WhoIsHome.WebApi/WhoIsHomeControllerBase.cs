@@ -4,7 +4,7 @@ namespace WhoIsHome.WebApi;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public abstract class WhoIsHomeControllerBase<T, TModel> : ControllerBase where T : class
+public abstract class WhoIsHomeControllerBase<T, TModel> : ControllerBase
 {
     protected ActionResult<TModel> BuildResponse(T result)
     {

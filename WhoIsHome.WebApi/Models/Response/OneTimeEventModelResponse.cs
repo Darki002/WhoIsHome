@@ -16,9 +16,9 @@ public class OneTimeEventModelResponse
 
     public required DinnerTime DinnerTime { get; set; }
 
-    public required int UserId { get; set; }
+    public required UserModel User { get; set; }
     
-    public static OneTimeEventModelResponse From(OneTimeEvent data)
+    public static OneTimeEventModelResponse From(OneTimeEvent data, User user)
     {
         return new OneTimeEventModelResponse
         {
@@ -28,7 +28,7 @@ public class OneTimeEventModelResponse
             StartTime = data.StartTime,
             EndTime = data.EndTime,
             DinnerTime = data.DinnerTime,
-            UserId = data.UserId
+            User = UserModel.From(user)
         };
     }
 }

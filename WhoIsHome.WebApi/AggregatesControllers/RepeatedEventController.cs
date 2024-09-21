@@ -47,6 +47,6 @@ public class RepeatedEventController(RepeatedEventService repeatedEventService) 
         
         return BuildResponse(result);
     }
-
-    protected override RepeatedEventModelResponse ConvertToModel(RepeatedEvent data) => RepeatedEventModelResponse.From(data);
+    
+    protected override RepeatedEventModelResponse ConvertToModel(RepeatedEvent data, User user) => RepeatedEventModelResponse.From(data, user);
 }
