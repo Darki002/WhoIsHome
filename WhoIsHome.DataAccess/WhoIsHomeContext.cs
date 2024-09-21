@@ -5,13 +5,13 @@ namespace WhoIsHome.DataAccess;
 
 public class WhoIsHomeContext : DbContext
 {
-    public DbSet<User> Users { get; set; }
+    public DbSet<UserModel> Users { get; set; }
     
-    public DbSet<Event> Events { get; set; }
+    public DbSet<EventModel> Events { get; set; }
     
-    public DbSet<RepeatedEvent> RepeatedEvents { get; set; }
+    public DbSet<RepeatedEventModel> RepeatedEvents { get; set; }
     
-    public DbSet<DinnerTime> DinnerTimes { get; set; }
+    public DbSet<DinnerTimeModel> DinnerTimes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

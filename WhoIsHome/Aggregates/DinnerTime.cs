@@ -1,6 +1,6 @@
 ﻿using WhoIsHome.Shared;
 
-namespace WhoIsHome.Models;
+namespace WhoIsHome.Aggregates;
 
 public class DinnerTime : Aggregate
 {
@@ -9,6 +9,8 @@ public class DinnerTime : Aggregate
     public PresentsType PresentsType { get; set; }
     
     public TimeOnly? Time { get; set; }
+
+    public bool IsAtHome => PresentsType != PresentsType.NotPresent;
 
     private DinnerTime(int? id, PresentsType presentsType, TimeOnly? time = null)
     {

@@ -1,6 +1,6 @@
 ﻿using WhoIsHome.Shared;
 
-namespace WhoIsHome.Models;
+namespace WhoIsHome.Aggregates;
 
 public class Event : Aggregate
 {
@@ -17,6 +17,9 @@ public class Event : Aggregate
     public DinnerTime DinnerTime { get; }
 
     public int UserId { get; }
+    
+    
+    public bool IsToday => Date == DateOnly.FromDateTime(DateTime.Today);
     
     private Event(int? id, string title, DateOnly date, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime,
         int userId)

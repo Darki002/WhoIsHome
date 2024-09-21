@@ -1,10 +1,10 @@
-using WhoIsHome.Services.Persons;
+using WhoIsHome.Aggregates;
 
 namespace WhoIsHome.QueryHandler.PersonOverview;
 
 public class PersonOverview
 {
-    public required Person Person { get; init; }
+    public required User User { get; init; }
     
     public required IReadOnlyList<PersonOverviewEvent> Events { get; init; }
 }

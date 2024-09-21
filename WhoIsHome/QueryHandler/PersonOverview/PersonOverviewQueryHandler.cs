@@ -1,15 +1,10 @@
 using Galaxus.Functional;
 using Google.Cloud.Firestore;
-using WhoIsHome.Services.Events;
-using WhoIsHome.Services.Persons;
-using WhoIsHome.Services.RepeatedEvents;
+using WhoIsHome.DataAccess;
 
 namespace WhoIsHome.QueryHandler.PersonOverview;
 
-public class PersonOverviewQueryHandler(
-    IPersonService personService,
-    IEventService eventService,
-    IRepeatedEventService repeatedEventService)
+public class PersonOverviewQueryHandler(WhoIsHomeContext context)
 {
     public async Task<Result<PersonOverview, string>> HandleAsync(string personId, CancellationToken cancellationToken)
     {

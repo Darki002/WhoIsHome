@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Shared;
 
 namespace WhoIsHome.DataAccess.Models;
 
+[Table("User")]
 [Index(nameof(Email), IsUnique = true)]
-public class User : DbModel
+public class UserModel : DbModel
 {
     [Required]
     [MaxLength(30)]

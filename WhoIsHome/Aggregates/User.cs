@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using WhoIsHome.Shared;
 
-namespace WhoIsHome.Models;
+namespace WhoIsHome.Aggregates;
 
 public partial class User : Aggregate
 {

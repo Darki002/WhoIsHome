@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using WhoIsHome.Shared;
 
 namespace WhoIsHome.DataAccess.Models;
 
-public class DinnerTime : DbModel
+[Table("DinnerTime")]
+public class DinnerTimeModel : DbModel
 {
     [DefaultValue(PresentsType.Unknown)]
     public PresentsType PresentsType { get; set; }

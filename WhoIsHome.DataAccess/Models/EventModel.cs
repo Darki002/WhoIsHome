@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using WhoIsHome.Shared;
 
 namespace WhoIsHome.DataAccess.Models;
 
-public class Event : DbModel
+[Table("Event")]
+public class EventModel : DbModel
 {
     [Required]
     [MaxLength(50)]
@@ -18,8 +20,8 @@ public class Event : DbModel
     [Required]
     public TimeOnly EndTime { get; set; }
 
-    [Required] public DinnerTime DinnerTime { get; set; } = null!;
+    [Required] public DinnerTimeModel DinnerTimeModel { get; set; } = null!;
     
     [Required]
-    public User User { get; set; } = null!;
+    public UserModel UserModel { get; set; } = null!;
 }

@@ -1,8 +1,6 @@
-﻿using WhoIsHome.Shared;
+﻿namespace WhoIsHome.Aggregates;
 
-namespace WhoIsHome.Models;
-
-public class RepeatedEvent : Aggregate
+public class RepeatedEvent : Shared.Aggregate
 {
     public int? Id { get; set; }
     
@@ -19,6 +17,9 @@ public class RepeatedEvent : Aggregate
     public DinnerTime DinnerTime { get; set; }
     
     public int UserId { get; set; }
+    
+    public bool IsToday => DateTime.Now.DayOfWeek != FirstOccurrence.DayOfWeek &&
+                           DateOnly.FromDateTime(DateTime.Today) < LastOccurrence;
 
     private RepeatedEvent(
         int? id, 
