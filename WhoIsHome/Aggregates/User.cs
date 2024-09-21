@@ -3,7 +3,7 @@ using WhoIsHome.Shared;
 
 namespace WhoIsHome.Aggregates;
 
-public partial class User : Aggregate
+public partial class User : AggregateBase
 {
     private const int UserNameMinLength = 5;
     private const int UserNameMaxLength = 30;

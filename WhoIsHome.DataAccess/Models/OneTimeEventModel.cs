@@ -5,7 +5,7 @@ using WhoIsHome.Shared;
 namespace WhoIsHome.DataAccess.Models;
 
 [Table("Event")]
-public class EventModel : DbModel
+public class OneTimeEventModel : DbModel
 {
     [Required]
     [MaxLength(50)]

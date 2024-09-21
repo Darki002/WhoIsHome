@@ -1,5 +1,4 @@
 using Galaxus.Functional;
-using Google.Cloud.Firestore;
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Aggregates;
 using WhoIsHome.DataAccess;
@@ -12,79 +11,57 @@ public class DailyOverviewQueryHandler(WhoIsHomeContext context)
 {
     public async Task<Result<IReadOnlyCollection<DailyOverview>, string>> HandleAsync(CancellationToken cancellationToken)
     {
-        var users = await context.Users.ToListAsync(cancellationToken);
+        var users = (await context.Users.ToListAsync(cancellationToken))
+            .ToAggregateList<User, UserModel>();
 
         var today = DateOnly.FromDateTime(DateTime.Today);
 
-        var result = new List<DailyOverview>();
-
-        var events = (await context.Events
+        var oneTimeEvents = (await context.Events
                 .Where(e => e.DinnerTimeModel.PresentsType != PresentsType.Unknown)
                 .Where(e => e.Date == today)
                 .GroupBy(e => e.UserModel.Id)
                 .ToListAsync(cancellationToken))
-            .Select(g => g.ToModelList<Event, EventModel>())
-            .ToList();
-        
+            .ToDictionary(
+                g => g.Key,
+                g => g.ToAggregateList<OneTimeEvent, OneTimeEventModel>());
+
         var repeatedEvents = (await context.RepeatedEvents
                 .Where(e => e.DinnerTimeModel.PresentsType != PresentsType.Unknown)
                 .Where(e => e.FirstOccurrence > today)
                 .Where(e => e.LastOccurrence <= today)
                 .GroupBy(e => e.UserModel.Id)
                 .ToListAsync(cancellationToken))
-            .Select(g => g.ToModelList<RepeatedEvent, RepeatedEventModel>())
-            .ToList();
-        
-        // TODO Use a base Type Event for Repeated and OneTime. The base type has all the necessary things to calculate the Overview and other stuff
-        
+            .ToDictionary(
+                g => g.Key,
+                g => g.ToAggregateList<RepeatedEvent, RepeatedEventModel>());
+
+        var eventsByUsers = new Dictionary<User, List<EventBase>>();
+
         foreach (var user in users)
         {
-            if (events.Any(e => !e?.IsAtHome ?? false))
-            {
-                result.Add(DailyOverview.NotAtHome(person));
-                continue;
-            }
-            
-            if (repeatedEvents.Any(re => !re?.IsAtHome ?? false))
-            {
-                result.Add(DailyOverview.NotAtHome(person));
-                continue;
-            }
+            var userEvents = new List<EventBase>();
+            userEvents.AddRange(oneTimeEvents[user.Id!.Value]);
+            userEvents.AddRange(repeatedEvents[user.Id.Value]);
+            eventsByUsers.Add(user, userEvents);
+        }
 
-            var latestEvent = events
-                .Where(re => re != null)
-                .Where(re => re!.IsToday)
-                .MaxBy(re => re!.DinnerAt);
-            
-            var latestRepeatedEvent = repeatedEvents
-                .Where(re => re != null)
-                .Where(re => re!.IsToday)
-                .MaxBy(re => re!.DinnerAt);
+        var result = new List<DailyOverview>();
+        
+        foreach (var eventByUser in eventsByUsers)
+        {
+            var nextEvent = eventByUser.Value.Select(e => (Event: e, NextOccurrence: e.GetNextOccurrence()))
+                .MaxBy(e => e.NextOccurrence)
+                .Event;
 
-            var personPresence = GetPersonPresence(latestEvent, latestRepeatedEvent, person);
+            var personPresence = GetPersonPresence(nextEvent, eventByUser.Key);
             result.Add(personPresence);
         }
 
         return result;
     }
 
-    private static DailyOverview GetPersonPresence(Event? e, RepeatedEvent? re, User user)
+    private static DailyOverview GetPersonPresence(EventBase? eventBase, User user)
     {
-        if (e == null && re == null)
-        {
-            return DailyOverview.Empty(user);
-        }
-        
-        if (EventIsBeforeRepeatedEventOrNoRepeatedEventIsGiven(e, re))
-        {
-            return DailyOverview.From(user, e!.DinnerTime);
-        }
-    
-        return re != null ? DailyOverview.From(user, re.DinnerTime) : DailyOverview.Empty(user);
-    }
-
-    private static bool EventIsBeforeRepeatedEventOrNoRepeatedEventIsGiven(Event? e, RepeatedEvent? re)
-    {
-        return e != null && (re == null || e.DinnerTime.Time >= re.DinnerTime.Time);
+        return eventBase == null ? DailyOverview.Empty(user) : DailyOverview.From(user, eventBase.DinnerTime);
     }
 }

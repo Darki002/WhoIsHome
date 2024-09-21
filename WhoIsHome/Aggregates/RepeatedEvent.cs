@@ -1,26 +1,15 @@
-﻿namespace WhoIsHome.Aggregates;
+﻿using WhoIsHome.Shared;
 
-public class RepeatedEvent : Shared.Aggregate
+namespace WhoIsHome.Aggregates;
+
+public class RepeatedEvent : EventBase
 {
-    public int? Id { get; set; }
-    
-    public string Title { get; set; }
+    private const int OccurrenceFrequency = 7;
     
     public DateOnly FirstOccurrence { get; set; }
     
     public DateOnly LastOccurrence { get; set; }
     
-    public TimeOnly StartTime { get; set; }
-    
-    public TimeOnly EndTime { get; set; }
-    
-    public DinnerTime DinnerTime { get; set; }
-    
-    public int UserId { get; set; }
-    
-    public bool IsToday => DateTime.Now.DayOfWeek != FirstOccurrence.DayOfWeek &&
-                           DateOnly.FromDateTime(DateTime.Today) < LastOccurrence;
-
     private RepeatedEvent(
         int? id, 
         string title, 
@@ -29,16 +18,10 @@ public class RepeatedEvent : Shared.Aggregate
         TimeOnly startTime, 
         TimeOnly endTime, 
         DinnerTime dinnerTime, 
-        int userId)
+        int userId) : base(id, title, startTime, endTime, dinnerTime, userId)
     {
-        Id = id;
-        Title = title;
         FirstOccurrence = firstOccurrence;
         LastOccurrence = lastOccurrence;
-        StartTime = startTime;
-        EndTime = endTime;
-        DinnerTime = dinnerTime;
-        UserId = userId;
     }
     
     public static RepeatedEvent Create(
@@ -50,24 +33,11 @@ public class RepeatedEvent : Shared.Aggregate
         DinnerTime dinnerTime, 
         int userId)
     {
-        if (title.Length >= 50)
-        {
-            throw new ArgumentException("Title must be less then or equal to 50 characters long.", nameof(title));
-        }
-
-        if (startTime > endTime)
-        {
-            throw new ArgumentException("StartDate must be before EndDate.", nameof(startTime));
-        }
+        ValidateBase(title, startTime, endTime, dinnerTime);
         
         if (firstOccurrence > lastOccurrence)
         {
             throw new ArgumentException("First occurrence must be before the last occurrence.", nameof(firstOccurrence));
-        }
-        
-        if (endTime > dinnerTime.Time)
-        {
-            throw new ArgumentException("Dinner Time must be later then the End Time of the Event.", nameof(dinnerTime));
         }
         
         return new RepeatedEvent(
@@ -79,5 +49,31 @@ public class RepeatedEvent : Shared.Aggregate
             endTime,
             dinnerTime,
             userId);
+    }
+    
+    protected override bool IsEventToday()
+    {
+        return DateTime.Now.DayOfWeek != FirstOccurrence.DayOfWeek &&
+               DateOnly.FromDateTime(DateTime.Today) < LastOccurrence;
+    }
+
+    public override DateOnly GetNextOccurrence()
+    {
+        var today = DateOnlyHelper.Today;
+
+        if (today > LastOccurrence)
+        {
+            throw new InvalidOperationException("Can't get the next occurrence of an Event that is in the past.");
+        }
+
+        if (FirstOccurrence > today)
+        {
+            return FirstOccurrence;
+        }
+        
+        var daysLeftThisWeek = 7 - (int)today.DayOfWeek;
+
+        var occurence = today.AddDays(daysLeftThisWeek).AddDays((int)FirstOccurrence.DayOfWeek);
+        return occurence;
     }
 }

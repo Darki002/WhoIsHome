@@ -4,17 +4,17 @@ namespace WhoIsHome.Shared;
 
 public static class Mapper
 {
-    public static List<TDbModel> ToDbModelList<TDbModel>(this IEnumerable<Aggregate> models) 
+    public static List<TDbModel> ToDbModelList<TDbModel>(this IEnumerable<AggregateBase> models) 
         where TDbModel : DbModel
     {
         return models.Select(m => m.ToDbModel<TDbModel>()).ToList();
     }
     
-    public static List<TModel> ToModelList<TModel, TDbModel>(this IEnumerable<TDbModel> models) 
-        where TModel : Aggregate 
+    public static List<TAggregate> ToAggregateList<TAggregate, TDbModel>(this IEnumerable<TDbModel> models) 
+        where TAggregate : AggregateBase 
         where TDbModel : DbModel
     {
-        return models.Select(m => m.ToModel<TModel>()).ToList();
+        return models.Select(m => m.ToModel<TAggregate>()).ToList();
     }
     
     internal static TTo Map<TTo>(Type modelType, object model, PropertyInfo[] propertyInfos)

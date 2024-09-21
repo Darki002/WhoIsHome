@@ -2,7 +2,7 @@
 
 namespace WhoIsHome.Aggregates;
 
-public class DinnerTime : Aggregate
+public class DinnerTime : AggregateBase
 {
     public int? Id { get; set; }
 
