@@ -2,39 +2,25 @@
 
 namespace WhoIsHome.Shared;
 
-public static class Mapper
+internal static class Mapper
 {
-    public static List<TDbModel> ToDbModelList<TDbModel, TModel>(this List<TModel> models)
+    public static List<TDbModel> ToDbModelList<TDbModel>(this List<Model> models) where TDbModel : DbModel
     {
-        var propertyInfos = typeof(TDbModel).GetProperties();
-        return models.Select(m => Map<TDbModel, TModel>(m, propertyInfos)).ToList();
+        return models.Select(m => m.ToDbModel<TDbModel>()).ToList();
     }
     
-    public static TDbModel ToDbModel<TDbModel, TModel>(this TModel model)
+    public static List<TModel> ToModelList<TModel>(this List<DbModel> models) where TModel : Model
     {
-        var propertyInfos = typeof(TDbModel).GetProperties();
-        return Map<TDbModel, TModel>(model, propertyInfos);
+        return models.Select(m => m.ToModel<TModel>()).ToList();
     }
     
-    public static List<TModel> ToModelList<TModel, TDbModel>(this List<TDbModel> models)
-    {
-        var propertyInfos = typeof(TDbModel).GetProperties();
-        return models.Select(m => Map<TModel, TDbModel>(m, propertyInfos)).ToList();
-    }
-    
-    public static TModel ToModel<TModel, TDbModel>(this TDbModel dbModel)
-    {
-        var propertyInfos = typeof(TDbModel).GetProperties();
-        return Map<TModel, TDbModel>(dbModel, propertyInfos);
-    }
-    
-    private static TTo Map<TTo, TFrom>(TFrom model, PropertyInfo[] propertyInfos)
+    internal static TTo Map<TTo>(Type modelType, object model, PropertyInfo[] propertyInfos)
     {
         var dbModel = Activator.CreateInstance<TTo>();
         
         foreach (var propertyInfo in propertyInfos)
         {
-            var value = typeof(TFrom).GetProperty(propertyInfo.Name)?.GetValue(model);
+            var value = modelType.GetProperty(propertyInfo.Name)?.GetValue(model);
             propertyInfo.SetValue(dbModel, value);
         }
 
