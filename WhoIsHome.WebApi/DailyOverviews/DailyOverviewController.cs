@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.QueryHandler.DailyOverview;
-using WhoIsHome.WebApi.ModelControllers.Models;
 
 namespace WhoIsHome.WebApi.DailyOverviews;
 
@@ -17,13 +16,7 @@ public class DailyOverviewController(DailyOverviewQueryHandler queryHandler)
     protected override IReadOnlyCollection<DailyOverviewModel> ConvertToModel(IReadOnlyCollection<DailyOverview> data)
     {
         return data
-            .Select(presence => 
-                new DailyOverviewModel
-                {
-                    Person = PersonModel.From(presence.Person), 
-                    IsAtHome = presence.IsAtHome, 
-                    DinnerAt = presence.DinnerAt?.ToString()
-                })
+            .Select(DailyOverviewModel.From)
             .ToList();
     }
 }

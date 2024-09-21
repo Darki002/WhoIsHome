@@ -8,7 +8,7 @@ public class DailyOverview
 
     public bool IsAtHome { get; init; } = true;
 
-    public TimeOnly? DinnerAt { get; init; }
+    public TimeOnly? DinnerTime { get; init; }
 
     public static DailyOverview Empty(User user)
     {
@@ -24,7 +24,7 @@ public class DailyOverview
         {
             User = user,
             IsAtHome = false,
-            DinnerAt = null
+            DinnerTime = null
         };
     }
 
@@ -34,7 +34,7 @@ public class DailyOverview
         {
             User = user,
             IsAtHome = dinnerTime.IsAtHome,
-            DinnerAt = dinnerTime.Time
+            DinnerTime = dinnerTime.Time
         };
     }
     

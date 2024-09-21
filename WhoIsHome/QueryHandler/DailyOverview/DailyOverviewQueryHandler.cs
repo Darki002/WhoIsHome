@@ -1,4 +1,3 @@
-using Galaxus.Functional;
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Aggregates;
 using WhoIsHome.DataAccess;
@@ -9,7 +8,7 @@ namespace WhoIsHome.QueryHandler.DailyOverview;
 
 public class DailyOverviewQueryHandler(WhoIsHomeContext context)
 {
-    public async Task<Result<IReadOnlyCollection<DailyOverview>, string>> HandleAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<DailyOverview>> HandleAsync(CancellationToken cancellationToken)
     {
         var users = (await context.Users.ToListAsync(cancellationToken))
             .ToAggregateList<User, UserModel>();

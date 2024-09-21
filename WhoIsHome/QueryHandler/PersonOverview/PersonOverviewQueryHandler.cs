@@ -1,4 +1,3 @@
-using Galaxus.Functional;
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Aggregates;
 using WhoIsHome.DataAccess;
@@ -9,7 +8,7 @@ namespace WhoIsHome.QueryHandler.PersonOverview;
 
 public class PersonOverviewQueryHandler(WhoIsHomeContext context)
 {
-    public async Task<Result<PersonOverview, string>> HandleAsync(int userId, CancellationToken cancellationToken)
+    public async Task<PersonOverview> HandleAsync(int userId, CancellationToken cancellationToken)
     {
         var today = DateOnlyHelper.Today;
 
