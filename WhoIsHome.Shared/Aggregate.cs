@@ -1,6 +1,6 @@
 ﻿namespace WhoIsHome.Shared;
 
-public abstract class Model
+public abstract class Aggregate
 {
     public TDbModel ToDbModel<TDbModel>() where TDbModel : DbModel
     {

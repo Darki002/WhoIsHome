@@ -1,10 +1,15 @@
-﻿namespace WhoIsHome.Shared;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WhoIsHome.Shared;
 
 public abstract class DbModel
 {
-    public TModel ToModel<TModel>() where TModel : Model
+    [Key]
+    public int Id { get; set; }
+    
+    public TAggregate ToModel<TAggregate>() where TAggregate : Aggregate
     {
         var propertyInfos = typeof(DbModel).GetProperties();
-        return Mapper.Map<TModel>(GetType(), this, propertyInfos);
+        return Mapper.Map<TAggregate>(GetType(), this, propertyInfos);
     }
 }

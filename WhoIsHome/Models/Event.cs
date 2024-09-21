@@ -1,6 +1,8 @@
-﻿namespace WhoIsHome.Models;
+﻿using WhoIsHome.Shared;
 
-public class Event
+namespace WhoIsHome.Models;
+
+public class Event : Aggregate
 {
     private Event(int? id, string title, DateOnly date, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime,
         int userId)

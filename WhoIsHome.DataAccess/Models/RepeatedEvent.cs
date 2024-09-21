@@ -1,15 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using WhoIsHome.Shared;
 
 namespace WhoIsHome.DataAccess.Models;
 
-public class RepeatedEvent
+public class RepeatedEvent : DbModel
 {
-    [Key]
-    public int Id { get; set; }
-    
-    [Required]
-    [MaxLength(50)]
-    public string Title { get; set; }
+    [Required] [MaxLength(50)] public string Title { get; set; } = null!;
     
     [Required]
     public DateOnly FirstOccurrence { get; set; }
@@ -24,8 +20,8 @@ public class RepeatedEvent
     public TimeOnly EndTime { get; set; }
     
     [Required]
-    public DinnerTime DinnerTime { get; set; }
+    public DinnerTime DinnerTime { get; set; } = null!;
     
     [Required]
-    public User User { get; set; }
+    public User User { get; set; } = null!;
 }

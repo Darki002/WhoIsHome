@@ -4,12 +4,12 @@ namespace WhoIsHome.Shared;
 
 internal static class Mapper
 {
-    public static List<TDbModel> ToDbModelList<TDbModel>(this List<Model> models) where TDbModel : DbModel
+    public static List<TDbModel> ToDbModelList<TDbModel>(this List<Aggregate> models) where TDbModel : DbModel
     {
         return models.Select(m => m.ToDbModel<TDbModel>()).ToList();
     }
     
-    public static List<TModel> ToModelList<TModel>(this List<DbModel> models) where TModel : Model
+    public static List<TModel> ToModelList<TModel>(this List<DbModel> models) where TModel : Aggregate
     {
         return models.Select(m => m.ToModel<TModel>()).ToList();
     }

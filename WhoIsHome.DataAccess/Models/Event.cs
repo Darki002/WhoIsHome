@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using WhoIsHome.Shared;
 
 namespace WhoIsHome.DataAccess.Models;
 
-public class Event
+public class Event : DbModel
 {
-    [Key]
-    public int Id { get; set; }
-    
     [Required]
     [MaxLength(50)]
     public string Title { get; set; } = null!;

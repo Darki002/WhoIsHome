@@ -1,6 +1,8 @@
-﻿namespace WhoIsHome.Models;
+﻿using WhoIsHome.Shared;
 
-public class RepeatedEvent
+namespace WhoIsHome.Models;
+
+public class RepeatedEvent : Aggregate
 {
     public int? Id { get; set; }
     

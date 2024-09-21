@@ -1,8 +1,9 @@
 ﻿using System.Text.RegularExpressions;
+using WhoIsHome.Shared;
 
 namespace WhoIsHome.Models;
 
-public partial class User
+public partial class User : Aggregate
 {
     private const int UserNameMinLength = 5;
     private const int UserNameMaxLength = 30;

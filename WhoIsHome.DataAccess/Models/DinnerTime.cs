@@ -4,11 +4,8 @@ using WhoIsHome.Shared;
 
 namespace WhoIsHome.DataAccess.Models;
 
-public class DinnerTime
+public class DinnerTime : DbModel
 {
-    [Key]
-    public int Id { get; set; }
-
     [DefaultValue(PresentsType.Unknown)]
     public PresentsType PresentsType { get; set; }
     
