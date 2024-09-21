@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome", "WhoIsHome\WhoI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.DataAccess", "WhoIsHome.DataAccess\WhoIsHome.DataAccess.csproj", "{AD91F62D-8784-4AF3-A197-688DC9C75F12}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.Shared", "WhoIsHome.Shared\WhoIsHome.Shared.csproj", "{8E900FDC-EB4A-4726-92C9-BA57A7EA71BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{AD91F62D-8784-4AF3-A197-688DC9C75F12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD91F62D-8784-4AF3-A197-688DC9C75F12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD91F62D-8784-4AF3-A197-688DC9C75F12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E900FDC-EB4A-4726-92C9-BA57A7EA71BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E900FDC-EB4A-4726-92C9-BA57A7EA71BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E900FDC-EB4A-4726-92C9-BA57A7EA71BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E900FDC-EB4A-4726-92C9-BA57A7EA71BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

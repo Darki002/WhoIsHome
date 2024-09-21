@@ -9,7 +9,7 @@ public class Event
     
     [Required]
     [MaxLength(50)]
-    public string Title { get; set; }
+    public string Title { get; set; } = null!;
     
     [Required]
     public DateOnly Date { get; set; }
@@ -19,10 +19,9 @@ public class Event
     
     [Required]
     public TimeOnly EndTime { get; set; }
+
+    [Required] public DinnerTime DinnerTime { get; set; } = null!;
     
     [Required]
-    public DinnerTime DinnerTime { get; set; }
-    
-    [Required]
-    public User User { get; set; }
+    public User User { get; set; } = null!;
 }

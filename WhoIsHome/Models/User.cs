@@ -4,9 +4,6 @@ namespace WhoIsHome.Models;
 
 public partial class User
 {
-    private const int PasswordMinLength = 4;
-    private const int PasswordMaxLength = 30;
-
     private const int UserNameMinLength = 5;
     private const int UserNameMaxLength = 30;
 
@@ -26,7 +23,7 @@ public partial class User
 
     public string PasswordHash { get; private set; }
 
-    public static User Create(string userName, string email, string password)
+    public static User Create(string userName, string email, string passwordHash)
     {
         if (IsValidEmail(email) is false)
             throw new ArgumentException("Email is not in the correct format.", nameof(email));
@@ -35,29 +32,17 @@ public partial class User
             throw new ArgumentException(
                 $"UserName is to long or to short. Must be between {UserNameMinLength} and {UserNameMaxLength} Characters.",
                 nameof(userName));
-
-        if (IsValidPassword(password))
-            throw new ArgumentException(
-                $"Password is to long or to short. Must be between {PasswordMinLength} and {PasswordMaxLength} Characters.",
-                nameof(password));
-
-        // TODO Hash Password
-
+        
         return new User(
             null,
             userName,
             email,
-            password);
+            passwordHash);
     }
 
     private static bool IsValidUserName(string userName)
     {
         return userName.Length is > UserNameMaxLength or < UserNameMinLength;
-    }
-
-    private static bool IsValidPassword(string password)
-    {
-        return password.Length is > PasswordMaxLength or < PasswordMinLength;
     }
 
     private static bool IsValidEmail(string email)

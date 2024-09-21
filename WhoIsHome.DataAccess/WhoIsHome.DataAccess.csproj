@@ -10,4 +10,8 @@
       <PackageReference Include="MySql.EntityFrameworkCore" Version="8.0.5" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\WhoIsHome.Shared\WhoIsHome.Shared.csproj" />
+    </ItemGroup>
+
 </Project>
