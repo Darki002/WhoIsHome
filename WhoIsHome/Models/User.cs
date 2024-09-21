@@ -8,14 +8,6 @@ public partial class User : Aggregate
     private const int UserNameMinLength = 5;
     private const int UserNameMaxLength = 30;
 
-    private User(int? id, string userName, string email, string passwordHash)
-    {
-        Id = id;
-        UserName = userName;
-        Email = email;
-        PasswordHash = passwordHash;
-    }
-
     public int? Id { get; }
 
     public string UserName { get; private set; }
@@ -24,6 +16,14 @@ public partial class User : Aggregate
 
     public string PasswordHash { get; private set; }
 
+    private User(int? id, string userName, string email, string passwordHash)
+    {
+        Id = id;
+        UserName = userName;
+        Email = email;
+        PasswordHash = passwordHash;
+    }
+    
     public static User Create(string userName, string email, string passwordHash)
     {
         if (IsValidEmail(email) is false)

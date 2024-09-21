@@ -4,18 +4,6 @@ namespace WhoIsHome.Models;
 
 public class Event : Aggregate
 {
-    private Event(int? id, string title, DateOnly date, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime,
-        int userId)
-    {
-        Id = id;
-        Title = title;
-        Date = date;
-        StartTime = startTime;
-        EndTime = endTime;
-        DinnerTime = dinnerTime;
-        UserId = userId;
-    }
-
     public int? Id { get; }
 
     public string Title { get; private set; }
@@ -29,7 +17,19 @@ public class Event : Aggregate
     public DinnerTime DinnerTime { get; }
 
     public int UserId { get; }
-
+    
+    private Event(int? id, string title, DateOnly date, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime,
+        int userId)
+    {
+        Id = id;
+        Title = title;
+        Date = date;
+        StartTime = startTime;
+        EndTime = endTime;
+        DinnerTime = dinnerTime;
+        UserId = userId;
+    }
+    
     public static Event Create(
         string title, 
         DateOnly date, 
