@@ -15,7 +15,7 @@ public class DailyOverviewQueryHandler(WhoIsHomeContext context)
 
         var today = DateOnly.FromDateTime(DateTime.Today);
 
-        var oneTimeEvents = (await context.Events
+        var oneTimeEvents = (await context.OneTimeEvents
                 .Where(e => e.DinnerTimeModel.PresentsType != PresentsType.Unknown)
                 .Where(e => e.Date == today)
                 .GroupBy(e => e.UserModel.Id)

@@ -21,7 +21,7 @@ public class RepeatedEventService : IService<RepeatedEvent>
     }
 
     public async Task<RepeatedEvent> UpdateAsync(int id, string title, DateOnly firstOccurrence,
-        DateOnly lastOccurrence, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime, int userId,
+        DateOnly lastOccurrence, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime,
         CancellationToken cancellationToken)
     {
         throw new NotImplementedException();

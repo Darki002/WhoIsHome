@@ -13,13 +13,13 @@ public abstract class EventBase(
 {
     public int? Id { get; } = id;
 
-    public string Title { get; private set; } = title;
+    public string Title { get; protected set; } = title;
 
-    public TimeOnly StartTime { get; private set; } = startTime;
+    public TimeOnly StartTime { get; protected set; } = startTime;
 
-    public TimeOnly EndTime { get; private set; } = endTime;
+    public TimeOnly EndTime { get; protected set; } = endTime;
 
-    public DinnerTime DinnerTime { get; } = dinnerTime;
+    public DinnerTime DinnerTime { get; protected set; } = dinnerTime;
 
     public int UserId { get; } = userId;
 

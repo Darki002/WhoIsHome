@@ -1,28 +1,69 @@
-﻿using WhoIsHome.Aggregates;
+﻿using Microsoft.EntityFrameworkCore;
+using WhoIsHome.Aggregates;
+using WhoIsHome.DataAccess;
+using WhoIsHome.DataAccess.Models;
 
 namespace WhoIsHome.Services;
 
-public class OneTimeEventService : IService<OneTimeEvent>
+public class OneTimeEventService(WhoIsHomeContext context) : IService<OneTimeEvent>
 {
-    public Task<OneTimeEvent> GetAsync(int id, CancellationToken cancellationToken)
+    public async Task<OneTimeEvent> GetAsync(int id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        // TODO: Check User permission
+
+        var result = await context.OneTimeEvents
+            .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
+
+        if (result is null)
+        {
+            throw new ArgumentException($"No OneTimeEvent found with the id {id}.", nameof(id));
+        }
+        
+        return result.ToAggregate<OneTimeEvent>();
     }
 
-    public Task DeleteAsync(int id, CancellationToken cancellationToken)
+    public async Task DeleteAsync(int id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        // TODO: Check User permission
+        
+        var result = await context.OneTimeEvents
+            .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
+
+        if (result is null)
+        {
+            throw new ArgumentException($"No OneTimeEvent found with the id {id}.", nameof(id));
+        }
+        
+        context.Remove(result);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<OneTimeEvent> CreateAsync(string title, DateOnly date, TimeOnly startTime, TimeOnly endTime,
         DinnerTime dinnerTime, int userId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        // TODO: Check if User Exists
+        
+        var oneTimeEvent = OneTimeEvent.Create(title, date, startTime, endTime, dinnerTime, userId)
+            .ToDbModel<OneTimeEventModel>();
+
+        var result = await context.OneTimeEvents.AddAsync(oneTimeEvent, cancellationToken);
+        return result.Entity.ToAggregate<OneTimeEvent>();
     }
 
     public async Task<OneTimeEvent> UpdateAsync(int id, string title, DateOnly date, TimeOnly startTime,
-        TimeOnly endTime, DinnerTime dinnerTime, int userId, CancellationToken cancellationToken)
+        TimeOnly endTime, DinnerTime dinnerTime, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        // TODO: Check if User Exists
+        
+        var existingOneTimeEvent = await context.OneTimeEvents
+            .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
+
+        if (existingOneTimeEvent is null)
+        {
+            throw new ArgumentException($"No OneTimeEvent found with the id {id}.", nameof(id));
+        }
+
+        var aggregate = existingOneTimeEvent.ToAggregate<OneTimeEvent>();
+        aggregate.Update(title, date, startTime, endTime, dinnerTime);
     }
 }

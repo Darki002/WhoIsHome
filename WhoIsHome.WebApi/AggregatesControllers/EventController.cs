@@ -31,7 +31,6 @@ public class EventController(OneTimeEventService oneTimeEventService) : Aggregat
     public async Task<ActionResult<OneTimeEventModelResponse>> UpdateEvent([FromBody] OneTimeEventModel eventModel, CancellationToken cancellationToken)
     {
         // TODO Authentication
-        var userId = 1;
         
         var result = await oneTimeEventService.UpdateAsync(
             id: eventModel.Id,
@@ -40,7 +39,6 @@ public class EventController(OneTimeEventService oneTimeEventService) : Aggregat
             startTime: eventModel.StartTime,
             endTime: eventModel.EndTime,
             dinnerTime: eventModel.DinnerTime,
-            userId: userId,
             cancellationToken: cancellationToken);
         
         return BuildResponse(result);

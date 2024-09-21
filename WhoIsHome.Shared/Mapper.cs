@@ -14,7 +14,7 @@ public static class Mapper
         where TAggregate : AggregateBase 
         where TDbModel : DbModel
     {
-        return models.Select(m => m.ToModel<TAggregate>()).ToList();
+        return models.Select(m => m.ToAggregate<TAggregate>()).ToList();
     }
     
     internal static TTo Map<TTo>(Type modelType, object model, PropertyInfo[] propertyInfos)

@@ -7,7 +7,7 @@ public class WhoIsHomeContext : DbContext
 {
     public DbSet<UserModel> Users { get; set; }
     
-    public DbSet<OneTimeEventModel> Events { get; set; }
+    public DbSet<OneTimeEventModel> OneTimeEvents { get; set; }
     
     public DbSet<RepeatedEventModel> RepeatedEvents { get; set; }
     

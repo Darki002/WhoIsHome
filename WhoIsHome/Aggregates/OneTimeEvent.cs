@@ -33,4 +33,13 @@ public class OneTimeEvent : EventBase
     protected override bool IsEventToday() => Date == DateOnly.FromDateTime(DateTime.Today);
 
     public override DateOnly GetNextOccurrence() => Date;
+
+    public void Update(string title, DateOnly date, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime)
+    {
+        Title = title;
+        Date = date;
+        StartTime = startTime;
+        EndTime = endTime;
+        DinnerTime = DinnerTime.Update(dinnerTime.PresentsType, dinnerTime.Time);
+    }
 }

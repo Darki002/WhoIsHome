@@ -12,7 +12,7 @@ public class PersonOverviewQueryHandler(WhoIsHomeContext context)
     {
         var today = DateOnlyHelper.Today;
 
-        var oneTimeEvents = (await context.Events
+        var oneTimeEvents = (await context.OneTimeEvents
                 .Where(e => e.Date > today)
                 .Where(e => e.UserModel.Id == userId)
                 .ToListAsync(cancellationToken))
@@ -75,7 +75,7 @@ public class PersonOverviewQueryHandler(WhoIsHomeContext context)
 
         var user = (await context.Users
                 .SingleAsync(u => u.Id == userId, cancellationToken))
-            .ToModel<User>();
+            .ToAggregate<User>();
 
         return new PersonOverview
         {

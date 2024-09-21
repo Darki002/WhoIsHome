@@ -32,7 +32,6 @@ public class RepeatedEventController(RepeatedEventService repeatedEventService) 
     public async Task<ActionResult<RepeatedEventModelResponse>> UpdateEvent([FromBody] RepeatedEventModel eventModel, CancellationToken cancellationToken) 
     {
         // TODO Authentication
-        var userId = 1;
         
         var result = await repeatedEventService.UpdateAsync(
             id: eventModel.Id,
@@ -42,7 +41,6 @@ public class RepeatedEventController(RepeatedEventService repeatedEventService) 
             startTime: eventModel.StartTime,
             endTime: eventModel.EndTime,
             dinnerTime: eventModel.DinnerTime,
-            userId: userId,
             cancellationToken: cancellationToken);
         
         return BuildResponse(result);
