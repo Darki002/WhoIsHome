@@ -34,7 +34,7 @@ public class OneTimeEventService(WhoIsHomeContext context) : IService<OneTimeEve
             throw new ArgumentException($"No OneTimeEvent found with the id {id}.", nameof(id));
         }
         
-        context.Remove(result);
+        context.OneTimeEvents.Remove(result);
         await context.SaveChangesAsync(cancellationToken);
     }
 
@@ -42,18 +42,19 @@ public class OneTimeEventService(WhoIsHomeContext context) : IService<OneTimeEve
         DinnerTime dinnerTime, int userId, CancellationToken cancellationToken)
     {
         // TODO: Check if User Exists
-        
+
         var oneTimeEvent = OneTimeEvent.Create(title, date, startTime, endTime, dinnerTime, userId)
             .ToDbModel<OneTimeEventModel>();
 
         var result = await context.OneTimeEvents.AddAsync(oneTimeEvent, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
         return result.Entity.ToAggregate<OneTimeEvent>();
     }
 
     public async Task<OneTimeEvent> UpdateAsync(int id, string title, DateOnly date, TimeOnly startTime,
         TimeOnly endTime, DinnerTime dinnerTime, CancellationToken cancellationToken)
     {
-        // TODO: Check if User Exists
+        // TODO: Check User permission
         
         var existingOneTimeEvent = await context.OneTimeEvents
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
@@ -65,5 +66,9 @@ public class OneTimeEventService(WhoIsHomeContext context) : IService<OneTimeEve
 
         var aggregate = existingOneTimeEvent.ToAggregate<OneTimeEvent>();
         aggregate.Update(title, date, startTime, endTime, dinnerTime);
+        
+        var result = context.OneTimeEvents.Update(aggregate.ToDbModel<OneTimeEventModel>());
+        await context.SaveChangesAsync(cancellationToken);
+        return result.Entity.ToAggregate<OneTimeEvent>();
     }
 }

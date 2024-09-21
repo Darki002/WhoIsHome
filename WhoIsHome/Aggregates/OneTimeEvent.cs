@@ -36,6 +36,8 @@ public class OneTimeEvent : EventBase
 
     public void Update(string title, DateOnly date, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime)
     {
+        ValidateBase(title, startTime, endTime, dinnerTime);
+        
         Title = title;
         Date = date;
         StartTime = startTime;

@@ -34,11 +34,7 @@ public class RepeatedEvent : EventBase
         int userId)
     {
         ValidateBase(title, startTime, endTime, dinnerTime);
-        
-        if (firstOccurrence > lastOccurrence)
-        {
-            throw new ArgumentException("First occurrence must be before the last occurrence.", nameof(firstOccurrence));
-        }
+        ValidateOccurrence(firstOccurrence, lastOccurrence);
         
         return new RepeatedEvent(
             null,
@@ -75,5 +71,26 @@ public class RepeatedEvent : EventBase
 
         var occurence = today.AddDays(daysLeftThisWeek).AddDays((int)FirstOccurrence.DayOfWeek);
         return occurence;
+    }
+
+    public void Update(string title, DateOnly firstOccurrence, DateOnly lastOccurrence, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime)
+    {
+        ValidateBase(title, startTime, endTime, dinnerTime);
+        ValidateOccurrence(firstOccurrence, lastOccurrence);
+        
+        Title = title;
+        FirstOccurrence = firstOccurrence;
+        LastOccurrence = lastOccurrence;
+        StartTime = startTime;
+        EndTime = endTime;
+        DinnerTime = DinnerTime.Update(dinnerTime.PresentsType, dinnerTime.Time);
+    }
+
+    private static void ValidateOccurrence(DateOnly firstOccurrence,  DateOnly lastOccurrence)
+    {
+        if (firstOccurrence > lastOccurrence)
+        {
+            throw new ArgumentException("First occurrence must be before the last occurrence.", nameof(firstOccurrence));
+        }
     }
 }
