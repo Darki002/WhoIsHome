@@ -3,8 +3,6 @@
 public static class DateOnlyHelper
 {
     public static DateOnly Today => DateOnly.FromDateTime(DateTime.Today);
-
-    public static int WeekOfYear(this DateOnly dateOnly) => dateOnly.DayOfYear / 7;
     
     public static bool IsThisWeek(this DateOnly dateOnly1)
     {
