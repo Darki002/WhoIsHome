@@ -12,16 +12,12 @@ public class EventController(OneTimeEventAggregateAggregateService oneTimeEventA
     [HttpPost]
     public async Task<ActionResult<OneTimeEventModelResponse>> CreateEvent([FromBody] NewOneTimeEventModel eventModel, CancellationToken cancellationToken)
     {
-        // TODO Authentication
-        var userId = 1;
-        
         var result = await oneTimeEventAggregateAggregateService.CreateAsync(
             title: eventModel.Title,
             date: eventModel.Date,
             startTime: eventModel.StartTime,
             endTime: eventModel.EndTime,
             dinnerTime: eventModel.DinnerTime,
-            userId: userId,
             cancellationToken: cancellationToken);
         
         return BuildResponse(result);
@@ -30,8 +26,6 @@ public class EventController(OneTimeEventAggregateAggregateService oneTimeEventA
     [HttpPut]
     public async Task<ActionResult<OneTimeEventModelResponse>> UpdateEvent([FromBody] OneTimeEventModel eventModel, CancellationToken cancellationToken)
     {
-        // TODO Authentication
-        
         var result = await oneTimeEventAggregateAggregateService.UpdateAsync(
             id: eventModel.Id,
             title: eventModel.Title,
