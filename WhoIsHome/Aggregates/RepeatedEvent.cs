@@ -1,4 +1,5 @@
 ﻿using WhoIsHome.Shared;
+using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Aggregates;
 
@@ -90,7 +91,7 @@ public class RepeatedEvent : EventBase
     {
         if (firstOccurrence > lastOccurrence)
         {
-            throw new ArgumentException("First occurrence must be before the last occurrence.", nameof(firstOccurrence));
+            throw new InvalidModelException("First occurrence must be before the last occurrence.");
         }
     }
 }

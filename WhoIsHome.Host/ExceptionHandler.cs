@@ -1,33 +1,53 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Diagnostics;
 using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Host;
 
 public static class ExceptionHandler
 {
-    public static void Handle(IApplicationBuilder errorApp)
+    public static void UseExceptionHandler(this IApplicationBuilder app)
     {
-        errorApp.Run(async context =>
-        {
-            var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-
-            if (exceptionHandlerPathFeature?.Error is ActionNotAllowedException)
-            {
-                context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                await context.Response.WriteAsync("Action not allowed: " + exceptionHandlerPathFeature.Error.Message);
-            }
-
-            if (exceptionHandlerPathFeature?.Error is NotFoundException)
-            {
-                context.Response.StatusCode = StatusCodes.Status404NotFound;
-                await context.Response.WriteAsync("Not Found: " + exceptionHandlerPathFeature.Error.Message);
-            }
-
-            if (exceptionHandlerPathFeature?.Error is ArgumentException)
-            {
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await context.Response.WriteAsync("Bad Request: " + exceptionHandlerPathFeature.Error.Message);
-            }
-        });
+        app.UseExceptionHandler(errorApp =>
+                errorApp.Run(async context =>
+                {
+                    var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+                    var exception = exceptionHandlerPathFeature?.Error;
+            
+                    if(exception is null) return;
+            
+                    int statusCode;
+                    string message;
+            
+                    switch (exception)
+                    {
+                        case ActionNotAllowedException:
+                            statusCode = StatusCodes.Status403Forbidden;
+                            message = $"Action not allowed: {exception.Message}";
+                            break;
+                        case NotFoundException:
+                            statusCode = StatusCodes.Status404NotFound;
+                            message = $"Not Found: {exception.Message}";
+                            break;
+                        case InvalidModelException:
+                            statusCode = StatusCodes.Status400BadRequest;
+                            message = $"Bad Request: {exception.Message}";
+                            break;
+                        default:
+                            statusCode = StatusCodes.Status500InternalServerError;
+                            message = "An unexpected error occurred.";
+                            // TODO Logger
+                            break;
+                    }
+            
+                    context.Response.StatusCode = statusCode;
+                    context.Response.ContentType = "application/json";
+                    var result = JsonSerializer.Serialize(new
+                    {
+                        statusCode,
+                        error = message
+                    });
+                    await context.Response.WriteAsync(result);
+                }));
     }
 }

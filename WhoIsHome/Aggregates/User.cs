@@ -1,6 +1,7 @@
 ﻿using System.Net.Mail;
 using WhoIsHome.Shared;
 using WhoIsHome.Shared.Authentication;
+using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Aggregates;
 
@@ -31,9 +32,7 @@ public class User : AggregateBase
         _ = new MailAddress(email);
         
         if (IsValidUserName(userName))
-            throw new ArgumentException(
-                $"UserName is to long or to short. Must be between {UserNameMinLength} and {UserNameMaxLength} Characters.",
-                nameof(userName));
+            throw new InvalidModelException($"UserName is to long or to short. Must be between {UserNameMinLength} and {UserNameMaxLength} Characters.");
         
         return new User(
             null,
