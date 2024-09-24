@@ -10,7 +10,7 @@ public static class JwtAuthentication
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
-        var secretKey = Environment.GetEnvironmentVariable("SECRET_KEY");
+        var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
 
         if (secretKey is null)
         {
