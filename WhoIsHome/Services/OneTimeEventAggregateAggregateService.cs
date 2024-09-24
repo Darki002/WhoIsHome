@@ -3,6 +3,7 @@ using WhoIsHome.Aggregates;
 using WhoIsHome.DataAccess;
 using WhoIsHome.DataAccess.Models;
 using WhoIsHome.Shared.Authentication;
+using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Services;
 
@@ -14,7 +15,7 @@ public class OneTimeEventAggregateAggregateService(WhoIsHomeContext context, IUs
         var result = await context.OneTimeEvents
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
-        if (result is null) throw new ArgumentException($"No OneTimeEvent found with the id {id}.", nameof(id));
+        if (result is null) throw new NotFoundException($"No OneTimeEvent found with the id {id}.");
 
         return result.ToAggregate<OneTimeEvent>();
     }
@@ -25,11 +26,11 @@ public class OneTimeEventAggregateAggregateService(WhoIsHomeContext context, IUs
             .Include(oneTimeEventModel => oneTimeEventModel.UserModel)
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
-        if (result is null) throw new ArgumentException($"No OneTimeEvent found with the id {id}.", nameof(id));
+        if (result is null) throw new NotFoundException($"No OneTimeEvent found with the id {id}.");
 
         if (!userService.IsUserPermitted(result.UserModel.Id))
         {
-            throw new UnauthorizedAccessException($"User with ID {result.UserModel.Id} is not allowed to delete or modify the content of {id}");
+            throw new ActionNotAllowedException($"User with ID {result.UserModel.Id} is not allowed to delete or modify the content of {id}");
         }
 
         context.OneTimeEvents.Remove(result);
@@ -57,11 +58,11 @@ public class OneTimeEventAggregateAggregateService(WhoIsHomeContext context, IUs
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (existingOneTimeEvent is null)
-            throw new ArgumentException($"No OneTimeEvent found with the id {id}.", nameof(id));
+            throw new NotFoundException($"No OneTimeEvent found with the id {id}.");
 
         if (!userService.IsUserPermitted(existingOneTimeEvent.UserModel.Id))
         {
-            throw new UnauthorizedAccessException($"User with ID {existingOneTimeEvent.UserModel.Id} is not allowed to delete or modify the content of {id}");
+            throw new ActionNotAllowedException($"User with ID {existingOneTimeEvent.UserModel.Id} is not allowed to delete or modify the content of {id}");
         }
         
         var aggregate = existingOneTimeEvent.ToAggregate<OneTimeEvent>();

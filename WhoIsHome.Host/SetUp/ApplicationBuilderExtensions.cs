@@ -11,6 +11,8 @@ public static class ApplicationBuilderExtensions
             app.UseDeveloperExceptionPage();
         }
 
+        app.UseExceptionHandler(ExceptionHandler.Handle);
+
         app.UseSwagger();
         app.UseSwaggerUI();
 

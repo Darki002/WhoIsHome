@@ -80,7 +80,7 @@ public class RepeatedEvent : EventBase
             return FirstOccurrence;
         }
         
-        var daysLeftThisWeek = 7 - (int)today.DayOfWeek;
+        var daysLeftThisWeek = OccurrenceFrequency - (int)today.DayOfWeek;
 
         var occurence = today.AddDays(daysLeftThisWeek).AddDays((int)FirstOccurrence.DayOfWeek);
         return occurence;

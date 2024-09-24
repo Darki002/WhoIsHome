@@ -3,6 +3,7 @@ using WhoIsHome.Aggregates;
 using WhoIsHome.DataAccess;
 using WhoIsHome.DataAccess.Models;
 using WhoIsHome.Shared.Authentication;
+using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Services;
 
@@ -13,7 +14,7 @@ public class RepeatedEventAggregateAggregateService(WhoIsHomeContext context, IU
         var result = await context.RepeatedEvents
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
-        if (result is null) throw new ArgumentException($"No RepeatedEvent found with the id {id}.", nameof(id));
+        if (result is null) throw new NotFoundException($"No RepeatedEvent found with the id {id}.");
 
         return result.ToAggregate<RepeatedEvent>();
     }
@@ -24,11 +25,11 @@ public class RepeatedEventAggregateAggregateService(WhoIsHomeContext context, IU
             .Include(repeatedEventModel => repeatedEventModel.UserModel)
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
-        if (result is null) throw new ArgumentException($"No RepeatedEvent found with the id {id}.", nameof(id));
+        if (result is null) throw new NotFoundException($"No RepeatedEvent found with the id {id}.");
 
         if (!userService.IsUserPermitted(result.UserModel.Id))
         {
-            throw new UnauthorizedAccessException($"User with ID {result.UserModel.Id} is not allowed to delete or modify the content of {id}");
+            throw new ActionNotAllowedException($"User with ID {result.UserModel.Id} is not allowed to delete or modify the content of {id}");
         }
         
         context.RepeatedEvents.Remove(result);
@@ -59,12 +60,12 @@ public class RepeatedEventAggregateAggregateService(WhoIsHomeContext context, IU
 
         if (existingRepeatedEvent is null)
         {
-            throw new ArgumentException($"No RepeatedEvent found with the id {id}.", nameof(id));
+            throw new NotFoundException($"No RepeatedEvent found with the id {id}.");
         }
         
         if (!userService.IsUserPermitted(existingRepeatedEvent.UserModel.Id))
         {
-            throw new UnauthorizedAccessException($"User with ID {existingRepeatedEvent.UserModel.Id} is not allowed to delete or modify the content of {id}");
+            throw new ActionNotAllowedException($"User with ID {existingRepeatedEvent.UserModel.Id} is not allowed to delete or modify the content of {id}");
         }
 
         var aggregate = existingRepeatedEvent.ToAggregate<RepeatedEvent>();

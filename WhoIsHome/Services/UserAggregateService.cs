@@ -2,6 +2,7 @@
 using WhoIsHome.Aggregates;
 using WhoIsHome.DataAccess;
 using WhoIsHome.DataAccess.Models;
+using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Services;
 
@@ -9,7 +10,13 @@ public class UserAggregateService(WhoIsHomeContext context)
 {
     public async Task<User> GetUserByIdAsync(int id, CancellationToken cancellationToken)
     {
-        var user = await context.Users.SingleAsync(u => u.Id == id, cancellationToken);
+        var user = await context.Users.SingleOrDefaultAsync(u => u.Id == id, cancellationToken);
+
+        if (user is null)
+        {
+            throw new NotFoundException($"No User found with id {id}");
+        }
+        
         return user.ToAggregate<User>();
     }
     

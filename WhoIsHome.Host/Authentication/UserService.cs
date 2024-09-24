@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using WhoIsHome.DataAccess;
 using WhoIsHome.DataAccess.Models;
 using WhoIsHome.Shared.Authentication;
+using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Host.Authentication;
 
@@ -56,7 +57,7 @@ public class UserService(IHttpContextAccessor httpContextAccessor, WhoIsHomeCont
         var email = httpContextAccessor.HttpContext?.User.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
         if (expectedEmail != email)
         {
-            throw new UnauthorizedAccessException("Email Address in the Request must match the Email of the User.");
+            throw new ActionNotAllowedException("Email Address in the Request must match the Email of the User.");
         }
     }
 }
