@@ -1,4 +1,5 @@
 ﻿using WhoIsHome.DataAccess;
+using WhoIsHome.WebApi;
 
 namespace WhoIsHome.Host.SetUp;
 
@@ -11,8 +12,10 @@ public static class ServiceCollectionExtensions
         services.AddSwagger();
         services.AddControllers();
         
-        services.AddWhoIsHomeServices(configuration);
-        services.AddDataAccessServices();
+        services.AddWhoIsHomeServices(configuration)
+            .AddDataAccessServices()
+            .AddWebApiServices();
+        
         return services;
     }
 }

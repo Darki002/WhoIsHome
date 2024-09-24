@@ -1,9 +1,9 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Net.Mail;
 using WhoIsHome.Shared;
 
 namespace WhoIsHome.Aggregates;
 
-public partial class User : AggregateBase
+public class User : AggregateBase
 {
     private const int UserNameMinLength = 5;
     private const int UserNameMaxLength = 30;
@@ -26,9 +26,9 @@ public partial class User : AggregateBase
     
     public static User Create(string userName, string email, string passwordHash)
     {
-        if (IsValidEmail(email) is false)
-            throw new ArgumentException("Email is not in the correct format.", nameof(email));
-
+        // validates Email, throws if Invalid format
+        _ = new MailAddress(email);
+        
         if (IsValidUserName(userName))
             throw new ArgumentException(
                 $"UserName is to long or to short. Must be between {UserNameMinLength} and {UserNameMaxLength} Characters.",
@@ -45,12 +45,4 @@ public partial class User : AggregateBase
     {
         return userName.Length is > UserNameMaxLength or < UserNameMinLength;
     }
-
-    private static bool IsValidEmail(string email)
-    {
-        return MyRegex().IsMatch(email);
-    }
-
-    [GeneratedRegex(@"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")]
-    private static partial Regex MyRegex();
 }

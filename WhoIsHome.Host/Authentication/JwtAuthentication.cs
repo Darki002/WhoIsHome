@@ -40,8 +40,6 @@ public static class JwtAuthentication
             };
         });
 
-        services.AddTransient<JwtTokenService>();
-
         return services;
     }
 }
