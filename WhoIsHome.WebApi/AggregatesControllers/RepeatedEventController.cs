@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Aggregates;
 using WhoIsHome.Services;
@@ -11,7 +10,6 @@ namespace WhoIsHome.WebApi.AggregatesControllers;
 public class RepeatedEventController(RepeatedEventAggregateAggregateService repeatedEventAggregateAggregateService) : AggregateControllerBase<RepeatedEvent, RepeatedEventModelResponse>(repeatedEventAggregateAggregateService)
 {
     [HttpPost]
-    [Authorize]
     public async Task<ActionResult<RepeatedEventModelResponse>> CreateEvent([FromBody] NewRepeatedEventModel eventModel, CancellationToken cancellationToken)
     {
         var result = await repeatedEventAggregateAggregateService.CreateAsync(
@@ -27,7 +25,6 @@ public class RepeatedEventController(RepeatedEventAggregateAggregateService repe
     }
 
     [HttpPut]
-    [Authorize]
     public async Task<ActionResult<RepeatedEventModelResponse>> UpdateEvent([FromBody] RepeatedEventModel eventModel, CancellationToken cancellationToken) 
     {
         var result = await repeatedEventAggregateAggregateService.UpdateAsync(
