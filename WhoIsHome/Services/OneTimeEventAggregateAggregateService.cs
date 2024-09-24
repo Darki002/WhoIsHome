@@ -5,7 +5,7 @@ using WhoIsHome.DataAccess.Models;
 
 namespace WhoIsHome.Services;
 
-public class OneTimeEventService(WhoIsHomeContext context) : IService<OneTimeEvent>
+public class OneTimeEventAggregateAggregateService(WhoIsHomeContext context) : IAggregateService<OneTimeEvent>
 {
     public async Task<OneTimeEvent> GetAsync(int id, CancellationToken cancellationToken)
     {

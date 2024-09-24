@@ -7,7 +7,7 @@ using WhoIsHome.WebApi.Models.Response;
 
 namespace WhoIsHome.WebApi.AggregatesControllers;
 
-public class RepeatedEventController(RepeatedEventService repeatedEventService) : AggregateControllerBase<RepeatedEvent, RepeatedEventModelResponse>(repeatedEventService)
+public class RepeatedEventController(RepeatedEventAggregateAggregateService repeatedEventAggregateAggregateService) : AggregateControllerBase<RepeatedEvent, RepeatedEventModelResponse>(repeatedEventAggregateAggregateService)
 {
     [HttpPost]
     public async Task<ActionResult<RepeatedEventModelResponse>> CreateEvent([FromBody] NewRepeatedEventModel eventModel, CancellationToken cancellationToken)
@@ -15,7 +15,7 @@ public class RepeatedEventController(RepeatedEventService repeatedEventService) 
         // TODO Authentication
         var userId = 1;
         
-        var result = await repeatedEventService.CreateAsync(
+        var result = await repeatedEventAggregateAggregateService.CreateAsync(
             title: eventModel.Title,
             firstOccurrence: eventModel.FirstOccurrence,
             lastOccurrence: eventModel.LastOccurrence,
@@ -33,7 +33,7 @@ public class RepeatedEventController(RepeatedEventService repeatedEventService) 
     {
         // TODO Authentication
         
-        var result = await repeatedEventService.UpdateAsync(
+        var result = await repeatedEventAggregateAggregateService.UpdateAsync(
             id: eventModel.Id,
             title: eventModel.Title,
             firstOccurrence: eventModel.FirstOccurrence,

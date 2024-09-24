@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Aggregates;
+using WhoIsHome.Services;
 
 namespace WhoIsHome.WebApi.UserAuthentication;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class UserController(UserService userService, JwtTokenService jwtTokenService, PasswordHasher<User> passwordHasher) : Controller
+public class UserController(UserAggregateService userService, JwtTokenService jwtTokenService, PasswordHasher<User> passwordHasher) : Controller
 {
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto loginDto, CancellationToken cancellationToken)

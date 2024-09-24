@@ -5,12 +5,20 @@ using WhoIsHome.DataAccess.Models;
 
 namespace WhoIsHome.Services;
 
-public class UserService(WhoIsHomeContext context)
+public class UserAggregateService(WhoIsHomeContext context)
 {
     public async Task<User> GetUserByIdAsync(int id, CancellationToken cancellationToken)
     {
         var user = await context.Users.SingleAsync(u => u.Id == id, cancellationToken);
         return user.ToAggregate<User>();
+    }
+    
+    public async Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        var user = await context.Users
+            .Where(u => u.Email == email)
+            .SingleOrDefaultAsync(cancellationToken);
+        return user?.ToAggregate<User>();
     }
 
     public async Task<User> CreateUserAsync(string userName, string email, string password, CancellationToken cancellationToken)

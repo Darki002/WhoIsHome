@@ -1,5 +1,6 @@
 ﻿using System.Net.Mail;
 using WhoIsHome.Shared;
+using WhoIsHome.Shared.Authentication;
 
 namespace WhoIsHome.Aggregates;
 
@@ -41,8 +42,24 @@ public class User : AggregateBase
             passwordHash);
     }
 
+    public static User FromAuthenticatedUser(AuthenticatedUser authenticatedUser)
+    {
+        return new User(authenticatedUser.Id,
+            authenticatedUser.UserName,
+            authenticatedUser.Email,
+            authenticatedUser.PasswordHash);
+    }
+
     private static bool IsValidUserName(string userName)
     {
         return userName.Length is > UserNameMaxLength or < UserNameMinLength;
+    }
+}
+
+public static class UserExtension
+{
+    public static User ToUser(this AuthenticatedUser authenticatedUser)
+    {
+        return User.FromAuthenticatedUser(authenticatedUser);
     }
 }
