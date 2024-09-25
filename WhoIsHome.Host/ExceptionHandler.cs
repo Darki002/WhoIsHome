@@ -25,6 +25,10 @@ public static class ExceptionHandler
                             statusCode = StatusCodes.Status403Forbidden;
                             message = $"Action not allowed: {exception.Message}";
                             break;
+                        case InvalidClaimsException:
+                            statusCode = StatusCodes.Status403Forbidden;
+                            message = $"Invalid Claims: {exception.Message}";
+                            break;
                         case NotFoundException:
                             statusCode = StatusCodes.Status404NotFound;
                             message = $"Not Found: {exception.Message}";

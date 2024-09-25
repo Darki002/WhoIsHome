@@ -24,7 +24,7 @@ public class UserService(IHttpContextAccessor httpContextAccessor, WhoIsHomeCont
     {
         if (UserId is null)
         {
-            throw new InvalidOperationException("No User is present in the Request.");
+            throw new InvalidClaimsException("No User is present in the Request.");
         }
 
         if (authenticatedUserCache is not null)
@@ -57,7 +57,7 @@ public class UserService(IHttpContextAccessor httpContextAccessor, WhoIsHomeCont
         var email = httpContextAccessor.HttpContext?.User.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
         if (expectedEmail != email)
         {
-            throw new ActionNotAllowedException("Email Address in the Request must match the Email of the User.");
+            throw new InvalidClaimsException("Email Address in the Request must match the Email of the User.");
         }
     }
 }
