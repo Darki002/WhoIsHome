@@ -18,16 +18,6 @@ public class DailyOverview
         };
     }
 
-    public static DailyOverview NotAtHome(User user)
-    {
-        return new DailyOverview
-        {
-            User = user,
-            IsAtHome = false,
-            DinnerTime = null
-        };
-    }
-
     public static DailyOverview From(User user, DinnerTime dinnerTime)
     {
         return new DailyOverview
