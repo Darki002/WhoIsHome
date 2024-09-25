@@ -7,7 +7,7 @@ using OneTimeEventModel = WhoIsHome.WebApi.Models.Request.OneTimeEventModel;
 
 namespace WhoIsHome.WebApi.AggregatesControllers;
 
-public class EventController(OneTimeEventAggregateAggregateService oneTimeEventAggregateAggregateService) : AggregateControllerBase<OneTimeEvent, OneTimeEventModelResponse>(oneTimeEventAggregateAggregateService)
+public class OneTimeEventController(OneTimeEventAggregateAggregateService oneTimeEventAggregateAggregateService) : AggregateControllerBase<OneTimeEvent, OneTimeEventModelResponse>(oneTimeEventAggregateAggregateService)
 {
     [HttpPost]
     public async Task<ActionResult<OneTimeEventModelResponse>> CreateEvent([FromBody] NewOneTimeEventModel eventModel, CancellationToken cancellationToken)

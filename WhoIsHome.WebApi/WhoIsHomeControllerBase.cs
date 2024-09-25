@@ -14,11 +14,5 @@ public abstract class WhoIsHomeControllerBase<T, TModel> : ControllerBase
         return Ok(model);
     }
     
-    protected ActionResult<IReadOnlyList<TModel>> BuildResponse(IReadOnlyList<T> result)
-    {
-        var model = result.Select(ConvertToModel).ToList();
-        return Ok(model);
-    }
-    
     protected abstract TModel ConvertToModel(T data);
 }

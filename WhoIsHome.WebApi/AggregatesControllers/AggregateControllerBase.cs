@@ -9,7 +9,6 @@ public abstract class AggregateControllerBase<T, TModel>(IAggregateService<T> ag
     [HttpGet("{id}")]
     public async Task<ActionResult<TModel>> Get(int id, CancellationToken cancellationToken)
     {
-        // TODO Authentication
         var result = await aggregateAggregateAggregateService.GetAsync(id, cancellationToken);
         return BuildResponse(result);
     }
@@ -17,7 +16,6 @@ public abstract class AggregateControllerBase<T, TModel>(IAggregateService<T> ag
     [HttpDelete("{id}")]
     public async Task<ActionResult<TModel>> Delete(int id, CancellationToken cancellationToken)
     {
-        // TODO Authentication
         await aggregateAggregateAggregateService.DeleteAsync(id, cancellationToken);
         return Ok();
     }
