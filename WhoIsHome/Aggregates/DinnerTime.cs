@@ -1,6 +1,4 @@
-﻿using Google.Api.Gax.Grpc;
-using WhoIsHome.Shared;
-using WhoIsHome.Shared.BaseTypes;
+﻿using WhoIsHome.Shared.BaseTypes;
 using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.Shared.Types;
 
