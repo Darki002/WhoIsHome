@@ -12,8 +12,8 @@ For informations about Authentication & Authorized read the following Documentat
 
 - `JWT_SECRET_KEY` : Key used for the JWT Authentication.
 - `API_KEY` : API Key used by the middleware in every request to Authorized.
-- `PROJECT_ID` : the Firebase projectId of your Firebase project.
-- `GOOGLE_APPLICATION_CREDENTIALS` : Google Authentication for Firebase. Read more [here](https://cloud.google.com/docs/authentication/provide-credentials-adc#wlif-key)
+- `PROJECT_ID` : the Firebase projectId of your Firebase project. (Not in used yet)
+- `GOOGLE_APPLICATION_CREDENTIALS` : Google Authentication for Firebase. Read more [here](https://cloud.google.com/docs/authentication/provide-credentials-adc#wlif-key) (Not in used yet)
 
 ## Local Development
 
