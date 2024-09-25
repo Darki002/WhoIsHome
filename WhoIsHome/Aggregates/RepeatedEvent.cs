@@ -1,5 +1,6 @@
 ﻿using WhoIsHome.Shared;
 using WhoIsHome.Shared.Exceptions;
+using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.Aggregates;
 

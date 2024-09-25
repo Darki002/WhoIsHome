@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
+using WhoIsHome.Shared.BaseTypes;
 
-namespace WhoIsHome.Shared;
+namespace WhoIsHome.Shared.Framework;
 
 public static class Mapper
 {

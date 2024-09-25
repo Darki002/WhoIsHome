@@ -1,4 +1,4 @@
-﻿namespace WhoIsHome.Shared;
+﻿namespace WhoIsHome.Shared.Helper;
 
 public static class DateOnlyHelper
 {

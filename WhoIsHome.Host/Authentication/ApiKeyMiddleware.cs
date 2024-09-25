@@ -1,10 +1,12 @@
-﻿namespace WhoIsHome.Host.Authentication;
+﻿using WhoIsHome.Shared.Helper;
+using WhoIsHome.Shared.Types;
+
+namespace WhoIsHome.Host.Authentication;
 
 public class ApiKeyMiddleware(RequestDelegate next)
 {
     public const string ApiKeyHeaderName = "X-API-KEY";
-    private readonly string apiKey = Environment.GetEnvironmentVariable("API_KEY") ??
-                                     throw new Exception("API_KEY not found in environment variables.");
+    private readonly string apiKey = EnvironmentHelper.GetVariable(EnvVariables.ApiKey);
 
     public async Task InvokeAsync(HttpContext context, IConfiguration configuration)
     {

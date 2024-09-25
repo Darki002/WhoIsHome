@@ -4,6 +4,8 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using WhoIsHome.Aggregates;
+using WhoIsHome.Shared.Helper;
+using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.WebApi.UserAuthentication;
 
@@ -13,11 +15,7 @@ public class JwtTokenService(IConfiguration configuration)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
         
-        var secretKey = Environment.GetEnvironmentVariable("SECRET_KEY");
-        if (secretKey is null)
-        {
-            throw new Exception("SECRET_KEY not found in the Environment Variables.");
-        }
+        var secretKey = EnvironmentHelper.GetVariable(EnvVariables.JwtSecretKey);
         
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
