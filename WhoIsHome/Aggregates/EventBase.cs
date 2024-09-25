@@ -1,4 +1,6 @@
 ﻿using WhoIsHome.Shared;
+using WhoIsHome.Shared.BaseTypes;
+using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Aggregates;
 
@@ -40,7 +42,7 @@ public abstract class EventBase(
     {
         if (title.Length >= 50)
         {
-            throw new ArgumentException("Title must be less then or equal to 50 characters long.", nameof(title));
+            throw new InvalidModelException("Title must be less then or equal to 50 characters long.");
         }
     }
 
@@ -48,7 +50,7 @@ public abstract class EventBase(
     {
         if (startTime > endTime)
         {
-            throw new ArgumentException("StartDate must be before EndDate.", nameof(startTime));
+            throw new InvalidModelException("StartDate must be before EndDate.");
         }
     }
 
@@ -56,7 +58,7 @@ public abstract class EventBase(
     {
         if (endTime > dinnerTime.Time)
         {
-            throw new ArgumentException("Dinner Time must be later then the End Time of the Event.", nameof(dinnerTime));
+            throw new InvalidModelException("Dinner Time must be later then the End Time of the Event.");
         }
     }
 

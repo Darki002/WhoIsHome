@@ -1,5 +1,6 @@
-﻿using Google.Api.Gax.Grpc;
-using WhoIsHome.Shared;
+﻿using WhoIsHome.Shared.BaseTypes;
+using WhoIsHome.Shared.Exceptions;
+using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Aggregates;
 
@@ -50,10 +51,10 @@ public class DinnerTime : AggregateBase
     {
         return presentsType switch
         {
-            PresentsType.Unknown => !time.HasValue ? CreateUnknown().WithId(Id) : throw new ArgumentException("Can't set Time for Type Unknown.", nameof(time)),
-            PresentsType.Default => time.HasValue ? CreateDefault(time.Value).WithId(Id) : throw new ArgumentException("Must provide a Time for Default Type.", nameof(time)),
-            PresentsType.Late => time.HasValue ? CreateLate(time.Value).WithId(Id) : throw new ArgumentException("Must provide a Time for Late Type.", nameof(time)),
-            PresentsType.NotPresent => !time.HasValue ? CreateNotPresent().WithId(Id) : throw new ArgumentException("Can't set Time for Type NotPresent.", nameof(time)),
+            PresentsType.Unknown => !time.HasValue ? CreateUnknown().WithId(Id) : throw new InvalidModelException("Can't set Time for Type Unknown."),
+            PresentsType.Default => time.HasValue ? CreateDefault(time.Value).WithId(Id) : throw new InvalidModelException("Must provide a Time for Default Type."),
+            PresentsType.Late => time.HasValue ? CreateLate(time.Value).WithId(Id) : throw new InvalidModelException("Must provide a Time for Late Type."),
+            PresentsType.NotPresent => !time.HasValue ? CreateNotPresent().WithId(Id) : throw new InvalidModelException("Can't set Time for Type NotPresent."),
             _ => throw new ArgumentOutOfRangeException(nameof(presentsType), presentsType, null)
         };
     }

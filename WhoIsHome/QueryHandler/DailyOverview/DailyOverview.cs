@@ -37,6 +37,4 @@ public class DailyOverview
             DinnerTime = dinnerTime.Time
         };
     }
-    
-    private static TimeOnly? TryGetTimeOnly(int? timestamp) => timestamp?.ToTimeOnly();
 }

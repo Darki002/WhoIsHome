@@ -1,4 +1,6 @@
-﻿namespace WhoIsHome.Shared;
+﻿using WhoIsHome.Shared.Framework;
+
+namespace WhoIsHome.Shared.BaseTypes;
 
 public abstract class AggregateBase
 {

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using WhoIsHome.Shared.Framework;
 
-namespace WhoIsHome.Shared;
+namespace WhoIsHome.Shared.BaseTypes;
 
 public abstract class DbModel
 {

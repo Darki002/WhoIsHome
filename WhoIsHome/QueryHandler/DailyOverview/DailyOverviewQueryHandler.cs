@@ -3,6 +3,8 @@ using WhoIsHome.Aggregates;
 using WhoIsHome.DataAccess;
 using WhoIsHome.DataAccess.Models;
 using WhoIsHome.Shared;
+using WhoIsHome.Shared.Framework;
+using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.QueryHandler.DailyOverview;
 

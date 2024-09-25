@@ -1,4 +1,6 @@
 ﻿using WhoIsHome.Shared;
+using WhoIsHome.Shared.Exceptions;
+using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.Aggregates;
 
@@ -80,7 +82,7 @@ public class RepeatedEvent : EventBase
             return FirstOccurrence;
         }
         
-        var daysLeftThisWeek = 7 - (int)today.DayOfWeek;
+        var daysLeftThisWeek = OccurrenceFrequency - (int)today.DayOfWeek;
 
         var occurence = today.AddDays(daysLeftThisWeek).AddDays((int)FirstOccurrence.DayOfWeek);
         return occurence;
@@ -90,7 +92,7 @@ public class RepeatedEvent : EventBase
     {
         if (firstOccurrence > lastOccurrence)
         {
-            throw new ArgumentException("First occurrence must be before the last occurrence.", nameof(firstOccurrence));
+            throw new InvalidModelException("First occurrence must be before the last occurrence.");
         }
     }
 }

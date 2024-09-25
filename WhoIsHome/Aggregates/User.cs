@@ -1,9 +1,12 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Net.Mail;
 using WhoIsHome.Shared;
+using WhoIsHome.Shared.Authentication;
+using WhoIsHome.Shared.BaseTypes;
+using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Aggregates;
 
-public partial class User : AggregateBase
+public class User : AggregateBase
 {
     private const int UserNameMinLength = 5;
     private const int UserNameMaxLength = 30;
@@ -26,13 +29,11 @@ public partial class User : AggregateBase
     
     public static User Create(string userName, string email, string passwordHash)
     {
-        if (IsValidEmail(email) is false)
-            throw new ArgumentException("Email is not in the correct format.", nameof(email));
-
+        // validates Email, throws if Invalid format
+        _ = new MailAddress(email);
+        
         if (IsValidUserName(userName))
-            throw new ArgumentException(
-                $"UserName is to long or to short. Must be between {UserNameMinLength} and {UserNameMaxLength} Characters.",
-                nameof(userName));
+            throw new InvalidModelException($"UserName is to long or to short. Must be between {UserNameMinLength} and {UserNameMaxLength} Characters.");
         
         return new User(
             null,
@@ -41,16 +42,24 @@ public partial class User : AggregateBase
             passwordHash);
     }
 
+    public static User FromAuthenticatedUser(AuthenticatedUser authenticatedUser)
+    {
+        return new User(authenticatedUser.Id,
+            authenticatedUser.UserName,
+            authenticatedUser.Email,
+            authenticatedUser.PasswordHash);
+    }
+
     private static bool IsValidUserName(string userName)
     {
         return userName.Length is > UserNameMaxLength or < UserNameMinLength;
     }
+}
 
-    private static bool IsValidEmail(string email)
+public static class UserExtension
+{
+    public static User ToUser(this AuthenticatedUser authenticatedUser)
     {
-        return MyRegex().IsMatch(email);
+        return User.FromAuthenticatedUser(authenticatedUser);
     }
-
-    [GeneratedRegex(@"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")]
-    private static partial Regex MyRegex();
 }
