@@ -12,13 +12,11 @@ public static class ApplicationBuilderExtensions
         app.UseSwaggerUI();
 
         app.UseExceptionHandler();
-
         app.UseMiddleware<ApiKeyMiddleware>();
 
+        app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
-
-        app.UseRouting();
         app.MapControllers();
         app.UseHttpsRedirection();
     }
