@@ -6,7 +6,7 @@ namespace WhoIsHome.WebApi.PersonOverviews;
 
 public class PersonOverviewController(PersonOverviewQueryHandler queryHandler) : WhoIsHomeControllerBase<PersonOverview, UserOverviewModel>
 {
-    [HttpGet("/{personId}")]
+    [HttpGet("{personId}")]
     public async Task<ActionResult<UserOverviewModel>> GetPersonOverviewAsync(int personId, CancellationToken cancellationToken)
     {
         var result = await queryHandler.HandleAsync(personId, cancellationToken);

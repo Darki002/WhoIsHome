@@ -8,7 +8,7 @@ namespace WhoIsHome.WebApi.UserAuthentication;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class UserController(UserAggregateService userAggregateService, JwtTokenService jwtTokenService, IPasswordHasher<User> passwordHasher) : Controller
+public class AuthController(UserAggregateService userAggregateService, JwtTokenService jwtTokenService, IPasswordHasher<User> passwordHasher) : Controller
 {
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto loginDto, CancellationToken cancellationToken)
