@@ -3,17 +3,19 @@ using WhoIsHome.QueryHandler.DailyOverview;
 
 namespace WhoIsHome.WebApi.DailyOverviews;
 
-public class DailyOverviewController(DailyOverviewQueryHandler queryHandler) 
+public class DailyOverviewController(DailyOverviewQueryHandler queryHandler)
     : WhoIsHomeControllerBase<IReadOnlyCollection<DailyOverview>, IReadOnlyCollection<DailyOverviewModel>>
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyCollection<DailyOverviewModel>>> GetAsync(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyCollection<DailyOverviewModel>>> GetAsync(
+        CancellationToken cancellationToken)
     {
         var result = await queryHandler.HandleAsync(cancellationToken);
-        return BuildResponse(result);
+        return await BuildResponseAsync(result);
     }
 
-    protected override IReadOnlyCollection<DailyOverviewModel> ConvertToModel(IReadOnlyCollection<DailyOverview> data)
+    protected override async Task<IReadOnlyCollection<DailyOverviewModel>> ConvertToModelAsync(
+        IReadOnlyCollection<DailyOverview> data)
     {
         return data
             .Select(DailyOverviewModel.From)

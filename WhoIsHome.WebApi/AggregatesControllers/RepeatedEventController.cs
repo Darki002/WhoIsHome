@@ -1,16 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Aggregates;
 using WhoIsHome.Services;
+using WhoIsHome.Shared.Authentication;
 using WhoIsHome.WebApi.Models.New;
 using WhoIsHome.WebApi.Models.Request;
 using WhoIsHome.WebApi.Models.Response;
 
 namespace WhoIsHome.WebApi.AggregatesControllers;
 
-public class RepeatedEventController(RepeatedEventAggregateAggregateService repeatedEventAggregateAggregateService) : AggregateControllerBase<RepeatedEvent, RepeatedEventModelResponse>(repeatedEventAggregateAggregateService)
+public class RepeatedEventController(RepeatedEventAggregateAggregateService repeatedEventAggregateAggregateService, IUserService userService)
+    : AggregateControllerBase<RepeatedEvent, RepeatedEventModelResponse>(repeatedEventAggregateAggregateService, userService)
 {
     [HttpPost]
-    public async Task<ActionResult<RepeatedEventModelResponse>> CreateEvent([FromBody] NewRepeatedEventModel eventModel, CancellationToken cancellationToken)
+    public async Task<ActionResult<RepeatedEventModelResponse>> CreateEvent([FromBody] NewRepeatedEventModel eventModel,
+        CancellationToken cancellationToken)
     {
         var result = await repeatedEventAggregateAggregateService.CreateAsync(
             title: eventModel.Title,
@@ -20,12 +23,13 @@ public class RepeatedEventController(RepeatedEventAggregateAggregateService repe
             endTime: eventModel.EndTime,
             dinnerTime: eventModel.DinnerTime,
             cancellationToken: cancellationToken);
-        
-        return BuildResponse(result);
+
+        return await BuildResponseAsync(result);
     }
 
     [HttpPut]
-    public async Task<ActionResult<RepeatedEventModelResponse>> UpdateEvent([FromBody] RepeatedEventModel eventModel, CancellationToken cancellationToken) 
+    public async Task<ActionResult<RepeatedEventModelResponse>> UpdateEvent([FromBody] RepeatedEventModel eventModel,
+        CancellationToken cancellationToken)
     {
         var result = await repeatedEventAggregateAggregateService.UpdateAsync(
             id: eventModel.Id,
@@ -36,9 +40,10 @@ public class RepeatedEventController(RepeatedEventAggregateAggregateService repe
             endTime: eventModel.EndTime,
             dinnerTime: eventModel.DinnerTime,
             cancellationToken: cancellationToken);
-        
-        return BuildResponse(result);
+
+        return await BuildResponseAsync(result);
     }
-    
-    protected override RepeatedEventModelResponse ConvertToModel(RepeatedEvent data, User user) => RepeatedEventModelResponse.From(data, user);
+
+    protected override async Task<RepeatedEventModelResponse> ConvertToModelAsync(RepeatedEvent data, User user) =>
+        RepeatedEventModelResponse.From(data, user);
 }

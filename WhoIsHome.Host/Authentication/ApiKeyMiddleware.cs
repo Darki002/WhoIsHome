@@ -3,7 +3,7 @@ using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Host.Authentication;
 
-public class ApiKeyMiddleware(RequestDelegate next)
+public class ApiKeyMiddleware(RequestDelegate next, ILogger<ApiKeyMiddleware> logger)
 {
     public const string ApiKeyHeaderName = "X-API-KEY";
     private readonly string apiKey = EnvironmentHelper.GetVariable(EnvVariables.ApiKey);
@@ -12,6 +12,7 @@ public class ApiKeyMiddleware(RequestDelegate next)
     {
         if (!context.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
         {
+            logger.LogInformation("Unauthorized access with missing API Key.");
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsync("API Key is missing.");
             return;
@@ -19,6 +20,7 @@ public class ApiKeyMiddleware(RequestDelegate next)
 
         if (!apiKey.Equals(extractedApiKey))
         {
+            logger.LogInformation("Unauthorized access with wrong API Key.");
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsync("Unauthorized access.");
             return;
