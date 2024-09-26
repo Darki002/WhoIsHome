@@ -10,10 +10,10 @@ public class PersonOverviewController(PersonOverviewQueryHandler queryHandler) :
     public async Task<ActionResult<UserOverviewModel>> GetPersonOverviewAsync(int personId, CancellationToken cancellationToken)
     {
         var result = await queryHandler.HandleAsync(personId, cancellationToken);
-        return BuildResponse(result);
+        return await BuildResponseAsync(result);
     }
     
-    protected override UserOverviewModel ConvertToModel(PersonOverview data)
+    protected override async Task<UserOverviewModel> ConvertToModelAsync(PersonOverview data)
     {
         return new UserOverviewModel
         {

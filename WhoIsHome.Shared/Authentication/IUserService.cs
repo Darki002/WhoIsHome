@@ -2,6 +2,8 @@
 
 public interface IUserService
 {
+    int UserId { get; }
+    
     Task<AuthenticatedUser> GetCurrentUserAsync();
     
     Task<AuthenticatedUser> GetCurrentUserAsync(CancellationToken cancellationToken);

@@ -4,10 +4,12 @@ using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Host;
 
-public static class ExceptionHandler
+internal static class ExceptionHandler
 {
-    public static void UseExceptionHandler(this IApplicationBuilder app)
+    public static void UseExceptionHandler(this WebApplication app)
     {
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        
         app.UseExceptionHandler(errorApp =>
                 errorApp.Run(async context =>
                 {
@@ -40,7 +42,7 @@ public static class ExceptionHandler
                         default:
                             statusCode = StatusCodes.Status500InternalServerError;
                             message = "An unexpected error occurred.";
-                            // TODO Logger
+                            logger.LogError(exception, "Unexpected Runtime Error");
                             break;
                     }
             

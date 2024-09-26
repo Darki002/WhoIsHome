@@ -7,13 +7,16 @@ using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Host.Authentication;
 
-public class UserService(IHttpContextAccessor httpContextAccessor, WhoIsHomeContext context) : IUserService
+public class UserService(
+    IHttpContextAccessor httpContextAccessor,
+    WhoIsHomeContext context,
+    ILogger<UserService> logger) : IUserService
 {
     private AuthenticatedUser? authenticatedUserCache = null;
-    
+
     private int? idCache = null;
-    
-    private int? UserId => idCache ?? GetIdFromClaims();
+
+    public int UserId => GetId() ?? throw new InvalidClaimsException("No User is present in the Request.");
 
     public async Task<AuthenticatedUser> GetCurrentUserAsync()
     {
@@ -22,8 +25,9 @@ public class UserService(IHttpContextAccessor httpContextAccessor, WhoIsHomeCont
 
     public async Task<AuthenticatedUser> GetCurrentUserAsync(CancellationToken cancellationToken)
     {
-        if (UserId is null)
+        if (GetId() is null)
         {
+            logger.LogInformation("(Invalid Claims) | No User ID found in request.");
             throw new InvalidClaimsException("No User is present in the Request.");
         }
 
@@ -33,17 +37,19 @@ public class UserService(IHttpContextAccessor httpContextAccessor, WhoIsHomeCont
         }
 
         var user = await context.Users.SingleAsync(u => u.Id == UserId, cancellationToken);
-        
-        CheckEmailAddress(user.Email);
-        
+
+        CheckEmailAddress(user);
+
         authenticatedUserCache = user.MapFromDb();
         return authenticatedUserCache;
     }
 
     public bool IsUserPermitted(int permittedUserId)
     {
-        return UserId == permittedUserId;
+        return GetId() == permittedUserId;
     }
+
+    private int? GetId() => idCache ?? GetIdFromClaims();
 
     private int? GetIdFromClaims()
     {
@@ -52,11 +58,13 @@ public class UserService(IHttpContextAccessor httpContextAccessor, WhoIsHomeCont
         return idCache;
     }
 
-    private void CheckEmailAddress(string expectedEmail)
+    private void CheckEmailAddress(UserModel user)
     {
         var email = httpContextAccessor.HttpContext?.User.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
-        if (expectedEmail != email)
+        if (user.Email != email)
         {
+            logger.LogInformation("(Invalid Claims) | For User {UserId} with unexpected Email {Email}.", user.Id,
+                email);
             throw new InvalidClaimsException("Email Address in the Request must match the Email of the User.");
         }
     }

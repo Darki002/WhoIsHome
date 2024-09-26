@@ -10,7 +10,7 @@ public static class ApplicationBuilderExtensions
 
         app.UseSwagger();
         app.UseSwaggerUI();
-
+        
         app.UseExceptionHandler();
         app.UseMiddleware<ApiKeyMiddleware>();
 
