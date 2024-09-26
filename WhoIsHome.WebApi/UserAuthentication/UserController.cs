@@ -47,11 +47,4 @@ public class UserController(UserAggregateService userAggregateService, JwtTokenS
             return BadRequest("Email is already in use. Did you intend to log in?");
         }
     }
-
-    [HttpPost("logout")]
-    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
-    {
-        // TODO Make Token Invalid
-        return Ok();
-    }
 }
