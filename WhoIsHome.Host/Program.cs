@@ -5,8 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 DotNetEnv.Env.Load();
 
-builder.Services.AddApplicationServices(builder.Configuration);
-builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddApplicationServices(builder.Configuration)
+    .AddJwtAuthentication(builder.Configuration);
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();

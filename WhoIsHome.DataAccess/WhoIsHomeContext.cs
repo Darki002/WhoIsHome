@@ -3,7 +3,7 @@ using WhoIsHome.DataAccess.Models;
 
 namespace WhoIsHome.DataAccess;
 
-public class WhoIsHomeContext : DbContext
+public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbContext(options)
 {
     public DbSet<UserModel> Users { get; set; }
     
@@ -12,10 +12,4 @@ public class WhoIsHomeContext : DbContext
     public DbSet<RepeatedEventModel> RepeatedEvents { get; set; }
     
     public DbSet<DinnerTimeModel> DinnerTimes { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        // TODO Add Connections String from Env Variable
-        base.OnConfiguring(optionsBuilder);
-    }
-}
+} 

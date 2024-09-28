@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserService, UserService>();
         
         services.AddWhoIsHomeServices()
-            .AddDataAccessServices()
+            .AddDataAccessServices(configuration)
             .AddWebApiServices();
         
         return services;
