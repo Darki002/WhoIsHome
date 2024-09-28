@@ -6,7 +6,7 @@ Backend for [Android App](https://github.com/Darki002/WhoIsHome.Android)
 This Project uses Swagger for the API Documentation. You can start up the project locally 
 and the swagger you should open automatically or use "localhost:7165/swagger/index.html"
 
-For informations about Authentication & Authorized read the following Documentation: [AuthDocs](./Docs/Auth.md)
+For information about Authentication & Authorized read the following Documentation: [AuthDocs](./Docs/Auth.md)
 
 # Environment Variables
 
