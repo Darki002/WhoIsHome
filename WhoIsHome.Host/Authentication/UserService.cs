@@ -27,7 +27,7 @@ public class UserService(
     {
         if (GetId() is null)
         {
-            logger.LogInformation("(Invalid Claims) | No User ID found in request.");
+            logger.LogInformation("(Invalid Claims) | No User ID found in request");
             throw new InvalidClaimsException("No User is present in the Request.");
         }
 
@@ -63,7 +63,7 @@ public class UserService(
         var email = httpContextAccessor.HttpContext?.User.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
         if (user.Email != email)
         {
-            logger.LogInformation("(Invalid Claims) | For User {UserId} with unexpected Email {Email}.", user.Id,
+            logger.LogInformation("(Invalid Claims) | For User {UserId} with unexpected Email {Email}", user.Id,
                 email);
             throw new InvalidClaimsException("Email Address in the Request must match the Email of the User.");
         }

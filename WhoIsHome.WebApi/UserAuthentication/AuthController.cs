@@ -10,7 +10,7 @@ namespace WhoIsHome.WebApi.UserAuthentication;
 [Route("api/v1/[controller]")]
 public class AuthController(UserAggregateService userAggregateService, JwtTokenService jwtTokenService, IPasswordHasher<User> passwordHasher) : Controller
 {
-    [HttpPost("login")]
+    [HttpPost("Login")]
     public async Task<IActionResult> Login(LoginDto loginDto, CancellationToken cancellationToken)
     {
         var user = await userAggregateService.GetUserByEmailAsync(loginDto.Email, cancellationToken);
@@ -29,7 +29,7 @@ public class AuthController(UserAggregateService userAggregateService, JwtTokenS
         return Ok(new { Token = token });
     }
 
-    [HttpPost("register")]
+    [HttpPost("Register")]
     public async Task<IActionResult> Register(RegisterDto registerDto, CancellationToken cancellationToken)
     {
         try
