@@ -14,11 +14,13 @@ public class DailyOverviewController(DailyOverviewQueryHandler queryHandler)
         return await BuildResponseAsync(result);
     }
 
-    protected override async Task<IReadOnlyCollection<DailyOverviewModel>> ConvertToModelAsync(
+    protected override Task<IReadOnlyCollection<DailyOverviewModel>> ConvertToModelAsync(
         IReadOnlyCollection<DailyOverview> data)
     {
-        return data
+        var result =data
             .Select(DailyOverviewModel.From)
             .ToList();
+
+        return Task.FromResult<IReadOnlyCollection<DailyOverviewModel>>(result);
     }
 }

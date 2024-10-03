@@ -9,7 +9,7 @@ public static class EnvironmentHelper
         var value = Environment.GetEnvironmentVariable(name);
         if (value is null)
         {
-            throw new EnvironmentHelperException("Environment variable not found.", name);
+            throw new EnvironmentHelperException($"Environment variable {name} not found.", name);
         }
 
         return value;

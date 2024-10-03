@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Aggregates;
 using WhoIsHome.DataAccess;
 using WhoIsHome.DataAccess.Models;
@@ -6,7 +7,7 @@ using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Services;
 
-public class UserAggregateService(WhoIsHomeContext context)
+public class UserAggregateService(WhoIsHomeContext context, IPasswordHasher<User> passwordHasher)
 {
     public async Task<User> GetUserByIdAsync(int id, CancellationToken cancellationToken)
     {
@@ -30,7 +31,16 @@ public class UserAggregateService(WhoIsHomeContext context)
 
     public async Task<User> CreateUserAsync(string userName, string email, string password, CancellationToken cancellationToken)
     {
-        var user = User.Create(userName, email, password);
+        var isEmailInUse = context.Users.Any(u => u.Email == email);
+
+        if (isEmailInUse)
+        {
+            throw new EmailInUseException();
+        }
+
+        var passwordHash = passwordHasher.HashPassword(null!, password);
+        
+        var user = User.Create(userName, email, passwordHash);
         var model = user.ToDbModel<UserModel>();
         context.Users.Add(model);
         await context.SaveChangesAsync(cancellationToken);

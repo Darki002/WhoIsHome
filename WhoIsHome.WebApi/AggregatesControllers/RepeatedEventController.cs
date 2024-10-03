@@ -44,6 +44,6 @@ public class RepeatedEventController(RepeatedEventAggregateAggregateService repe
         return await BuildResponseAsync(result);
     }
 
-    protected override async Task<RepeatedEventModelResponse> ConvertToModelAsync(RepeatedEvent data, User user) =>
-        RepeatedEventModelResponse.From(data, user);
+    protected override Task<RepeatedEventModelResponse> ConvertToModelAsync(RepeatedEvent data, User user) =>
+        Task.FromResult(RepeatedEventModelResponse.From(data, user));
 }

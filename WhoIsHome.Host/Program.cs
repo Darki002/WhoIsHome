@@ -13,4 +13,5 @@ builder.Logging.AddConsole();
 
 var app = builder.Build();
 app.ConfigureApplication();
+app.ConfigureDatabase();
 app.Run();
