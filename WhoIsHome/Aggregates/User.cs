@@ -17,14 +17,14 @@ public class User : AggregateBase
 
     public string Email { get; }
 
-    public string PasswordHash { get; private set; }
+    public string Password { get; private set; }
 
-    private User(int? id, string userName, string email, string passwordHash)
+    private User(int? id, string userName, string email, string password)
     {
         Id = id;
         UserName = userName;
         Email = email;
-        PasswordHash = passwordHash;
+        Password = password;
     }
     
     public static User Create(string userName, string email, string passwordHash)

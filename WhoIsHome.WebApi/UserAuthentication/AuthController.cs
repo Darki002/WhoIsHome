@@ -19,7 +19,7 @@ public class AuthController(UserAggregateService userAggregateService, JwtTokenS
             return Unauthorized("Invalid email or password.");
         }
 
-        var result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginDto.Password);
+        var result = passwordHasher.VerifyHashedPassword(user, user.Password, loginDto.Password);
         if (result == PasswordVerificationResult.Failed)
         {
             return Unauthorized("Invalid email or password.");
