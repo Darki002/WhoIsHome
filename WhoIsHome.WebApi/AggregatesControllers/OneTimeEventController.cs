@@ -44,6 +44,6 @@ public class OneTimeEventController(
         return await BuildResponseAsync(result);
     }
 
-    protected override async Task<OneTimeEventModelResponse> ConvertToModelAsync(OneTimeEvent data, User user) =>
-        OneTimeEventModelResponse.From(data, user);
+    protected override Task<OneTimeEventModelResponse> ConvertToModelAsync(OneTimeEvent data, User user) =>
+        Task.FromResult(OneTimeEventModelResponse.From(data, user));
 }
