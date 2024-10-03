@@ -1,5 +1,4 @@
 ﻿using System.Net.Mail;
-using WhoIsHome.Shared;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.BaseTypes;
 using WhoIsHome.Shared.Exceptions;
@@ -19,7 +18,7 @@ public class User : AggregateBase
 
     public string Password { get; private set; }
 
-    private User(int? id, string userName, string email, string password)
+    public User(int? id, string userName, string email, string password)
     {
         Id = id;
         UserName = userName;
