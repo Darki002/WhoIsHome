@@ -14,7 +14,7 @@ public class DinnerTime : AggregateBase
 
     public bool IsAtHome => PresentsType != PresentsType.NotPresent;
 
-    private DinnerTime(int? id, PresentsType presentsType, TimeOnly? time = null)
+    public DinnerTime(int? id, PresentsType presentsType, TimeOnly? time = null)
     {
         Id = id;
         PresentsType = presentsType;

@@ -12,7 +12,7 @@ public class RepeatedEvent : EventBase
     
     public DateOnly LastOccurrence { get; set; }
     
-    private RepeatedEvent(
+    public RepeatedEvent(
         int? id, 
         string title, 
         DateOnly firstOccurrence, 

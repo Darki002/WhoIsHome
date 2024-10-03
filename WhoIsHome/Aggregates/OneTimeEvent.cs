@@ -4,7 +4,7 @@ public class OneTimeEvent : EventBase
 {
     public DateOnly Date { get; private set; }
 
-    private OneTimeEvent(int? id, string title, DateOnly date, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime,
+    public OneTimeEvent(int? id, string title, DateOnly date, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime,
         int userId) : base(id, title, startTime, endTime, dinnerTime, userId)
     {
         Date = date;

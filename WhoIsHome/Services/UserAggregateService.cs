@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Aggregates;
+using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.DataAccess;
 using WhoIsHome.DataAccess.Models;
 using WhoIsHome.Shared.Exceptions;
@@ -18,7 +19,7 @@ public class UserAggregateService(WhoIsHomeContext context, IPasswordHasher<User
             throw new NotFoundException($"No User found with id {id}");
         }
         
-        return user.ToAggregate<User>();
+        return user.ToAggregate();
     }
     
     public async Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
@@ -26,7 +27,7 @@ public class UserAggregateService(WhoIsHomeContext context, IPasswordHasher<User
         var user = await context.Users
             .Where(u => u.Email == email)
             .SingleOrDefaultAsync(cancellationToken);
-        return user?.ToAggregate<User>();
+        return user?.ToAggregate();
     }
 
     public async Task<User> CreateUserAsync(string userName, string email, string password, CancellationToken cancellationToken)
@@ -41,11 +42,11 @@ public class UserAggregateService(WhoIsHomeContext context, IPasswordHasher<User
         var passwordHash = passwordHasher.HashPassword(null!, password);
         
         var user = User.Create(userName, email, passwordHash);
-        var model = user.ToDbModel<UserModel>();
+        var model = user.ToModel();
         context.Users.Add(model);
         await context.SaveChangesAsync(cancellationToken);
 
         var createdUser = await context.Users.SingleAsync(u => u.Email == email, cancellationToken);
-        return createdUser.ToAggregate<User>();
+        return createdUser.ToAggregate();
     }
 }
