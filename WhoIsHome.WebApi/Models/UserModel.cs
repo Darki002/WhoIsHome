@@ -18,7 +18,7 @@ public class UserModel
         {
             Id = user.Id!.Value,
             Email = user.Email,
-            PasswordHash = user.PasswordHash,
+            PasswordHash = user.Password,
             UserName = user.UserName
         };
     }

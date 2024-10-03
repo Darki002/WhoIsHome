@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
-using WhoIsHome.Shared;
 using WhoIsHome.Shared.BaseTypes;
 
 namespace WhoIsHome.DataAccess.Models;

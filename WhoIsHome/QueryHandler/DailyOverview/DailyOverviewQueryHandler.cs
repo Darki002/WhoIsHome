@@ -1,9 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Aggregates;
+using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.DataAccess;
-using WhoIsHome.DataAccess.Models;
-using WhoIsHome.Shared;
-using WhoIsHome.Shared.Framework;
 using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.QueryHandler.DailyOverview;
@@ -13,7 +11,7 @@ public class DailyOverviewQueryHandler(WhoIsHomeContext context)
     public async Task<IReadOnlyCollection<DailyOverview>> HandleAsync(CancellationToken cancellationToken)
     {
         var users = (await context.Users.ToListAsync(cancellationToken))
-            .ToAggregateList<User, UserModel>();
+            .Select(m => m.ToAggregate());
 
         var today = DateOnly.FromDateTime(DateTime.Today);
 
@@ -24,7 +22,7 @@ public class DailyOverviewQueryHandler(WhoIsHomeContext context)
                 .ToListAsync(cancellationToken))
             .ToDictionary(
                 g => g.Key,
-                g => g.ToAggregateList<OneTimeEvent, OneTimeEventModel>());
+                g => g.Select(m => m.ToAggregate()));
 
         var repeatedEvents = (await context.RepeatedEvents
                 .Where(e => e.DinnerTimeModel.PresentsType != PresentsType.Unknown)
@@ -34,7 +32,7 @@ public class DailyOverviewQueryHandler(WhoIsHomeContext context)
                 .ToListAsync(cancellationToken))
             .ToDictionary(
                 g => g.Key,
-                g => g.ToAggregateList<RepeatedEvent, RepeatedEventModel>());
+                g => g.Select(m => m.ToAggregate()));
 
         var eventsByUsers = new Dictionary<User, List<EventBase>>();
 

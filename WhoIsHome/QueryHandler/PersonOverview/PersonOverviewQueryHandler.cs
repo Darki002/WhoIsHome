@@ -1,9 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Aggregates;
+using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.DataAccess;
-using WhoIsHome.DataAccess.Models;
-using WhoIsHome.Shared;
-using WhoIsHome.Shared.Framework;
 using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.QueryHandler.PersonOverview;
@@ -18,13 +16,13 @@ public class PersonOverviewQueryHandler(WhoIsHomeContext context)
                 .Where(e => e.Date > today)
                 .Where(e => e.UserModel.Id == userId)
                 .ToListAsync(cancellationToken))
-            .ToAggregateList<OneTimeEvent, OneTimeEventModel>();
+            .Select(m => m.ToAggregate());
 
         var repeatedEvents = (await context.RepeatedEvents
                 .Where(e => e.LastOccurrence > today)
                 .Where(e => e.UserModel.Id == userId)
                 .ToListAsync(cancellationToken))
-            .ToAggregateList<RepeatedEvent, RepeatedEventModel>();
+            .Select(m => m.ToAggregate());
 
 
         var userEvents = new List<EventBase>();
@@ -77,7 +75,7 @@ public class PersonOverviewQueryHandler(WhoIsHomeContext context)
 
         var user = (await context.Users
                 .SingleAsync(u => u.Id == userId, cancellationToken))
-            .ToAggregate<User>();
+            .ToAggregate();
 
         return new PersonOverview
         {
