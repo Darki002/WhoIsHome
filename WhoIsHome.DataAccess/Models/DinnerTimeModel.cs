@@ -9,8 +9,8 @@ namespace WhoIsHome.DataAccess.Models;
 [Table("DinnerTime")]
 public class DinnerTimeModel : DbModel
 {
-    [DefaultValue(PresentsType.Unknown)]
-    public PresentsType PresentsType { get; set; }
+    [DefaultValue(PresenceType.Unknown)]
+    public PresenceType PresenceType { get; set; }
     
     public TimeOnly? Time { get; set; }
 }

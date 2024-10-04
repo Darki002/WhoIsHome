@@ -1,6 +1,6 @@
 ﻿namespace WhoIsHome.Shared.Types;
 
-public enum PresentsType
+public enum PresenceType
 {
     Unknown,
     Default,

@@ -1,31 +1,25 @@
-﻿using WhoIsHome.Shared;
-using WhoIsHome.Shared.Exceptions;
+﻿using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.Aggregates;
 
-public class RepeatedEvent : EventBase
+public class RepeatedEvent(
+    int? id,
+    string title,
+    DateOnly firstOccurrence,
+    DateOnly lastOccurrence,
+    TimeOnly startTime,
+    TimeOnly endTime,
+    DinnerTime dinnerTime,
+    int userId)
+    : EventBase(id, title, startTime, endTime, dinnerTime, userId)
 {
     private const int OccurrenceFrequency = 7;
     
-    public DateOnly FirstOccurrence { get; set; }
-    
-    public DateOnly LastOccurrence { get; set; }
-    
-    public RepeatedEvent(
-        int? id, 
-        string title, 
-        DateOnly firstOccurrence, 
-        DateOnly lastOccurrence, 
-        TimeOnly startTime, 
-        TimeOnly endTime, 
-        DinnerTime dinnerTime, 
-        int userId) : base(id, title, startTime, endTime, dinnerTime, userId)
-    {
-        FirstOccurrence = firstOccurrence;
-        LastOccurrence = lastOccurrence;
-    }
-    
+    public DateOnly FirstOccurrence { get; set; } = firstOccurrence;
+
+    public DateOnly LastOccurrence { get; set; } = lastOccurrence;
+
     public static RepeatedEvent Create(
         string title, 
         DateOnly firstOccurrence, 
@@ -59,7 +53,7 @@ public class RepeatedEvent : EventBase
         LastOccurrence = lastOccurrence;
         StartTime = startTime;
         EndTime = endTime;
-        DinnerTime = DinnerTime.Update(dinnerTime.PresentsType, dinnerTime.Time);
+        DinnerTime = DinnerTime.Update(dinnerTime.PresenceType, dinnerTime.Time);
     }
     
     protected override bool IsEventToday()

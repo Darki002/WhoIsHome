@@ -9,10 +9,15 @@ public static class DateOnlyHelper
         var date1 = dateOnly1.ToDateTime(TimeOnly.MinValue);
         var date2 = DateTime.Today;
         
-        var cal = System.Globalization.DateTimeFormatInfo.CurrentInfo.Calendar;
-        var d1 = date1.Date.AddDays(-1 * (int)cal.GetDayOfWeek(date1));
-        var d2 = date2.Date.AddDays(-1 * (int)cal.GetDayOfWeek(date2));
+        var d1 = date1.StartOfWeek();
+        var d2 = date2.StartOfWeek();
 
         return d1 == d2;
+    }
+    
+    public static DateTime StartOfWeek(this DateTime dt)
+    {
+        var diff = (7 + (dt.DayOfWeek - DayOfWeek.Monday)) % 7;
+        return dt.AddDays(-1 * diff).Date;
     }
 }

@@ -1,15 +1,17 @@
 ﻿namespace WhoIsHome.Aggregates;
 
-public class OneTimeEvent : EventBase
+public class OneTimeEvent(
+    int? id,
+    string title,
+    DateOnly date,
+    TimeOnly startTime,
+    TimeOnly endTime,
+    DinnerTime dinnerTime,
+    int userId)
+    : EventBase(id, title, startTime, endTime, dinnerTime, userId)
 {
-    public DateOnly Date { get; private set; }
+    public DateOnly Date { get; private set; } = date;
 
-    public OneTimeEvent(int? id, string title, DateOnly date, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime,
-        int userId) : base(id, title, startTime, endTime, dinnerTime, userId)
-    {
-        Date = date;
-    }
-    
     public static OneTimeEvent Create(
         string title, 
         DateOnly date, 
@@ -38,7 +40,7 @@ public class OneTimeEvent : EventBase
         Date = date;
         StartTime = startTime;
         EndTime = endTime;
-        DinnerTime = DinnerTime.Update(dinnerTime.PresentsType, dinnerTime.Time);
+        DinnerTime = DinnerTime.Update(dinnerTime.PresenceType, dinnerTime.Time);
     }
     
     protected override bool IsEventToday() => Date == DateOnly.FromDateTime(DateTime.Today);

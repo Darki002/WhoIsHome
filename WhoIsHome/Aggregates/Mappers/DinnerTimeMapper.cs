@@ -7,8 +7,7 @@ public static class DinnerTimeMapper
 	public static DinnerTime ToAggregate(this DinnerTimeModel model)
 	{
 		return new DinnerTime(
-		model.Id,
-		model.PresentsType,
+		model.PresenceType,
 		model.Time);
 	}
 
@@ -16,8 +15,8 @@ public static class DinnerTimeMapper
 	{
 		return new DinnerTimeModel
 		{
-			Id = aggregate.Id!.Value,
-			PresentsType = aggregate.PresentsType,
+			Id = 1,
+			PresenceType = aggregate.PresenceType,
 			Time = aggregate.Time
 		};
 	}

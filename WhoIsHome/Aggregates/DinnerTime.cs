@@ -1,61 +1,45 @@
-﻿using WhoIsHome.Shared.BaseTypes;
-using WhoIsHome.Shared.Exceptions;
+﻿using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Aggregates;
 
-public class DinnerTime : AggregateBase
+public class DinnerTime(PresenceType presenceType, TimeOnly? time = null)
 {
-    public int? Id { get; private set; }
+    public PresenceType PresenceType { get; set; } = presenceType;
 
-    public PresentsType PresentsType { get; set; }
-    
-    public TimeOnly? Time { get; set; }
+    public TimeOnly? Time { get; set; } = time;
 
-    public bool IsAtHome => PresentsType != PresentsType.NotPresent;
-
-    public DinnerTime(int? id, PresentsType presentsType, TimeOnly? time = null)
-    {
-        Id = id;
-        PresentsType = presentsType;
-        Time = time;
-    }
+    public bool IsAtHome => PresenceType != PresenceType.NotPresent;
 
     public static DinnerTime CreateUnknown()
     {
-        return new DinnerTime(null, PresentsType.Unknown);
+        return new DinnerTime( PresenceType.Unknown);
     }
 
     public static DinnerTime CreateDefault(TimeOnly time)
     {
-        return new DinnerTime(null, PresentsType.Default, time);
+        return new DinnerTime( PresenceType.Default, time);
     }
     
     public static DinnerTime CreateLate(TimeOnly time)
     {
-        return new DinnerTime(null, PresentsType.Late, time);
+        return new DinnerTime( PresenceType.Late, time);
     }
     
     public static DinnerTime CreateNotPresent()
     {
-        return new DinnerTime(null, PresentsType.NotPresent);
+        return new DinnerTime( PresenceType.NotPresent);
     }
 
-    private DinnerTime WithId(int? id)
+    public DinnerTime Update(PresenceType presenceType, TimeOnly? time)
     {
-        Id = id;
-        return this;
-    }
-
-    public DinnerTime Update(PresentsType presentsType, TimeOnly? time)
-    {
-        return presentsType switch
+        return presenceType switch
         {
-            PresentsType.Unknown => !time.HasValue ? CreateUnknown().WithId(Id) : throw new InvalidModelException("Can't set Time for Type Unknown."),
-            PresentsType.Default => time.HasValue ? CreateDefault(time.Value).WithId(Id) : throw new InvalidModelException("Must provide a Time for Default Type."),
-            PresentsType.Late => time.HasValue ? CreateLate(time.Value).WithId(Id) : throw new InvalidModelException("Must provide a Time for Late Type."),
-            PresentsType.NotPresent => !time.HasValue ? CreateNotPresent().WithId(Id) : throw new InvalidModelException("Can't set Time for Type NotPresent."),
-            _ => throw new ArgumentOutOfRangeException(nameof(presentsType), presentsType, null)
+            PresenceType.Unknown => !time.HasValue ? CreateUnknown() : throw new InvalidModelException("Can't set Time for Type Unknown."),
+            PresenceType.Default => time.HasValue ? CreateDefault(time.Value) : throw new InvalidModelException("Must provide a Time for Default Type."),
+            PresenceType.Late => time.HasValue ? CreateLate(time.Value) : throw new InvalidModelException("Must provide a Time for Late Type."),
+            PresenceType.NotPresent => !time.HasValue ? CreateNotPresent() : throw new InvalidModelException("Can't set Time for Type NotPresent."),
+            _ => throw new ArgumentOutOfRangeException(nameof(presenceType), presenceType, null)
         };
     }
 }
