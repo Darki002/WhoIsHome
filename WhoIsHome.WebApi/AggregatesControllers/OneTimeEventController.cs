@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using WhoIsHome.Aggregates;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Authentication;
+using WhoIsHome.Shared.Types;
 using WhoIsHome.WebApi.Models.New;
 using WhoIsHome.WebApi.Models.Response;
 using OneTimeEventModel = WhoIsHome.WebApi.Models.Request.OneTimeEventModel;
@@ -22,7 +23,7 @@ public class OneTimeEventController(
             date: eventModel.Date,
             startTime: eventModel.StartTime,
             endTime: eventModel.EndTime,
-            presenceType: eventModel.PresenceType,
+            presenceType: PresenceTypeHelper.FromString(eventModel.PresenceType),
             time: eventModel.DinnerTime,
             cancellationToken: cancellationToken);
 
@@ -39,7 +40,7 @@ public class OneTimeEventController(
             date: eventModel.Date,
             startTime: eventModel.StartTime,
             endTime: eventModel.EndTime,
-            presenceType: eventModel.PresenceType,
+            presenceType: PresenceTypeHelper.FromString(eventModel.PresenceType),
             time: eventModel.DinnerTime,
             cancellationToken: cancellationToken);
 

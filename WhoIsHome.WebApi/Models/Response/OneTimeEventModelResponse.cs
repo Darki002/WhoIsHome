@@ -15,7 +15,7 @@ public class OneTimeEventModelResponse
 
     public required TimeOnly EndTime { get; set; }
 
-    public required PresenceType PresenceType { get; set; }
+    public required string PresenceType { get; set; }
 
     public TimeOnly? DinnerTime { get; set; } = null;
 
@@ -30,7 +30,7 @@ public class OneTimeEventModelResponse
             Date = data.Date,
             StartTime = data.StartTime,
             EndTime = data.EndTime,
-            PresenceType = data.DinnerTime.PresenceType,
+            PresenceType = data.DinnerTime.PresenceType.ToString(),
             DinnerTime = data.DinnerTime.Time,
             User = UserModel.From(user)
         };

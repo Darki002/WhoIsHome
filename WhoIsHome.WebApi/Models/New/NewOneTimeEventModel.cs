@@ -13,7 +13,7 @@ public class NewOneTimeEventModel
 
     public required TimeOnly EndTime { get; set; }
 
-    public required PresenceType PresenceType { get; set; }
+    public required string PresenceType { get; set; }
 
     public TimeOnly? DinnerTime { get; set; } = null;
 }
