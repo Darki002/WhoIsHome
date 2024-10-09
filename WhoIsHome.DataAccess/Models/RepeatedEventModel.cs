@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using WhoIsHome.Shared;
 using WhoIsHome.Shared.BaseTypes;
+using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.DataAccess.Models;
 
@@ -23,7 +25,10 @@ public class RepeatedEventModel : DbModel
     public TimeOnly EndTime { get; set; }
     
     [Required]
-    public DinnerTimeModel DinnerTimeModel { get; set; } = null!;
+    [DefaultValue(PresenceType.Unknown)]
+    public PresenceType PresenceType { get; set; }
+    
+    public TimeOnly? DinnerTime { get; set; }
     
     [Required]
     public UserModel UserModel { get; set; } = null!;

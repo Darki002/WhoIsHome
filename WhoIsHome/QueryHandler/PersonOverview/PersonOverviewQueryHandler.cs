@@ -13,19 +13,16 @@ public class PersonOverviewQueryHandler(WhoIsHomeContext context)
         var today = DateOnlyHelper.Today;
 
         var oneTimeEvents = (await context.OneTimeEvents
-                .Include(e => e.DinnerTimeModel)
                 .Where(e => e.Date > today)
                 .Where(e => e.UserModel.Id == userId)
                 .ToListAsync(cancellationToken))
             .Select(m => m.ToAggregate());
 
         var repeatedEvents = (await context.RepeatedEvents
-                .Include(e => e.DinnerTimeModel)
                 .Where(e => e.LastOccurrence > today)
                 .Where(e => e.UserModel.Id == userId)
                 .ToListAsync(cancellationToken))
             .Select(m => m.ToAggregate());
-
 
         var userEvents = new List<EventBase>();
         userEvents.AddRange(oneTimeEvents);

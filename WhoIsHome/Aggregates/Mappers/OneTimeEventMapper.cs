@@ -6,13 +6,15 @@ public static class OneTimeEventMapper
 {
 	public static OneTimeEvent ToAggregate(this OneTimeEventModel model)
 	{
+		var dinnerTime = new DinnerTime(model.PresenceType, model.DinnerTime);
+		
 		return new OneTimeEvent(
 		model.Id,
 		model.Title,
 		model.Date,
 		model.StartTime,
 		model.EndTime,
-		model.DinnerTimeModel.ToAggregate(),
+		dinnerTime,
 		model.UserModel.Id);
 	}
 
@@ -25,7 +27,8 @@ public static class OneTimeEventMapper
 			Title = aggregate.Title,
 			StartTime = aggregate.StartTime,
 			EndTime = aggregate.EndTime,
-			DinnerTimeModel = aggregate.DinnerTime.ToModel(),
+			PresenceType = aggregate.DinnerTime.PresenceType,
+			DinnerTime = aggregate.DinnerTime.Time,
 			UserModel = userModel
 		};
 	}
