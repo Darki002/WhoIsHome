@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Aggregates;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Authentication;
+using WhoIsHome.Shared.Types;
 using WhoIsHome.WebApi.Models.New;
 using WhoIsHome.WebApi.Models.Request;
 using WhoIsHome.WebApi.Models.Response;
@@ -21,7 +22,7 @@ public class RepeatedEventController(RepeatedEventAggregateAggregateService repe
             lastOccurrence: eventModel.LastOccurrence,
             startTime: eventModel.StartTime,
             endTime: eventModel.EndTime,
-            presenceType: eventModel.PresenceType,
+            presenceType: PresenceTypeHelper.FromString(eventModel.PresenceType),
             time: eventModel.DinnerTime,
             cancellationToken: cancellationToken);
 
@@ -39,7 +40,7 @@ public class RepeatedEventController(RepeatedEventAggregateAggregateService repe
             lastOccurrence: eventModel.LastOccurrence,
             startTime: eventModel.StartTime,
             endTime: eventModel.EndTime,
-            presenceType: eventModel.PresenceType,
+            presenceType: PresenceTypeHelper.FromString(eventModel.PresenceType),
             time: eventModel.DinnerTime,
             cancellationToken: cancellationToken);
 

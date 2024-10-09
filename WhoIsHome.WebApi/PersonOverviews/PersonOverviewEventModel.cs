@@ -14,7 +14,7 @@ public record PersonOverviewEventModel
     
     public required TimeOnly EndTime { get; init; }
     
-    public required EventType EventType { get; init; }
+    public required string EventType { get; init; }
 
     public static PersonOverviewEventModel From(PersonOverviewEvent personOverviewEvent)
     {
@@ -25,7 +25,7 @@ public record PersonOverviewEventModel
             Date = personOverviewEvent.Date,
             StartTime = personOverviewEvent.StartTime,
             EndTime = personOverviewEvent.EndTime,
-            EventType = personOverviewEvent.EventType
+            EventType = personOverviewEvent.EventType.ToString()
         };
     }
 }
