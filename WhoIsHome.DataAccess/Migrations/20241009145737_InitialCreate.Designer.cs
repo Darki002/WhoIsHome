@@ -11,7 +11,7 @@ using WhoIsHome.DataAccess;
 namespace WhoIsHome.DataAccess.Migrations
 {
     [DbContext(typeof(WhoIsHomeContext))]
-    [Migration("20241003152010_InitialCreate")]
+    [Migration("20241009145737_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -22,23 +22,6 @@ namespace WhoIsHome.DataAccess.Migrations
                 .HasAnnotation("ProductVersion", "8.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("WhoIsHome.DataAccess.Models.DinnerTimeModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("PresentsType")
-                        .HasColumnType("int");
-
-                    b.Property<TimeOnly?>("Time")
-                        .HasColumnType("time");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DinnerTime");
-                });
-
             modelBuilder.Entity("WhoIsHome.DataAccess.Models.OneTimeEventModel", b =>
                 {
                     b.Property<int>("Id")
@@ -48,11 +31,14 @@ namespace WhoIsHome.DataAccess.Migrations
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
-                    b.Property<int>("DinnerTimeModelId")
-                        .HasColumnType("int");
+                    b.Property<TimeOnly?>("DinnerTime")
+                        .HasColumnType("time");
 
                     b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
+
+                    b.Property<int>("PresenceType")
+                        .HasColumnType("int");
 
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time");
@@ -66,8 +52,6 @@ namespace WhoIsHome.DataAccess.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DinnerTimeModelId");
 
                     b.HasIndex("UserModelId");
 
@@ -80,8 +64,8 @@ namespace WhoIsHome.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("DinnerTimeModelId")
-                        .HasColumnType("int");
+                    b.Property<TimeOnly?>("DinnerTime")
+                        .HasColumnType("time");
 
                     b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
@@ -91,6 +75,9 @@ namespace WhoIsHome.DataAccess.Migrations
 
                     b.Property<DateOnly>("LastOccurrence")
                         .HasColumnType("date");
+
+                    b.Property<int>("PresenceType")
+                        .HasColumnType("int");
 
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time");
@@ -104,8 +91,6 @@ namespace WhoIsHome.DataAccess.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DinnerTimeModelId");
 
                     b.HasIndex("UserModelId");
 
@@ -143,38 +128,22 @@ namespace WhoIsHome.DataAccess.Migrations
 
             modelBuilder.Entity("WhoIsHome.DataAccess.Models.OneTimeEventModel", b =>
                 {
-                    b.HasOne("WhoIsHome.DataAccess.Models.DinnerTimeModel", "DinnerTimeModel")
-                        .WithMany()
-                        .HasForeignKey("DinnerTimeModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("WhoIsHome.DataAccess.Models.UserModel", "UserModel")
                         .WithMany()
                         .HasForeignKey("UserModelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("DinnerTimeModel");
 
                     b.Navigation("UserModel");
                 });
 
             modelBuilder.Entity("WhoIsHome.DataAccess.Models.RepeatedEventModel", b =>
                 {
-                    b.HasOne("WhoIsHome.DataAccess.Models.DinnerTimeModel", "DinnerTimeModel")
-                        .WithMany()
-                        .HasForeignKey("DinnerTimeModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("WhoIsHome.DataAccess.Models.UserModel", "UserModel")
                         .WithMany()
                         .HasForeignKey("UserModelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("DinnerTimeModel");
 
                     b.Navigation("UserModel");
                 });

@@ -1,5 +1,6 @@
 ﻿using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.Shared.Helper;
+using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Aggregates;
 
@@ -26,9 +27,11 @@ public class RepeatedEvent(
         DateOnly lastOccurrence, 
         TimeOnly startTime, 
         TimeOnly endTime, 
-        DinnerTime dinnerTime, 
+        PresenceType presenceType, 
+        TimeOnly? time,
         int userId)
     {
+        var dinnerTime = DinnerTime.Create(presenceType, time);
         ValidateBase(title, startTime, endTime, dinnerTime);
         ValidateOccurrence(firstOccurrence, lastOccurrence);
         
@@ -43,8 +46,9 @@ public class RepeatedEvent(
             userId);
     }
     
-    public void Update(string title, DateOnly firstOccurrence, DateOnly lastOccurrence, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime)
+    public void Update(string title, DateOnly firstOccurrence, DateOnly lastOccurrence, TimeOnly startTime, TimeOnly endTime, PresenceType presenceType, TimeOnly? time)
     {
+        var dinnerTime = DinnerTime.Update(presenceType, time);
         ValidateBase(title, startTime, endTime, dinnerTime);
         ValidateOccurrence(firstOccurrence, lastOccurrence);
         
@@ -53,7 +57,7 @@ public class RepeatedEvent(
         LastOccurrence = lastOccurrence;
         StartTime = startTime;
         EndTime = endTime;
-        DinnerTime = DinnerTime.Update(dinnerTime.PresenceType, dinnerTime.Time);
+        DinnerTime = dinnerTime;
     }
     
     protected override bool IsEventToday()

@@ -6,6 +6,8 @@ public static class RepeatedEventMapper
 {
 	public static RepeatedEvent ToAggregate(this RepeatedEventModel model)
 	{
+		var dinnerTime = new DinnerTime(model.PresenceType, model.DinnerTime);
+
 		return new RepeatedEvent(
 		model.Id,
 		model.Title,
@@ -13,7 +15,7 @@ public static class RepeatedEventMapper
 		model.LastOccurrence,
 		model.StartTime,
 		model.EndTime,
-		model.DinnerTimeModel.ToAggregate(),
+		dinnerTime,
 		model.UserModel.Id);
 	}
 
@@ -27,7 +29,8 @@ public static class RepeatedEventMapper
 			Title = aggregate.Title,
 			StartTime = aggregate.StartTime,
 			EndTime = aggregate.EndTime,
-			DinnerTimeModel = aggregate.DinnerTime.ToModel(),
+			PresenceType = aggregate.DinnerTime.PresenceType,
+			DinnerTime = aggregate.DinnerTime.Time,
 			UserModel = userModel
 		};
 	}

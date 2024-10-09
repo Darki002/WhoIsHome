@@ -16,21 +16,6 @@ namespace WhoIsHome.DataAccess.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "DinnerTime",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    PresentsType = table.Column<int>(type: "int", nullable: false),
-                    Time = table.Column<TimeOnly>(type: "time", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DinnerTime", x => x.Id);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
                 {
@@ -56,18 +41,13 @@ namespace WhoIsHome.DataAccess.Migrations
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     StartTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
-                    DinnerTimeModelId = table.Column<int>(type: "int", nullable: false),
+                    PresenceType = table.Column<int>(type: "int", nullable: false),
+                    DinnerTime = table.Column<TimeOnly>(type: "time", nullable: true),
                     UserModelId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Event", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Event_DinnerTime_DinnerTimeModelId",
-                        column: x => x.DinnerTimeModelId,
-                        principalTable: "DinnerTime",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Event_User_UserModelId",
                         column: x => x.UserModelId,
@@ -88,18 +68,13 @@ namespace WhoIsHome.DataAccess.Migrations
                     LastOccurrence = table.Column<DateOnly>(type: "date", nullable: false),
                     StartTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
-                    DinnerTimeModelId = table.Column<int>(type: "int", nullable: false),
+                    PresenceType = table.Column<int>(type: "int", nullable: false),
+                    DinnerTime = table.Column<TimeOnly>(type: "time", nullable: true),
                     UserModelId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RepeatedEvent", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RepeatedEvent_DinnerTime_DinnerTimeModelId",
-                        column: x => x.DinnerTimeModelId,
-                        principalTable: "DinnerTime",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_RepeatedEvent_User_UserModelId",
                         column: x => x.UserModelId,
@@ -110,19 +85,9 @@ namespace WhoIsHome.DataAccess.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Event_DinnerTimeModelId",
-                table: "Event",
-                column: "DinnerTimeModelId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Event_UserModelId",
                 table: "Event",
                 column: "UserModelId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RepeatedEvent_DinnerTimeModelId",
-                table: "RepeatedEvent",
-                column: "DinnerTimeModelId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RepeatedEvent_UserModelId",
@@ -144,9 +109,6 @@ namespace WhoIsHome.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "RepeatedEvent");
-
-            migrationBuilder.DropTable(
-                name: "DinnerTime");
 
             migrationBuilder.DropTable(
                 name: "User");

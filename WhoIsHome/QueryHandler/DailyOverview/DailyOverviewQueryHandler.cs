@@ -16,8 +16,7 @@ public class DailyOverviewQueryHandler(WhoIsHomeContext context)
         var today = DateOnly.FromDateTime(DateTime.Today);
 
         var oneTimeEvents = (await context.OneTimeEvents
-                .Include(e => e.DinnerTimeModel)
-                .Where(e => e.DinnerTimeModel.PresenceType != PresenceType.Unknown)
+                .Where(e => e.PresenceType != PresenceType.Unknown)
                 .Where(e => e.Date == today)
                 .GroupBy(e => e.UserModel.Id)
                 .ToListAsync(cancellationToken))
@@ -26,8 +25,7 @@ public class DailyOverviewQueryHandler(WhoIsHomeContext context)
                 g => g.Select(m => m.ToAggregate()));
 
         var repeatedEvents = (await context.RepeatedEvents
-                .Include(e => e.DinnerTimeModel)
-                .Where(e => e.DinnerTimeModel.PresenceType != PresenceType.Unknown)
+                .Where(e => e.PresenceType != PresenceType.Unknown)
                 .Where(e => e.FirstOccurrence > today)
                 .Where(e => e.LastOccurrence <= today)
                 .GroupBy(e => e.UserModel.Id)

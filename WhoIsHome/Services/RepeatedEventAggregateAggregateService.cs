@@ -5,6 +5,7 @@ using WhoIsHome.DataAccess;
 using WhoIsHome.DataAccess.Models;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
+using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Services;
 
@@ -38,12 +39,12 @@ public class RepeatedEventAggregateAggregateService(WhoIsHomeContext context, IU
     }
 
     public async Task<RepeatedEvent> CreateAsync(string title, DateOnly firstOccurrence, DateOnly lastOccurrence,
-        TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime, CancellationToken cancellationToken)
+        TimeOnly startTime, TimeOnly endTime, PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
     {
         var user = await userService.GetCurrentUserAsync(cancellationToken);
         
         var repeatedEvent = RepeatedEvent
-            .Create(title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, user.Id)
+            .Create(title, firstOccurrence, lastOccurrence, startTime, endTime, presenceType, time, user.Id)
             .ToModel(user.ToUser().ToModel());
 
         var result = await context.RepeatedEvents.AddAsync(repeatedEvent, cancellationToken);
@@ -52,7 +53,7 @@ public class RepeatedEventAggregateAggregateService(WhoIsHomeContext context, IU
     }
 
     public async Task<RepeatedEvent> UpdateAsync(int id, string title, DateOnly firstOccurrence,
-        DateOnly lastOccurrence, TimeOnly startTime, TimeOnly endTime, DinnerTime dinnerTime,
+        DateOnly lastOccurrence, TimeOnly startTime, TimeOnly endTime, PresenceType presenceType, TimeOnly? time,
         CancellationToken cancellationToken)
     {
         var existingRepeatedEvent = await context.RepeatedEvents
@@ -70,7 +71,7 @@ public class RepeatedEventAggregateAggregateService(WhoIsHomeContext context, IU
         }
 
         var aggregate = existingRepeatedEvent.ToAggregate();
-        aggregate.Update(title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime);
+        aggregate.Update(title, firstOccurrence, lastOccurrence, startTime, endTime, presenceType, time);
         
         var user = await userService.GetCurrentUserAsync(cancellationToken);
         var result = context.RepeatedEvents.Update(aggregate.ToModel(user.ToUser().ToModel()));
