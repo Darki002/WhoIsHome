@@ -22,7 +22,8 @@ public class OneTimeEventController(
             date: eventModel.Date,
             startTime: eventModel.StartTime,
             endTime: eventModel.EndTime,
-            dinnerTime: eventModel.DinnerTime,
+            presenceType: eventModel.PresenceType,
+            time: eventModel.DinnerTime,
             cancellationToken: cancellationToken);
 
         return await BuildResponseAsync(result);
@@ -38,7 +39,8 @@ public class OneTimeEventController(
             date: eventModel.Date,
             startTime: eventModel.StartTime,
             endTime: eventModel.EndTime,
-            dinnerTime: eventModel.DinnerTime,
+            presenceType: eventModel.PresenceType,
+            time: eventModel.DinnerTime,
             cancellationToken: cancellationToken);
 
         return await BuildResponseAsync(result);

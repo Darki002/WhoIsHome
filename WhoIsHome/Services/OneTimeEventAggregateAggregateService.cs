@@ -5,6 +5,7 @@ using WhoIsHome.DataAccess;
 using WhoIsHome.DataAccess.Models;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
+using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Services;
 
@@ -39,11 +40,11 @@ public class OneTimeEventAggregateAggregateService(WhoIsHomeContext context, IUs
     }
 
     public async Task<OneTimeEvent> CreateAsync(string title, DateOnly date, TimeOnly startTime, TimeOnly endTime,
-        DinnerTime dinnerTime, CancellationToken cancellationToken)
+        PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
     {
         var user = await userService.GetCurrentUserAsync(cancellationToken);
         
-        var oneTimeEvent = OneTimeEvent.Create(title, date, startTime, endTime, dinnerTime, user.Id)
+        var oneTimeEvent = OneTimeEvent.Create(title, date, startTime, endTime, presenceType, time, user.Id)
             .ToModel(user.ToUser().ToModel());
 
         var result = await context.OneTimeEvents.AddAsync(oneTimeEvent, cancellationToken);
@@ -52,7 +53,7 @@ public class OneTimeEventAggregateAggregateService(WhoIsHomeContext context, IUs
     }
 
     public async Task<OneTimeEvent> UpdateAsync(int id, string title, DateOnly date, TimeOnly startTime,
-        TimeOnly endTime, DinnerTime dinnerTime, CancellationToken cancellationToken)
+        TimeOnly endTime, PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
     {
         var existingOneTimeEvent = await context.OneTimeEvents
             .Include(e => e.UserModel)
@@ -67,7 +68,7 @@ public class OneTimeEventAggregateAggregateService(WhoIsHomeContext context, IUs
         }
         
         var aggregate = existingOneTimeEvent.ToAggregate();
-        aggregate.Update(title, date, startTime, endTime, dinnerTime);
+        aggregate.Update(title, date, startTime, endTime, presenceType, time);
         
         var user = await userService.GetCurrentUserAsync(cancellationToken);
         var result = context.OneTimeEvents.Update(aggregate.ToModel(user.ToUser().ToModel()));

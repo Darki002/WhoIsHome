@@ -1,4 +1,5 @@
 ﻿using WhoIsHome.Aggregates;
+using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.WebApi.Models.New;
 
@@ -14,5 +15,7 @@ public class NewRepeatedEventModel
 
     public required TimeOnly EndTime { get; set; }
 
-    public required DinnerTime DinnerTime { get; set; }
+    public required PresenceType PresenceType { get; set; }
+
+    public TimeOnly? DinnerTime { get; set; } = null;
 }

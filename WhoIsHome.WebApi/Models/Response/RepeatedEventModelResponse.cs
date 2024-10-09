@@ -1,4 +1,5 @@
 ﻿using WhoIsHome.Aggregates;
+using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.WebApi.Models.Response;
 
@@ -16,7 +17,9 @@ public class RepeatedEventModelResponse
 
     public required TimeOnly EndTime { get; set; }
 
-    public required DinnerTime DinnerTime { get; set; }
+    public required PresenceType PresenceType { get; set; }
+
+    public TimeOnly? DinnerTime { get; set; } = null;
 
     public required UserModel User { get; set; }
     
@@ -30,7 +33,8 @@ public class RepeatedEventModelResponse
             LastOccurrence = data.LastOccurrence,
             StartTime = data.StartTime,
             EndTime = data.EndTime,
-            DinnerTime = data.DinnerTime,
+            PresenceType = data.DinnerTime.PresenceType,
+            DinnerTime = data.DinnerTime.Time,
             User = UserModel.From(user)
         };
     }
