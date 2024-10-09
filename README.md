@@ -1,7 +1,7 @@
 # WhoIsHome
 Backend for [Android App](https://github.com/Darki002/WhoIsHome.Android)
 
-# API Endpoints
+# API
 
 This Project uses Swagger for the API Documentation. You can start up the project locally 
 and the swagger you should open automatically or use "localhost:7165/swagger/index.html"
