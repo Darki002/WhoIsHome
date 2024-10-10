@@ -1,6 +1,27 @@
-﻿namespace WhoIsHome.Test;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using WhoIsHome.DataAccess;
+
+namespace WhoIsHome.Test;
 
 public abstract class InMemoryDbTest
 {
-    // TODO Make In Memory Tests with MySql EF-Core possible
+    protected WhoIsHomeContext Db { get; private set; }
+
+    private DbContextOptions<WhoIsHomeContext> options = null!;
+
+    [OneTimeSetUp]
+    public void OneTimeSetUpDb()
+    {
+        options = new DbContextOptionsBuilder<WhoIsHomeContext>()
+            .UseInMemoryDatabase("InMemoryDbTest")
+            .ConfigureWarnings(c => c.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+            .Options;
+    }
+    
+    [SetUp]
+    public void SetUpDb()
+    {
+        Db = new WhoIsHomeContext(options);
+    }
 }
