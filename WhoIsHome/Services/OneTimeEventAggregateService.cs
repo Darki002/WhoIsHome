@@ -2,7 +2,6 @@
 using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.DataAccess;
-using WhoIsHome.DataAccess.Models;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.Shared.Types;
