@@ -150,4 +150,72 @@ public class OneTimeEventTest
             act.Should().Throw<InvalidModelException>();
         }
     }
+    
+    [TestFixture]
+    private class IsToday : OneTimeEventTest
+    {
+        [Test]
+        public void ReturnsTrue_WhenEventIsToday()
+        {
+            // Arrange
+            var date = DateOnly.FromDateTime(DateTime.Today);
+            var dinnerTime = new DinnerTime(PresenceType, time);
+            var oneTimeEvent = new OneTimeEvent(null, Title, date, startTime, endTime, dinnerTime, UserId);
+            
+            // Act
+            var result = oneTimeEvent.IsToday;
+            
+            // Assert
+            result.Should().BeTrue();
+        }
+        
+        [Test]
+        public void ReturnsFalse_WhenEventIsYesterday()
+        {
+            // Arrange
+            var date = DateOnly.FromDateTime(DateTime.Today.AddDays(-1));
+            var dinnerTime = new DinnerTime(PresenceType, time);
+            var oneTimeEvent = new OneTimeEvent(null, Title, date, startTime, endTime, dinnerTime, UserId);
+            
+            // Act
+            var result = oneTimeEvent.IsToday;
+            
+            // Assert
+            result.Should().BeFalse();
+        }
+        
+        [Test]
+        public void ReturnsFalse_WhenEventIsTomorrow()
+        {
+            // Arrange
+            var date = DateOnly.FromDateTime(DateTime.Today.AddDays(1));
+            var dinnerTime = new DinnerTime(PresenceType, time);
+            var oneTimeEvent = new OneTimeEvent(null, Title, date, startTime, endTime, dinnerTime, UserId);
+            
+            // Act
+            var result = oneTimeEvent.IsToday;
+            
+            // Assert
+            result.Should().BeFalse();
+        }
+    }
+    
+     [TestFixture]
+     private class GetNextOccurrence : OneTimeEventTest
+     {
+         [Test]
+         public void ReturnsDateOnly_ThatRepresentsTheOccurenceDate()
+         {
+             // Arrange
+             var date = DateOnly.FromDateTime(DateTime.Today);
+             var dinnerTime = new DinnerTime(PresenceType, time);
+             var oneTimeEvent = new OneTimeEvent(null, Title, date, startTime, endTime, dinnerTime, UserId);
+             
+             // Act
+             var result = oneTimeEvent.GetNextOccurrence();
+             
+             // Assert
+             result.Should().Be(date);
+         }
+     }
 }
