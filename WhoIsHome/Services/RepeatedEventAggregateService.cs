@@ -9,7 +9,7 @@ using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Services;
 
-public class RepeatedEventAggregateAggregateService(WhoIsHomeContext context, IUserService userService) : IAggregateService<RepeatedEvent>
+public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserService userService) : IAggregateService<RepeatedEvent>
 {
     public async Task<RepeatedEvent> GetAsync(int id, CancellationToken cancellationToken)
     {

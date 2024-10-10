@@ -9,7 +9,7 @@ using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Services;
 
-public class OneTimeEventAggregateAggregateService(WhoIsHomeContext context, IUserService userService)
+public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserService userService)
     : IAggregateService<OneTimeEvent>
 {
     public async Task<OneTimeEvent> GetAsync(int id, CancellationToken cancellationToken)
