@@ -9,7 +9,7 @@ using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Services;
 
-public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserService userService) : IAggregateService<RepeatedEvent>
+public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserContext userContext) : IAggregateService<RepeatedEvent>
 {
     public async Task<RepeatedEvent> GetAsync(int id, CancellationToken cancellationToken)
     {
@@ -29,7 +29,7 @@ public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserServic
 
         if (result is null) throw new NotFoundException($"No RepeatedEvent found with the id {id}.");
 
-        if (!userService.IsUserPermitted(result.UserModel.Id))
+        if (!userContext.IsUserPermitted(result.UserModel.Id))
         {
             throw new ActionNotAllowedException($"User with ID {result.UserModel.Id} is not allowed to delete or modify the content of {id}");
         }
@@ -41,7 +41,7 @@ public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserServic
     public async Task<RepeatedEvent> CreateAsync(string title, DateOnly firstOccurrence, DateOnly lastOccurrence,
         TimeOnly startTime, TimeOnly endTime, PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
     {
-        var user = await userService.GetCurrentUserAsync(cancellationToken);
+        var user = await userContext.GetCurrentUserAsync(cancellationToken);
         
         var repeatedEvent = RepeatedEvent
             .Create(title, firstOccurrence, lastOccurrence, startTime, endTime, presenceType, time, user.Id)
@@ -65,7 +65,7 @@ public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserServic
             throw new NotFoundException($"No RepeatedEvent found with the id {id}.");
         }
         
-        if (!userService.IsUserPermitted(existingRepeatedEvent.UserModel.Id))
+        if (!userContext.IsUserPermitted(existingRepeatedEvent.UserModel.Id))
         {
             throw new ActionNotAllowedException($"User with ID {existingRepeatedEvent.UserModel.Id} is not allowed to delete or modify the content of {id}");
         }
@@ -73,7 +73,7 @@ public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserServic
         var aggregate = existingRepeatedEvent.ToAggregate();
         aggregate.Update(title, firstOccurrence, lastOccurrence, startTime, endTime, presenceType, time);
         
-        var user = await userService.GetCurrentUserAsync(cancellationToken);
+        var user = await userContext.GetCurrentUserAsync(cancellationToken);
         var result = context.RepeatedEvents.Update(aggregate.ToModel(user.ToUser().ToModel()));
         await context.SaveChangesAsync(cancellationToken);
         return result.Entity.ToAggregate();

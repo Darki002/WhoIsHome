@@ -1,6 +1,6 @@
 ﻿namespace WhoIsHome.Shared.Authentication;
 
-public interface IUserService
+public interface IUserContext
 {
     int UserId { get; }
     

@@ -8,7 +8,7 @@ using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Services;
 
-public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserService userService)
+public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserContext userContext)
     : IAggregateService<OneTimeEvent>
 {
     public async Task<OneTimeEvent> GetAsync(int id, CancellationToken cancellationToken)
@@ -29,7 +29,7 @@ public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserService
 
         if (result is null) throw new NotFoundException($"No OneTimeEvent found with the id {id}.");
 
-        if (!userService.IsUserPermitted(result.UserModel.Id))
+        if (!userContext.IsUserPermitted(result.UserModel.Id))
         {
             throw new ActionNotAllowedException($"User with ID {result.UserModel.Id} is not allowed to delete or modify the content of {id}");
         }
@@ -41,7 +41,7 @@ public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserService
     public async Task<OneTimeEvent> CreateAsync(string title, DateOnly date, TimeOnly startTime, TimeOnly endTime,
         PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
     {
-        var user = await userService.GetCurrentUserAsync(cancellationToken);
+        var user = await userContext.GetCurrentUserAsync(cancellationToken);
         
         var oneTimeEvent = OneTimeEvent.Create(title, date, startTime, endTime, presenceType, time, user.Id)
             .ToModel(user.ToUser().ToModel());
@@ -61,7 +61,7 @@ public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserService
         if (existingOneTimeEvent is null)
             throw new NotFoundException($"No OneTimeEvent found with the id {id}.");
 
-        if (!userService.IsUserPermitted(existingOneTimeEvent.UserModel.Id))
+        if (!userContext.IsUserPermitted(existingOneTimeEvent.UserModel.Id))
         {
             throw new ActionNotAllowedException($"User with ID {existingOneTimeEvent.UserModel.Id} is not allowed to delete or modify the content of {id}");
         }
@@ -69,7 +69,7 @@ public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserService
         var aggregate = existingOneTimeEvent.ToAggregate();
         aggregate.Update(title, date, startTime, endTime, presenceType, time);
         
-        var user = await userService.GetCurrentUserAsync(cancellationToken);
+        var user = await userContext.GetCurrentUserAsync(cancellationToken);
         var result = context.OneTimeEvents.Update(aggregate.ToModel(user.ToUser().ToModel()));
         await context.SaveChangesAsync(cancellationToken);
         return result.Entity.ToAggregate();

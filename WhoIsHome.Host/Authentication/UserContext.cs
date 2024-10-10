@@ -7,10 +7,10 @@ using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Host.Authentication;
 
-public class UserService(
+public class UserContext(
     IHttpContextAccessor httpContextAccessor,
     WhoIsHomeContext context,
-    ILogger<UserService> logger) : IUserService
+    ILogger<UserContext> logger) : IUserContext
 {
     private AuthenticatedUser? authenticatedUserCache = null;
 
