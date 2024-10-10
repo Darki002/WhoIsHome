@@ -23,6 +23,10 @@ public abstract class InMemoryDbTest
     public async Task SetUpDb()
     {
         Db = new WhoIsHomeContext(options);
+
+        await Db.Database.EnsureDeletedAsync();
+        await Db.Database.EnsureCreatedAsync();
+        
         await DbSetUpAsync();
     }
 
