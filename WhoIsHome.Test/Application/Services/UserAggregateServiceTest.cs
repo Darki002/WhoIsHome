@@ -4,7 +4,7 @@ using WhoIsHome.DataAccess.Models;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Exceptions;
 
-namespace WhoIsHome.Test.Services;
+namespace WhoIsHome.Test.Application.Services;
 
 [TestFixture]
 public class UserAggregateServiceTest : InMemoryDbTest
