@@ -15,13 +15,19 @@ namespace WhoIsHome.Aggregates.Mappers
 
 		public static UserModel ToModel(this User aggregate)
 		{
-			return new UserModel
+			var model = new UserModel
 			{
-				Id = aggregate.Id!.Value,
 				UserName = aggregate.UserName,
 				Email = aggregate.Email,
 				Password = aggregate.Password
 			};
+
+			if (aggregate.Id.HasValue)
+			{
+				model.Id = aggregate.Id.Value;
+			}
+
+			return model;
 		}
 	}
 }
