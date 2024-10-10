@@ -55,5 +55,20 @@ public class UserTest
             // Assert
             act.Should().Throw<InvalidModelException>();
         }
+        
+        [Test]
+        public void ThrowsInvalidModelException_WhenUserNameIsTooShort()
+        {
+            // Arrange
+            const string userName = "aaaa";
+            const string invalidEmail = "darki@whoishome.dev";
+            const string password = "securePassword1234";
+        
+            // Act
+            var act = () => User.Create(userName, invalidEmail, password);
+        
+            // Assert
+            act.Should().Throw<InvalidModelException>();
+        }
     }
 }
