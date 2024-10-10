@@ -16,6 +16,7 @@ public class OneTimeEventTest
     private readonly TimeOnly endTime = new TimeOnly(14, 0, 0);
     private readonly TimeOnly? time = new TimeOnly(18, 0, 0);
     
+    [TestFixture]
     private class Create : OneTimeEventTest
     {
         [Test]
@@ -78,6 +79,7 @@ public class OneTimeEventTest
         }
     }
     
+    [TestFixture]
     private class Update : OneTimeEventTest
     {
         private OneTimeEvent oneTimeEvent = null!;

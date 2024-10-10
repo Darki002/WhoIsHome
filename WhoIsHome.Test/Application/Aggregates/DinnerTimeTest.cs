@@ -9,6 +9,7 @@ public class DinnerTimeTest
 {
     private readonly TimeOnly timeOnly = new TimeOnly(13, 30, 0);
 
+    [TestFixture]
     private class Create : DinnerTimeTest
     {
         [Test]
