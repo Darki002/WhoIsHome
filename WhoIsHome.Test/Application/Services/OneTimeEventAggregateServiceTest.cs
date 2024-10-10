@@ -26,6 +26,7 @@ public class OneTimeEventAggregateServiceTest : InMemoryDbTest
         user = UserTestData.CreateDefaultUser();
         await Db.Users.AddAsync(user.ToModel());
         await Db.SaveChangesAsync();
+        Db.ChangeTracker.Clear();
     }
 
     [TestFixture]
