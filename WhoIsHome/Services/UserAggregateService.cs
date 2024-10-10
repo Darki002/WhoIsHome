@@ -10,18 +10,6 @@ namespace WhoIsHome.Services;
 
 public class UserAggregateService(WhoIsHomeContext context, IPasswordHasher<User> passwordHasher)
 {
-    public async Task<User> GetUserByIdAsync(int id, CancellationToken cancellationToken)
-    {
-        var user = await context.Users.SingleOrDefaultAsync(u => u.Id == id, cancellationToken);
-
-        if (user is null)
-        {
-            throw new NotFoundException($"No User found with id {id}");
-        }
-        
-        return user.ToAggregate();
-    }
-    
     public async Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
     {
         var user = await context.Users
