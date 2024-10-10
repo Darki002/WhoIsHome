@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using WhoIsHome.Aggregates;
+using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.DataAccess.Models;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Exceptions;
+using WhoIsHome.Test.TestData;
 
 namespace WhoIsHome.Test.Application.Services;
 
@@ -38,8 +40,8 @@ public class UserAggregateServiceTest : InMemoryDbTest
         
         protected override async Task DbSetUpAsync()
         {
-            var user = CreateDefaultUser();
-            await Db.Users.AddAsync(user);
+            var user = UserTestData.CreateDefaultUser();
+            await Db.Users.AddAsync(user.ToModel());
             await Db.SaveChangesAsync();
         }
     }
@@ -52,7 +54,7 @@ public class UserAggregateServiceTest : InMemoryDbTest
         {
             // Arrange
             await CreateAndSaveDefault();
-            var user = CreateDefaultUser();
+            var user = UserTestData.CreateDefaultUser();
             
             // Act
             var act = async () => await service.CreateUserAsync(user.UserName, user.Email, user.Password, CancellationToken.None);
@@ -66,7 +68,7 @@ public class UserAggregateServiceTest : InMemoryDbTest
         {
             // Arrange
             const string password = "test";
-            var user = CreateDefaultUser(password: password);
+            var user = UserTestData.CreateDefaultUser(password: password);
             
             // Act
             await service.CreateUserAsync(user.UserName, user.Email, user.Password, CancellationToken.None);
@@ -80,7 +82,7 @@ public class UserAggregateServiceTest : InMemoryDbTest
         public async Task ReturnsNewCreatedUser()
         {
             // Arrange
-            var user = CreateDefaultUser();
+            var user = UserTestData.CreateDefaultUser();
             
             // Act
             await service.CreateUserAsync(user.UserName, user.Email, user.Password, CancellationToken.None);
@@ -98,22 +100,9 @@ public class UserAggregateServiceTest : InMemoryDbTest
         string email = "test.user@whoishome.dev",
         string password = "test")
     {
-        var user = CreateDefaultUser(userName, email, password);
-        await Db.Users.AddAsync(user);
+        var user = UserTestData.CreateDefaultUser(userName, email, password);
+        await Db.Users.AddAsync(user.ToModel());
         await Db.SaveChangesAsync();
-        return user;
-    }
-    
-    private static UserModel CreateDefaultUser(
-        string userName = "Test User", 
-        string email = "test.user@whoishome.dev", 
-        string password = "test")
-    {
-        return new UserModel
-        {
-            UserName = userName,
-            Email = email,
-            Password = password
-        };
+        return user.ToModel();
     }
 }

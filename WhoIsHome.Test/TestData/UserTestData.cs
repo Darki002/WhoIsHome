@@ -2,7 +2,7 @@ using WhoIsHome.Aggregates;
 
 namespace WhoIsHome.Test.TestData;
 
-public class UserTestData
+public static class UserTestData
 {
     public static User CreateDefaultUser(
         string userName = "Test User", 
