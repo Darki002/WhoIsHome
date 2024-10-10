@@ -31,7 +31,7 @@ public class User : AggregateBase
         // validates Email, throws if Invalid format
         _ = new MailAddress(email);
         
-        if (IsValidUserName(userName))
+        if (IsValidUserName(userName) is false)
             throw new InvalidModelException($"UserName is to long or to short. Must be between {UserNameMinLength} and {UserNameMaxLength} Characters.");
         
         return new User(
@@ -51,7 +51,7 @@ public class User : AggregateBase
 
     private static bool IsValidUserName(string userName)
     {
-        return userName.Length is > UserNameMaxLength or < UserNameMinLength;
+        return userName.Length is < UserNameMaxLength and > UserNameMinLength;
     }
 }
 

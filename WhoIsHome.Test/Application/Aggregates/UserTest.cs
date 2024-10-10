@@ -13,7 +13,7 @@ public class UserTest
         public void ReturnsNewUser_RepresentingAUserFromTheGivenData()
         {
             // Arrange
-            const string userName = "Darki";
+            const string userName = "Darki123";
             const string email = "darki@whoishome.dev";
             const string password = "securePassword1234";
         
@@ -31,7 +31,7 @@ public class UserTest
         public void ThrowsFormatException_WhenEmailIsInvalidFormat()
         {
             // Arrange
-            const string userName = "Darki";
+            const string userName = "Darki123";
             const string invalidEmail = "missingAt.dev";
             const string password = "securePassword1234";
         
@@ -61,7 +61,7 @@ public class UserTest
         public void ThrowsInvalidModelException_WhenUserNameIsTooShort()
         {
             // Arrange
-            const string userName = "aaaa";
+            const string userName = "1234";
             const string invalidEmail = "darki@whoishome.dev";
             const string password = "securePassword1234";
         
