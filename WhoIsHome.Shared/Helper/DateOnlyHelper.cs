@@ -6,8 +6,13 @@ public static class DateOnlyHelper
     
     public static bool IsThisWeek(this DateOnly dateOnly1)
     {
-        var date1 = dateOnly1.ToDateTime(TimeOnly.MinValue);
-        var date2 = DateTime.Today;
+        return IsThisWeek(dateOnly1, DateTime.Today);
+    }
+
+    internal static bool IsThisWeek(DateOnly dateOnly, DateTime dateTime)
+    {
+        var date1 = dateOnly.ToDateTime(TimeOnly.MinValue);
+        var date2 = dateTime.Date;
         
         var d1 = date1.StartOfWeek();
         var d2 = date2.StartOfWeek();
