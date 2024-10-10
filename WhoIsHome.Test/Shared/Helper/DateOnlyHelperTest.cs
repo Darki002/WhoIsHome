@@ -13,7 +13,7 @@ public class DateOnlyHelperTest
         var date2 = new DateTime(2024, 10, 12, 0, 0, 0);
 
         // Act
-        var result = DateOnlyHelper.IsThisWeek(date1, date2);
+        var result = date1.IsSameWeek(date2);
 
         // Asser
         result.Should().BeTrue();
@@ -27,7 +27,7 @@ public class DateOnlyHelperTest
         var date2 = new DateTime(2024, 10, 15, 0, 0, 0);
 
         // Act
-        var result = DateOnlyHelper.IsThisWeek(date1, date2);
+        var result = date1.IsSameWeek(date2);
 
         // Asser
         result.Should().BeFalse();
@@ -41,7 +41,7 @@ public class DateOnlyHelperTest
         var date2 = new DateTime(2024, 10, 5, 0, 0, 0);
 
         // Act
-        var result = DateOnlyHelper.IsThisWeek(date1, date2);
+        var result = date1.IsSameWeek(date2);
 
         // Asser
         result.Should().BeFalse();
@@ -58,6 +58,23 @@ public class DateOnlyHelperTest
         var result = date.StartOfWeek();
 
         // Asser
+        result.Should().Be(expected);
+    }
+
+    [Test]
+    [TestCase(10, DayOfWeek.Friday, 1)]
+    [TestCase(10, DayOfWeek.Saturday, 2)]
+    [TestCase(10, DayOfWeek.Sunday, 3)]
+    [TestCase(10, DayOfWeek.Monday, 4)]
+    public void DaysUntilNext_ReturnsDaysUntilGivenWeekDay(int day, int weekDay, int expected)
+    {
+        // Arrange
+        var dateTime = new DateTime(2024, 10, day);
+        
+        // Act
+        var result = dateTime.DaysUntilNext((DayOfWeek)weekDay);
+        
+        // Assert
         result.Should().Be(expected);
     }
 }
