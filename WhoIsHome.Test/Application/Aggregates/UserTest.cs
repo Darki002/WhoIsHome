@@ -6,7 +6,7 @@ namespace WhoIsHome.Test.Application.Aggregates;
 [TestFixture]
 public class UserTest
 {
-    private class Create
+    private class Create : UserTest
     {
         [Test]
         public void ReturnsNewUser_RepresentingAUserFromTheGivenData()
