@@ -22,8 +22,6 @@ public class OneTimeEventTest
         [Test]
         public void ReturnsNewOneTimeEvent()
         {
-            // Arrange
-            
             // Act
             var result = OneTimeEvent.Create(Title, date, startTime, endTime, PresenceType, null, UserId);
             
