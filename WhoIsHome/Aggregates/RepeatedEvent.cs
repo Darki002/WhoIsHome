@@ -62,8 +62,8 @@ public class RepeatedEvent(
     
     protected override bool IsEventToday()
     {
-        return DateTime.Now.DayOfWeek != FirstOccurrence.DayOfWeek &&
-               DateOnly.FromDateTime(DateTime.Today) < LastOccurrence;
+        return DateTime.Now.DayOfWeek == FirstOccurrence.DayOfWeek &&
+               DateOnly.FromDateTime(DateTime.Today) <= LastOccurrence;
     }
 
     public override DateOnly GetNextOccurrence()
@@ -79,11 +79,20 @@ public class RepeatedEvent(
         {
             return FirstOccurrence;
         }
+
+        if (IsToday)
+        {
+            return today;
+        }
+
+        if (firstOccurrence.IsSameWeek(today))
+        {
+            var daysUntilNextOccurence = (int)firstOccurrence.DayOfWeek - (int)today.DayOfWeek;
+            return today.AddDays(daysUntilNextOccurence).AddDays((int)FirstOccurrence.DayOfWeek);
+        }
         
         var daysLeftThisWeek = OccurrenceFrequency - (int)today.DayOfWeek;
-
-        var occurence = today.AddDays(daysLeftThisWeek).AddDays((int)FirstOccurrence.DayOfWeek);
-        return occurence;
+        return today.AddDays(daysLeftThisWeek).AddDays((int)FirstOccurrence.DayOfWeek);
     }
 
     private static void ValidateOccurrence(DateOnly firstOccurrence,  DateOnly lastOccurrence)
