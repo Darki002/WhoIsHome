@@ -69,7 +69,7 @@ public class DateOnlyHelperTest
     public void DaysUntilNext_ReturnsDaysUntilGivenWeekDay(int day, int weekDay, int expected)
     {
         // Arrange
-        var dateTime = new DateTime(2024, 10, day);
+        var dateTime = new DateOnly(2024, 10, day);
         
         // Act
         var result = dateTime.DaysUntilNext((DayOfWeek)weekDay);

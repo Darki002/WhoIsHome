@@ -84,15 +84,9 @@ public class RepeatedEvent(
         {
             return today;
         }
-
-        if (firstOccurrence.IsSameWeek(today))
-        {
-            var daysUntilNextOccurence = (int)firstOccurrence.DayOfWeek - (int)today.DayOfWeek;
-            return today.AddDays(daysUntilNextOccurence).AddDays((int)FirstOccurrence.DayOfWeek);
-        }
         
-        var daysLeftThisWeek = OccurrenceFrequency - (int)today.DayOfWeek;
-        return today.AddDays(daysLeftThisWeek).AddDays((int)FirstOccurrence.DayOfWeek);
+        var daysUntilNextOccurence = today.DaysUntilNext(FirstOccurrence.DayOfWeek);
+        return today.AddDays(daysUntilNextOccurence);
     }
 
     private static void ValidateOccurrence(DateOnly firstOccurrence,  DateOnly lastOccurrence)

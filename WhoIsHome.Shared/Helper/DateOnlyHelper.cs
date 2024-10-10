@@ -32,7 +32,7 @@ public static class DateOnlyHelper
         return dt.AddDays(-1 * diff).Date;
     }
 
-    public static int DaysUntilNext(this DateTime date, DayOfWeek targetDay)
+    public static int DaysUntilNext(this DateOnly date, DayOfWeek targetDay)
     {
         var difference = targetDay.Normalize() - date.DayOfWeek.Normalize();
         return difference < 0 ? difference + 7 : difference;
