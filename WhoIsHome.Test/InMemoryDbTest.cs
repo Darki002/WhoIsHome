@@ -20,8 +20,15 @@ public abstract class InMemoryDbTest
     }
     
     [SetUp]
-    public void SetUpDb()
+    public async Task SetUpDb()
     {
         Db = new WhoIsHomeContext(options);
+        await DbSetUpAsync(Db);
+    }
+
+    // Optional Override for Set Up in test
+    protected virtual Task DbSetUpAsync(WhoIsHomeContext context)
+    {
+        return Task.CompletedTask;
     }
 }
