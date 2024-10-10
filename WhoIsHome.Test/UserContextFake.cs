@@ -6,8 +6,8 @@ namespace WhoIsHome.Test;
 public class UserContextFake : IUserContext
 {
     private AuthenticatedUser authenticatedUser = null!;
-    
-    public int UserId { get; } = 0;
+
+    public int UserId => authenticatedUser.Id;
     
     public Task<AuthenticatedUser> GetCurrentUserAsync()
     {
@@ -24,11 +24,11 @@ public class UserContextFake : IUserContext
         return authenticatedUser.Id == permittedUserId;
     }
 
-    public void SetUser(User user)
+    public void SetUser(User user, int id)
     {
         authenticatedUser = new AuthenticatedUser
         {
-            Id = user.Id!.Value,
+            Id = id,
             UserName = user.UserName,
             Email = user.Email,
             PasswordHash = user.Password

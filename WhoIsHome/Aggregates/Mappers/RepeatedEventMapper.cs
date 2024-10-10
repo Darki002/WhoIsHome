@@ -23,7 +23,6 @@ public static class RepeatedEventMapper
 	{
 		var model = new RepeatedEventModel
 		{
-			Id = aggregate.Id!.Value,
 			FirstOccurrence = aggregate.FirstOccurrence,
 			LastOccurrence = aggregate.LastOccurrence,
 			Title = aggregate.Title,

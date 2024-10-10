@@ -16,6 +16,7 @@ public abstract class InMemoryDbTest
         options = new DbContextOptionsBuilder<WhoIsHomeContext>()
             .UseInMemoryDatabase("InMemoryDbTest")
             .ConfigureWarnings(c => c.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+            .EnableSensitiveDataLogging()
             .Options;
     }
     

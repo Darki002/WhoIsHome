@@ -22,7 +22,6 @@ public static class OneTimeEventMapper
 	{
 		var model = new OneTimeEventModel
 		{
-			Id = aggregate.Id!.Value,
 			Date = aggregate.Date,
 			Title = aggregate.Title,
 			StartTime = aggregate.StartTime,

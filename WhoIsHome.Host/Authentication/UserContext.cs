@@ -36,7 +36,7 @@ public class UserContext(
             return authenticatedUserCache;
         }
 
-        var user = await context.Users.SingleAsync(u => u.Id == UserId, cancellationToken);
+        var user = await context.Users.AsNoTracking().SingleAsync(u => u.Id == UserId, cancellationToken);
 
         CheckEmailAddress(user);
 

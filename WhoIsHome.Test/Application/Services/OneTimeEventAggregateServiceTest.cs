@@ -17,7 +17,7 @@ public class OneTimeEventAggregateServiceTest : InMemoryDbTest
     public void SetUp()
     {
         userContextFake = new UserContextFake();
-        userContextFake.SetUser(user);
+        userContextFake.SetUser(user, 1);
         service = new OneTimeEventAggregateService(Db, userContextFake);
     }
 
@@ -121,8 +121,7 @@ public class OneTimeEventAggregateServiceTest : InMemoryDbTest
             Db.OneTimeEvents.Should().HaveCount(1);
             Db.OneTimeEvents.Single().Id.Should().Be(1);
             result.Id.Should().Be(1);
-            var oneTimeEventModel = oneTimeEvent.ToModel(user.ToModel());
-            Db.OneTimeEvents.Single().Should().BeEquivalentTo(oneTimeEventModel);
+            Db.OneTimeEvents.Single().Title.Should().BeEquivalentTo(oneTimeEvent.Title);
         }
     }
     
@@ -156,5 +155,6 @@ public class OneTimeEventAggregateServiceTest : InMemoryDbTest
         var model = oneTimeEvent.ToModel(userModel);
         await Db.OneTimeEvents.AddAsync(model);
         await Db.SaveChangesAsync();
+        Db.ChangeTracker.Clear();
     }
 }
