@@ -1,7 +1,7 @@
 using WhoIsHome.Aggregates;
 using WhoIsHome.Shared.Authentication;
 
-namespace WhoIsHome.Test.Application.Services;
+namespace WhoIsHome.Test;
 
 public class UserContextFake : IUserContext
 {
