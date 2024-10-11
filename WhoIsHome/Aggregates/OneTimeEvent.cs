@@ -1,4 +1,5 @@
-﻿using WhoIsHome.Shared.Types;
+﻿using WhoIsHome.Shared.Helper;
+using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Aggregates;
 
@@ -48,7 +49,7 @@ public class OneTimeEvent(
         DinnerTime = dinnerTime;
     }
     
-    protected override bool IsEventToday() => Date == DateOnly.FromDateTime(DateTime.Today);
+    protected override bool IsEventToday() => Date == DateOnlyHelper.Today;
 
     public override DateOnly GetNextOccurrence() => Date;
 }
