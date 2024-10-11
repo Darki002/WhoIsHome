@@ -16,31 +16,51 @@ public class DailyOverviewQueryHandler(WhoIsHomeContext context)
         var today = DateOnly.FromDateTime(DateTime.Today);
 
         var oneTimeEvents = (await context.OneTimeEvents
+                .Include(e => e.UserModel)
                 .Where(e => e.PresenceType != PresenceType.Unknown)
                 .Where(e => e.Date == today)
                 .GroupBy(e => e.UserModel.Id)
+                .Select(g => new
+                {
+                    g.Key,
+                    Data = g.Select(e => e)
+                })
                 .ToListAsync(cancellationToken))
             .ToDictionary(
                 g => g.Key,
-                g => g.Select(m => m.ToAggregate()));
+                g => g.Data.Select(m => m.ToAggregate()));
 
         var repeatedEvents = (await context.RepeatedEvents
+                .Include(e => e.UserModel)
                 .Where(e => e.PresenceType != PresenceType.Unknown)
-                .Where(e => e.FirstOccurrence > today)
-                .Where(e => e.LastOccurrence <= today)
+                .Where(e => e.FirstOccurrence <= today)
+                .Where(e => e.LastOccurrence >= today)
                 .GroupBy(e => e.UserModel.Id)
+                .Select(g => new
+                {
+                    g.Key,
+                    Data = g.Select(e => e)
+                })
                 .ToListAsync(cancellationToken))
             .ToDictionary(
                 g => g.Key,
-                g => g.Select(m => m.ToAggregate()));
+                g => g.Data.Select(m => m.ToAggregate()));
 
         var eventsByUsers = new Dictionary<User, List<EventBase>>();
 
         foreach (var user in users)
         {
             var userEvents = new List<EventBase>();
-            userEvents.AddRange(oneTimeEvents[user.Id!.Value]);
-            userEvents.AddRange(repeatedEvents[user.Id.Value]);
+
+            if (oneTimeEvents.TryGetValue(user.Id!.Value, out var userOneTimeEvents))
+            {
+                userEvents.AddRange(userOneTimeEvents);
+            }
+            if (repeatedEvents.TryGetValue(user.Id!.Value, out var userRepeatedEvents))
+            {
+                userEvents.AddRange(userRepeatedEvents);
+            }
+            
             eventsByUsers.Add(user, userEvents);
         }
 
@@ -48,10 +68,14 @@ public class DailyOverviewQueryHandler(WhoIsHomeContext context)
         
         foreach (var eventByUser in eventsByUsers)
         {
-            var nextEvent = eventByUser.Value.Select(e => (Event: e, NextOccurrence: e.GetNextOccurrence()))
-                .MaxBy(e => e.NextOccurrence)
-                .Event;
+            if (eventByUser.Value.Count == 0)
+            {
+                var presence = DailyOverview.Empty(eventByUser.Key);
+                result.Add(presence);
+                continue;
+            }
 
+            var nextEvent = eventByUser.Value.MaxBy(e => e.DinnerTime.Time);
             var personPresence = GetPersonPresence(nextEvent, eventByUser.Key);
             result.Add(personPresence);
         }
