@@ -63,7 +63,8 @@ public class RepeatedEvent(
     protected override bool IsEventToday()
     {
         return DateTime.Now.DayOfWeek == FirstOccurrence.DayOfWeek &&
-               DateOnly.FromDateTime(DateTime.Today) <= LastOccurrence;
+               DateOnlyHelper.Today >= FirstOccurrence &&
+               DateOnlyHelper.Today <= LastOccurrence;
     }
 
     public override DateOnly GetNextOccurrence()

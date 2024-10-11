@@ -1,5 +1,6 @@
 using WhoIsHome.Aggregates;
 using WhoIsHome.Shared.Exceptions;
+using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
 // ReSharper disable LocalVariableHidesMember
 
@@ -274,10 +275,10 @@ public class RepeatedEventTest
             var firstOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(-21));
             var lastOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(-7));
             var dinnerTime = new DinnerTime(PresenceType, time);
-            var oneTimeEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
+            var repeatedEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
              
             // Act
-            var act = () => oneTimeEvent.GetNextOccurrence();
+            var act = () => repeatedEvent.GetNextOccurrence();
              
             // Assert
             act.Should().Throw<InvalidOperationException>();
@@ -298,12 +299,36 @@ public class RepeatedEventTest
             var lastOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(lastDayShift));
             
             var dinnerTime = new DinnerTime(PresenceType, time);
-            var oneTimeEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
+            var repeatedEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
              
             // Act
-            var result = oneTimeEvent.GetNextOccurrence();
+            var result = repeatedEvent.GetNextOccurrence();
              
             // Assert
+            result.Should().Be(expected);
+        }
+        
+        [Test]
+        [TestCase(-7, 0, 0)]
+        [TestCase(-7, 7, 0)]
+        [TestCase(0, 7, 0)]
+        [TestCase(0, 14, 0)]
+        public void IsAtHomeIsTrue_AndNextOccurenceReturnsExpectedDate(int firstDayShift, int lastDayShift, int expectedDayShift)
+        {
+            // Arrange
+            var expected = DateOnlyHelper.Today.AddDays(expectedDayShift);
+            
+            var firstOccurrence = DateOnlyHelper.Today.AddDays(firstDayShift);
+            var lastOccurrence = DateOnlyHelper.Today.AddDays(lastDayShift);
+            
+            var dinnerTime = new DinnerTime(PresenceType, time);
+            var repeatedEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
+             
+            // Act
+            var result = repeatedEvent.GetNextOccurrence();
+             
+            // Assert
+            repeatedEvent.IsToday.Should().BeTrue();
             result.Should().Be(expected);
         }
     }
