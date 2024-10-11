@@ -120,11 +120,12 @@ public class DinnerTimeTest
             result.Should().Throw<InvalidModelException>();
         }
     }
-    
+
+    [TestFixture]
     private class Update : DinnerTimeTest
     {
         private readonly DinnerTime dinnerTime = new DinnerTime(PresenceType.Unknown, null);
-        
+
         [Test]
         public void ReturnsNewDinnerTime_FromUnknownType()
         {
@@ -231,6 +232,27 @@ public class DinnerTimeTest
 
             // Assert
             result.Should().Throw<InvalidModelException>();
+        }
+    }
+
+    [TestFixture]
+    private class IsAtHome
+    {
+        [Test]
+        [TestCase(PresenceType.NotPresent, false)]
+        [TestCase(PresenceType.Unknown, true)]
+        [TestCase(PresenceType.Default, true)]
+        [TestCase(PresenceType.Late, true)]
+        public void ReturnsExpected_FromType(PresenceType presenceType, bool expected)
+        {
+            // Act
+            var time = presenceType is PresenceType.Default or PresenceType.Late
+                ? new TimeOnly(19, 0, 0)
+                : (TimeOnly?)null;
+            var result = DinnerTime.Create(presenceType, time);
+
+            // Assert
+            result.IsAtHome.Should().Be(expected);
         }
     }
 }
