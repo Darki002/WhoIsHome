@@ -9,11 +9,13 @@ using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Services;
 
-public class RepeatedEventAggregateAggregateService(WhoIsHomeContext context, IUserService userService) : IAggregateService<RepeatedEvent>
+public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserContext userContext) : IAggregateService<RepeatedEvent>
 {
     public async Task<RepeatedEvent> GetAsync(int id, CancellationToken cancellationToken)
     {
         var result = await context.RepeatedEvents
+            .Include(e => e.UserModel)
+            .AsNoTracking()
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (result is null) throw new NotFoundException($"No RepeatedEvent found with the id {id}.");
@@ -29,7 +31,7 @@ public class RepeatedEventAggregateAggregateService(WhoIsHomeContext context, IU
 
         if (result is null) throw new NotFoundException($"No RepeatedEvent found with the id {id}.");
 
-        if (!userService.IsUserPermitted(result.UserModel.Id))
+        if (!userContext.IsUserPermitted(result.UserModel.Id))
         {
             throw new ActionNotAllowedException($"User with ID {result.UserModel.Id} is not allowed to delete or modify the content of {id}");
         }
@@ -41,11 +43,10 @@ public class RepeatedEventAggregateAggregateService(WhoIsHomeContext context, IU
     public async Task<RepeatedEvent> CreateAsync(string title, DateOnly firstOccurrence, DateOnly lastOccurrence,
         TimeOnly startTime, TimeOnly endTime, PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
     {
-        var user = await userService.GetCurrentUserAsync(cancellationToken);
-        
+        var user = await context.Users.SingleAsync(u => u.Id == userContext.UserId, cancellationToken: cancellationToken);
         var repeatedEvent = RepeatedEvent
             .Create(title, firstOccurrence, lastOccurrence, startTime, endTime, presenceType, time, user.Id)
-            .ToModel(user.ToUser().ToModel());
+            .ToModel(user);
 
         var result = await context.RepeatedEvents.AddAsync(repeatedEvent, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -56,25 +57,17 @@ public class RepeatedEventAggregateAggregateService(WhoIsHomeContext context, IU
         DateOnly lastOccurrence, TimeOnly startTime, TimeOnly endTime, PresenceType presenceType, TimeOnly? time,
         CancellationToken cancellationToken)
     {
-        var existingRepeatedEvent = await context.RepeatedEvents
-            .Include(repeatedEventModel => repeatedEventModel.UserModel)
-            .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
-
-        if (existingRepeatedEvent is null)
-        {
-            throw new NotFoundException($"No RepeatedEvent found with the id {id}.");
-        }
+        var aggregate = await GetAsync(id, cancellationToken);
+        var user = await context.Users.SingleAsync(u => u.Id == aggregate.UserId, cancellationToken: cancellationToken);
         
-        if (!userService.IsUserPermitted(existingRepeatedEvent.UserModel.Id))
+        if (!userContext.IsUserPermitted(user.Id))
         {
-            throw new ActionNotAllowedException($"User with ID {existingRepeatedEvent.UserModel.Id} is not allowed to delete or modify the content of {id}");
+            throw new ActionNotAllowedException($"User with ID {user.Id} is not allowed to delete or modify the content of {id}");
         }
 
-        var aggregate = existingRepeatedEvent.ToAggregate();
         aggregate.Update(title, firstOccurrence, lastOccurrence, startTime, endTime, presenceType, time);
         
-        var user = await userService.GetCurrentUserAsync(cancellationToken);
-        var result = context.RepeatedEvents.Update(aggregate.ToModel(user.ToUser().ToModel()));
+        var result = context.RepeatedEvents.Update(aggregate.ToModel(user));
         await context.SaveChangesAsync(cancellationToken);
         return result.Entity.ToAggregate();
     }

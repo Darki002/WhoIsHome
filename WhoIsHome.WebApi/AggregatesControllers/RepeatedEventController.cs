@@ -9,14 +9,14 @@ using WhoIsHome.WebApi.Models.Response;
 
 namespace WhoIsHome.WebApi.AggregatesControllers;
 
-public class RepeatedEventController(RepeatedEventAggregateAggregateService repeatedEventAggregateAggregateService, IUserService userService)
-    : AggregateControllerBase<RepeatedEvent, RepeatedEventModelResponse>(repeatedEventAggregateAggregateService, userService)
+public class RepeatedEventController(RepeatedEventAggregateService repeatedEventAggregateService, IUserContext userContext)
+    : AggregateControllerBase<RepeatedEvent, RepeatedEventModelResponse>(repeatedEventAggregateService, userContext)
 {
     [HttpPost]
     public async Task<ActionResult<RepeatedEventModelResponse>> CreateEvent([FromBody] NewRepeatedEventModel eventModel,
         CancellationToken cancellationToken)
     {
-        var result = await repeatedEventAggregateAggregateService.CreateAsync(
+        var result = await repeatedEventAggregateService.CreateAsync(
             title: eventModel.Title,
             firstOccurrence: eventModel.FirstOccurrence,
             lastOccurrence: eventModel.LastOccurrence,
@@ -33,7 +33,7 @@ public class RepeatedEventController(RepeatedEventAggregateAggregateService repe
     public async Task<ActionResult<RepeatedEventModelResponse>> UpdateEvent([FromBody] RepeatedEventModel eventModel,
         CancellationToken cancellationToken)
     {
-        var result = await repeatedEventAggregateAggregateService.UpdateAsync(
+        var result = await repeatedEventAggregateService.UpdateAsync(
             id: eventModel.Id,
             title: eventModel.Title,
             firstOccurrence: eventModel.FirstOccurrence,

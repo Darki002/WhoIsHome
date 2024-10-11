@@ -2,19 +2,20 @@
 using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.DataAccess;
-using WhoIsHome.DataAccess.Models;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Services;
 
-public class OneTimeEventAggregateAggregateService(WhoIsHomeContext context, IUserService userService)
+public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserContext userContext)
     : IAggregateService<OneTimeEvent>
 {
     public async Task<OneTimeEvent> GetAsync(int id, CancellationToken cancellationToken)
     {
         var result = await context.OneTimeEvents
+            .Include(e => e.UserModel)
+            .AsNoTracking()
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (result is null) throw new NotFoundException($"No OneTimeEvent found with the id {id}.");
@@ -30,7 +31,7 @@ public class OneTimeEventAggregateAggregateService(WhoIsHomeContext context, IUs
 
         if (result is null) throw new NotFoundException($"No OneTimeEvent found with the id {id}.");
 
-        if (!userService.IsUserPermitted(result.UserModel.Id))
+        if (!userContext.IsUserPermitted(result.UserModel.Id))
         {
             throw new ActionNotAllowedException($"User with ID {result.UserModel.Id} is not allowed to delete or modify the content of {id}");
         }
@@ -42,10 +43,9 @@ public class OneTimeEventAggregateAggregateService(WhoIsHomeContext context, IUs
     public async Task<OneTimeEvent> CreateAsync(string title, DateOnly date, TimeOnly startTime, TimeOnly endTime,
         PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
     {
-        var user = await userService.GetCurrentUserAsync(cancellationToken);
-        
-        var oneTimeEvent = OneTimeEvent.Create(title, date, startTime, endTime, presenceType, time, user.Id)
-            .ToModel(user.ToUser().ToModel());
+        var user = await context.Users.SingleAsync(u => u.Id == userContext.UserId, cancellationToken: cancellationToken);
+        var oneTimeEvent = OneTimeEvent.Create(title, date, startTime, endTime, presenceType, time, userContext.UserId)
+            .ToModel(user);
 
         var result = await context.OneTimeEvents.AddAsync(oneTimeEvent, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -55,23 +55,17 @@ public class OneTimeEventAggregateAggregateService(WhoIsHomeContext context, IUs
     public async Task<OneTimeEvent> UpdateAsync(int id, string title, DateOnly date, TimeOnly startTime,
         TimeOnly endTime, PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
     {
-        var existingOneTimeEvent = await context.OneTimeEvents
-            .Include(e => e.UserModel)
-            .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
+        var aggregate = await GetAsync(id, cancellationToken);
+        var user = await context.Users.SingleAsync(u => u.Id == aggregate.UserId, cancellationToken: cancellationToken);
 
-        if (existingOneTimeEvent is null)
-            throw new NotFoundException($"No OneTimeEvent found with the id {id}.");
-
-        if (!userService.IsUserPermitted(existingOneTimeEvent.UserModel.Id))
+        if (!userContext.IsUserPermitted(user.Id))
         {
-            throw new ActionNotAllowedException($"User with ID {existingOneTimeEvent.UserModel.Id} is not allowed to delete or modify the content of {id}");
+            throw new ActionNotAllowedException($"User with ID {user.Id} is not allowed to delete or modify the content of {id}");
         }
         
-        var aggregate = existingOneTimeEvent.ToAggregate();
         aggregate.Update(title, date, startTime, endTime, presenceType, time);
         
-        var user = await userService.GetCurrentUserAsync(cancellationToken);
-        var result = context.OneTimeEvents.Update(aggregate.ToModel(user.ToUser().ToModel()));
+        var result = context.OneTimeEvents.Update(aggregate.ToModel(user));
         await context.SaveChangesAsync(cancellationToken);
         return result.Entity.ToAggregate();
     }

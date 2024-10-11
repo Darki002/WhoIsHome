@@ -7,10 +7,10 @@ using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Host.Authentication;
 
-public class UserService(
+public class UserContext(
     IHttpContextAccessor httpContextAccessor,
     WhoIsHomeContext context,
-    ILogger<UserService> logger) : IUserService
+    ILogger<UserContext> logger) : IUserContext
 {
     private AuthenticatedUser? authenticatedUserCache = null;
 
@@ -36,7 +36,7 @@ public class UserService(
             return authenticatedUserCache;
         }
 
-        var user = await context.Users.SingleAsync(u => u.Id == UserId, cancellationToken);
+        var user = await context.Users.AsNoTracking().SingleAsync(u => u.Id == UserId, cancellationToken);
 
         CheckEmailAddress(user);
 

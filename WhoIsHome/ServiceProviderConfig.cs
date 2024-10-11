@@ -10,8 +10,8 @@ public static class ServiceProviderConfig
 {
     public static IServiceCollection AddWhoIsHomeServices(this IServiceCollection services)
     {
-        services.AddScoped<OneTimeEventAggregateAggregateService>();
-        services.AddScoped<RepeatedEventAggregateAggregateService>();
+        services.AddScoped<OneTimeEventAggregateService>();
+        services.AddScoped<RepeatedEventAggregateService>();
         services.AddScoped<UserAggregateService>();
 
         services.AddTransient<DailyOverviewQueryHandler>();

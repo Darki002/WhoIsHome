@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
         services.AddControllers();
 
         services.AddHttpContextAccessor();
-        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IUserContext, UserContext>();
         
         services.AddWhoIsHomeServices()
             .AddDataAccessServices(configuration)

@@ -21,9 +21,8 @@ public static class RepeatedEventMapper
 
 	public static RepeatedEventModel ToModel(this RepeatedEvent aggregate, UserModel userModel)
 	{
-		return new RepeatedEventModel
+		var model = new RepeatedEventModel
 		{
-			Id = aggregate.Id!.Value,
 			FirstOccurrence = aggregate.FirstOccurrence,
 			LastOccurrence = aggregate.LastOccurrence,
 			Title = aggregate.Title,
@@ -33,5 +32,12 @@ public static class RepeatedEventMapper
 			DinnerTime = aggregate.DinnerTime.Time,
 			UserModel = userModel
 		};
+
+		if (aggregate.Id.HasValue)
+		{
+			model.Id = aggregate.Id.Value;
+		}
+
+		return model;
 	}
 }

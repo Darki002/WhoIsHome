@@ -11,14 +11,14 @@ using OneTimeEventModel = WhoIsHome.WebApi.Models.Request.OneTimeEventModel;
 namespace WhoIsHome.WebApi.AggregatesControllers;
 
 public class OneTimeEventController(
-    OneTimeEventAggregateAggregateService oneTimeEventAggregateAggregateService, IUserService userService)
-    : AggregateControllerBase<OneTimeEvent, OneTimeEventModelResponse>(oneTimeEventAggregateAggregateService, userService)
+    OneTimeEventAggregateService oneTimeEventAggregateService, IUserContext userContext)
+    : AggregateControllerBase<OneTimeEvent, OneTimeEventModelResponse>(oneTimeEventAggregateService, userContext)
 {
     [HttpPost]
     public async Task<ActionResult<OneTimeEventModelResponse>> CreateEvent([FromBody] NewOneTimeEventModel eventModel,
         CancellationToken cancellationToken)
     {
-        var result = await oneTimeEventAggregateAggregateService.CreateAsync(
+        var result = await oneTimeEventAggregateService.CreateAsync(
             title: eventModel.Title,
             date: eventModel.Date,
             startTime: eventModel.StartTime,
@@ -34,7 +34,7 @@ public class OneTimeEventController(
     public async Task<ActionResult<OneTimeEventModelResponse>> UpdateEvent([FromBody] OneTimeEventModel eventModel,
         CancellationToken cancellationToken)
     {
-        var result = await oneTimeEventAggregateAggregateService.UpdateAsync(
+        var result = await oneTimeEventAggregateService.UpdateAsync(
             id: eventModel.Id,
             title: eventModel.Title,
             date: eventModel.Date,

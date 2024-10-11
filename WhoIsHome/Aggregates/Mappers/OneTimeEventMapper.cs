@@ -20,9 +20,8 @@ public static class OneTimeEventMapper
 
 	public static OneTimeEventModel ToModel(this OneTimeEvent aggregate, UserModel userModel)
 	{
-		return new OneTimeEventModel
+		var model = new OneTimeEventModel
 		{
-			Id = aggregate.Id!.Value,
 			Date = aggregate.Date,
 			Title = aggregate.Title,
 			StartTime = aggregate.StartTime,
@@ -31,5 +30,12 @@ public static class OneTimeEventMapper
 			DinnerTime = aggregate.DinnerTime.Time,
 			UserModel = userModel
 		};
+
+		if (aggregate.Id.HasValue)
+		{
+			model.Id = aggregate.Id.Value;
+		}
+
+		return model;
 	}
 }

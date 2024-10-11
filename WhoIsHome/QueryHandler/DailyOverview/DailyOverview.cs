@@ -14,7 +14,9 @@ public class DailyOverview
     {
         return new DailyOverview
         {
-            User = user
+            User = user,
+            IsAtHome = false,
+            DinnerTime = null
         };
     }
 

@@ -5,7 +5,7 @@ using WhoIsHome.Shared.Authentication;
 
 namespace WhoIsHome.WebApi.AggregatesControllers;
 
-public abstract class AggregateControllerBase<T, TModel>(IAggregateService<T> aggregateService, IUserService userService) : WhoIsHomeControllerBase<T, TModel>
+public abstract class AggregateControllerBase<T, TModel>(IAggregateService<T> aggregateService, IUserContext userContext) : WhoIsHomeControllerBase<T, TModel>
 {
     [HttpGet("{id}")]
     public async Task<ActionResult<TModel>> Get(int id, CancellationToken cancellationToken)
@@ -23,7 +23,7 @@ public abstract class AggregateControllerBase<T, TModel>(IAggregateService<T> ag
 
     protected override async Task<TModel> ConvertToModelAsync(T data)
     {
-        var user = await userService.GetCurrentUserAsync();
+        var user = await userContext.GetCurrentUserAsync();
         return await ConvertToModelAsync(data, user.ToUser());
     }
 
