@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using WhoIsHome.Aggregates;
 using WhoIsHome.Shared.Helper;
@@ -9,7 +10,7 @@ using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.WebApi.UserAuthentication;
 
-public class JwtTokenService(IConfiguration configuration)
+public class JwtTokenService(IConfiguration configuration, ILogger<JwtTokenService> logger)
 {
     public string GenerateToken(User user)
     {
@@ -34,7 +35,8 @@ public class JwtTokenService(IConfiguration configuration)
             expires: DateTime.Now.AddMinutes(double.Parse(jwtSettings["ExpiresInMinutes"]!)),
             signingCredentials: creds
         );
-
+        
+        logger.LogInformation("New Token for User {Id} was generated", user.Id);
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

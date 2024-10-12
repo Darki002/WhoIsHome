@@ -51,7 +51,7 @@ public class User : AggregateBase
 
     private static bool IsValidUserName(string userName)
     {
-        return userName.Length is < UserNameMaxLength and > UserNameMinLength;
+        return userName.Length is <= UserNameMaxLength and >= UserNameMinLength;
     }
 }
 
