@@ -19,7 +19,7 @@ public static class JwtAuthentication
         var secretKey = EnvironmentHelper.GetVariable(EnvVariables.JwtSecretKey);
         
         var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(secretKey));
-        
+
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
