@@ -14,6 +14,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{94D6ABE4
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.Test", "test\WhoIsHome.Test\WhoIsHome.Test.csproj", "{86A0F5FB-5780-49CB-BC1B-0A00DB7E6BA9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F1A62E6F-19DF-4020-B3E0-1CFD92F84265}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		Dockerfile = Dockerfile
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,5 +57,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{86A0F5FB-5780-49CB-BC1B-0A00DB7E6BA9} = {94D6ABE4-A8CC-4247-8531-CF070DCF8A86}
+		{A69C9C8D-6728-4728-9EB4-963E184B51E4} = {F1A62E6F-19DF-4020-B3E0-1CFD92F84265}
 	EndGlobalSection
 EndGlobal
