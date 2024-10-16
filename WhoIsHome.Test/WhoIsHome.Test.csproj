@@ -20,7 +20,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\WhoIsHome.DataAccess\WhoIsHome.DataAccess.csproj" />
       <ProjectReference Include="..\WhoIsHome.Shared\WhoIsHome.Shared.csproj" />
       <ProjectReference Include="..\WhoIsHome\WhoIsHome.csproj" />
     </ItemGroup>
