@@ -10,6 +10,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.DataAccess", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.Shared", "src\WhoIsHome.Shared\WhoIsHome.Shared.csproj", "{8E900FDC-EB4A-4726-92C9-BA57A7EA71BA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{94D6ABE4-A8CC-4247-8531-CF070DCF8A86}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.Test", "test\WhoIsHome.Test\WhoIsHome.Test.csproj", "{86A0F5FB-5780-49CB-BC1B-0A00DB7E6BA9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,5 +44,12 @@ Global
 		{B466EC39-A43E-4E5D-A278-20426D69182F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B466EC39-A43E-4E5D-A278-20426D69182F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B466EC39-A43E-4E5D-A278-20426D69182F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86A0F5FB-5780-49CB-BC1B-0A00DB7E6BA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86A0F5FB-5780-49CB-BC1B-0A00DB7E6BA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86A0F5FB-5780-49CB-BC1B-0A00DB7E6BA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86A0F5FB-5780-49CB-BC1B-0A00DB7E6BA9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{86A0F5FB-5780-49CB-BC1B-0A00DB7E6BA9} = {94D6ABE4-A8CC-4247-8531-CF070DCF8A86}
 	EndGlobalSection
 EndGlobal
