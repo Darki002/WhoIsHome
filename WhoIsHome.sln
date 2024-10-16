@@ -1,16 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.Host", "WhoIsHome.Host\WhoIsHome.Host.csproj", "{954C3CCA-CFF9-46B3-9BDF-4A1277018838}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.Host", "src\WhoIsHome.Host\WhoIsHome.Host.csproj", "{954C3CCA-CFF9-46B3-9BDF-4A1277018838}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.WebApi", "WhoIsHome.WebApi\WhoIsHome.WebApi.csproj", "{2E2CBACC-D216-4290-A6EA-170533A0AE91}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.WebApi", "src\WhoIsHome.WebApi\WhoIsHome.WebApi.csproj", "{2E2CBACC-D216-4290-A6EA-170533A0AE91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome", "WhoIsHome\WhoIsHome.csproj", "{01BCA085-14A7-484C-B8B7-22246747271E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome", "src\WhoIsHome\WhoIsHome.csproj", "{01BCA085-14A7-484C-B8B7-22246747271E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.DataAccess", "WhoIsHome.DataAccess\WhoIsHome.DataAccess.csproj", "{AD91F62D-8784-4AF3-A197-688DC9C75F12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.DataAccess", "src\WhoIsHome.DataAccess\WhoIsHome.DataAccess.csproj", "{AD91F62D-8784-4AF3-A197-688DC9C75F12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.Shared", "WhoIsHome.Shared\WhoIsHome.Shared.csproj", "{8E900FDC-EB4A-4726-92C9-BA57A7EA71BA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.Test", "WhoIsHome.Test\WhoIsHome.Test.csproj", "{B466EC39-A43E-4E5D-A278-20426D69182F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhoIsHome.Shared", "src\WhoIsHome.Shared\WhoIsHome.Shared.csproj", "{8E900FDC-EB4A-4726-92C9-BA57A7EA71BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
