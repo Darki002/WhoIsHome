@@ -2,7 +2,8 @@
 WORKDIR /app
 
 # Copy everything
-COPY ./src .
+COPY . .
+
 # Restore as distinct layers
 RUN dotnet restore
 # Build and publish a release
