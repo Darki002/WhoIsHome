@@ -152,8 +152,7 @@ public class OneTimeEventAggregateServiceTest : InMemoryDbTest
     
     private async Task SaveToDb(OneTimeEvent oneTimeEvent)
     {
-        var userModel = Db.Users.Single(u => u.Id == oneTimeEvent.UserId);
-        var model = oneTimeEvent.ToModel(userModel);
+        var model = oneTimeEvent.ToModel();
         await Db.OneTimeEvents.AddAsync(model);
         await Db.SaveChangesAsync();
         Db.ChangeTracker.Clear();

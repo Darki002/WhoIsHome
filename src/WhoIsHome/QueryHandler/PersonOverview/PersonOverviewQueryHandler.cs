@@ -14,13 +14,13 @@ public class PersonOverviewQueryHandler(WhoIsHomeContext context)
 
         var oneTimeEvents = (await context.OneTimeEvents
                 .Where(e => e.Date >= today)
-                .Where(e => e.UserModel.Id == userId)
+                .Where(e => e.User.Id == userId)
                 .ToListAsync(cancellationToken))
             .Select(m => m.ToAggregate());
 
         var repeatedEvents = (await context.RepeatedEvents
                 .Where(e => e.LastOccurrence >= today)
-                .Where(e => e.UserModel.Id == userId)
+                .Where(e => e.UserId == userId)
                 .ToListAsync(cancellationToken))
             .Select(m => m.ToAggregate());
 

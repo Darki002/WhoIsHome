@@ -33,5 +33,8 @@ public class RepeatedEventModel : DbModel
     public TimeOnly? DinnerTime { get; set; }
     
     [Required]
-    public UserModel UserModel { get; set; } = null!;
+    public int UserId { get; set; }
+    
+    [Required]
+    public UserModel User { get; set; } = null!;
 }
