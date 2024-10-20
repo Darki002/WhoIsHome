@@ -14,7 +14,7 @@ public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserContext
     public async Task<OneTimeEvent> GetAsync(int id, CancellationToken cancellationToken)
     {
         var result = await context.OneTimeEvents
-            .Include(e => e.UserModel)
+            .Include(e => e.User)
             .AsNoTracking()
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
@@ -26,14 +26,14 @@ public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserContext
     public async Task DeleteAsync(int id, CancellationToken cancellationToken)
     {
         var result = await context.OneTimeEvents
-            .Include(oneTimeEventModel => oneTimeEventModel.UserModel)
+            .Include(oneTimeEventModel => oneTimeEventModel.User)
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (result is null) throw new NotFoundException($"No OneTimeEvent found with the id {id}.");
 
-        if (!userContext.IsUserPermitted(result.UserModel.Id))
+        if (!userContext.IsUserPermitted(result.User.Id))
         {
-            throw new ActionNotAllowedException($"User with ID {result.UserModel.Id} is not allowed to delete or modify the content of {id}");
+            throw new ActionNotAllowedException($"User with ID {result.User.Id} is not allowed to delete or modify the content of {id}");
         }
 
         context.OneTimeEvents.Remove(result);
@@ -43,9 +43,8 @@ public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserContext
     public async Task<OneTimeEvent> CreateAsync(string title, DateOnly date, TimeOnly startTime, TimeOnly endTime,
         PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
     {
-        var user = await context.Users.SingleAsync(u => u.Id == userContext.UserId, cancellationToken: cancellationToken);
         var oneTimeEvent = OneTimeEvent.Create(title, date, startTime, endTime, presenceType, time, userContext.UserId)
-            .ToModel(user);
+            .ToModel();
 
         var result = await context.OneTimeEvents.AddAsync(oneTimeEvent, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -65,7 +64,7 @@ public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserContext
         
         aggregate.Update(title, date, startTime, endTime, presenceType, time);
         
-        var result = context.OneTimeEvents.Update(aggregate.ToModel(user));
+        var result = context.OneTimeEvents.Update(aggregate.ToModel());
         await context.SaveChangesAsync(cancellationToken);
         return result.Entity.ToAggregate();
     }

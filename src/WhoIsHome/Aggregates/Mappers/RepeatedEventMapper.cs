@@ -16,10 +16,10 @@ public static class RepeatedEventMapper
 		model.StartTime,
 		model.EndTime,
 		dinnerTime,
-		model.UserModel.Id);
+		model.UserId);
 	}
 
-	public static RepeatedEventModel ToModel(this RepeatedEvent aggregate, UserModel userModel)
+	public static RepeatedEventModel ToModel(this RepeatedEvent aggregate)
 	{
 		var model = new RepeatedEventModel
 		{
@@ -30,7 +30,7 @@ public static class RepeatedEventMapper
 			EndTime = aggregate.EndTime,
 			PresenceType = aggregate.DinnerTime.PresenceType,
 			DinnerTime = aggregate.DinnerTime.Time,
-			UserModel = userModel
+			UserId = aggregate.UserId
 		};
 
 		if (aggregate.Id.HasValue)
