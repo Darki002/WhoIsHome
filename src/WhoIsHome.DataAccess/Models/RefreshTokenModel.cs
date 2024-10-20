@@ -16,5 +16,8 @@ public class RefreshTokenModel : DbModel
     public DateTime Issued { get; set; }
     
     [Required]
-    public UserModel UserModel { get; set; } = null!;
+    public int UserId { get; set; }
+    
+    [Required]
+    public UserModel User { get; set; } = null!;
 }
