@@ -8,7 +8,10 @@ namespace WhoIsHome.WebApi.UserAuthentication;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class AuthController(UserAggregateService userAggregateService, JwtTokenService jwtTokenService, IPasswordHasher<User> passwordHasher) : Controller
+public class AuthController(
+    UserAggregateService userAggregateService, 
+    JwtTokenService jwtTokenService, 
+    IPasswordHasher<User> passwordHasher) : Controller
 {
     [HttpPost("Login")]
     public async Task<IActionResult> Login(LoginDto loginDto, CancellationToken cancellationToken)
@@ -44,7 +47,20 @@ public class AuthController(UserAggregateService userAggregateService, JwtTokenS
         }
         catch (EmailInUseException)
         {
-            return BadRequest("Email is already in use. Did you intend to log in?");
+            return BadRequest("Email is already in use!");
+        }
+    }
+
+    [HttpGet("/refresh")]
+    public async Task<IActionResult> Refresh()
+    {
+        try
+        {
+            return Ok();
+        }
+        catch (RefreshTokenExpiredException)
+        {
+            return BadRequest("Refresh Token is expired!");
         }
     }
 }
