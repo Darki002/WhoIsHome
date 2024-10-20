@@ -16,10 +16,10 @@ public class DailyOverviewQueryHandler(WhoIsHomeContext context)
         var today = DateOnly.FromDateTime(DateTime.Today);
 
         var oneTimeEvents = (await context.OneTimeEvents
-                .Include(e => e.UserModel)
+                .Include(e => e.User)
                 .Where(e => e.PresenceType != PresenceType.Unknown)
                 .Where(e => e.Date == today)
-                .GroupBy(e => e.UserModel.Id)
+                .GroupBy(e => e.User.Id)
                 .Select(g => new
                 {
                     g.Key,
@@ -31,11 +31,11 @@ public class DailyOverviewQueryHandler(WhoIsHomeContext context)
                 g => g.Data.Select(m => m.ToAggregate()));
 
         var repeatedEvents = (await context.RepeatedEvents
-                .Include(e => e.UserModel)
+                .Include(e => e.User)
                 .Where(e => e.PresenceType != PresenceType.Unknown)
                 .Where(e => e.FirstOccurrence <= today)
                 .Where(e => e.LastOccurrence >= today)
-                .GroupBy(e => e.UserModel.Id)
+                .GroupBy(e => e.UserId)
                 .Select(g => new
                 {
                     g.Key,

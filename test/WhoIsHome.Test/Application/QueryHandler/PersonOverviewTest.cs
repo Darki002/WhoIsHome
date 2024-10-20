@@ -38,19 +38,19 @@ public class PersonOverviewTest : InMemoryDbTest
         var user = UserTestData.CreateDefaultUser().ToModel();
         await Db.Users.AddAsync(user);
         
-        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(title: "1", date: DateOnlyHelper.Today).ToModel(user);
-        var oneTimeEvent2 = OneTimeEventTestData.CreateDefault(title: "2", date: DateOnlyHelper.Today.AddDays(-1)).ToModel(user);
-        var oneTimeEvent3 = OneTimeEventTestData.CreateDefault(title: "3", date: DateOnlyHelper.Today.AddDays(1)).ToModel(user);
+        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(title: "1", date: DateOnlyHelper.Today).ToModel();
+        var oneTimeEvent2 = OneTimeEventTestData.CreateDefault(title: "2", date: DateOnlyHelper.Today.AddDays(-1)).ToModel();
+        var oneTimeEvent3 = OneTimeEventTestData.CreateDefault(title: "3", date: DateOnlyHelper.Today.AddDays(1)).ToModel();
         
         var repeatedEvent1 = RepeatedEventTestData
             .CreateDefault(title: "4", firstOccurrence: DateOnlyHelper.Today, lastOccurrence: DateOnlyHelper.Today.AddDays(7))
-            .ToModel(user);
+            .ToModel();
         var repeatedEvent2 = RepeatedEventTestData
             .CreateDefault(title: "5", firstOccurrence: DateOnlyHelper.Today.AddDays(7), lastOccurrence: DateOnlyHelper.Today.AddDays(14))
-            .ToModel(user);
+            .ToModel();
         var repeatedEvent3 = RepeatedEventTestData
             .CreateDefault(title: "6", firstOccurrence: DateOnlyHelper.Today.AddDays(-14), lastOccurrence: DateOnlyHelper.Today.AddDays(-7))
-            .ToModel(user);
+            .ToModel();
 
         await Db.AddRangeAsync(oneTimeEvent1, oneTimeEvent2, oneTimeEvent3, repeatedEvent1, repeatedEvent2, repeatedEvent3);
         await Db.SaveChangesAsync();
@@ -75,19 +75,19 @@ public class PersonOverviewTest : InMemoryDbTest
         var user = UserTestData.CreateDefaultUser().ToModel();
         await Db.Users.AddAsync(user);
         
-        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(title: "1", date: DateOnlyHelper.Today).ToModel(user);
-        var oneTimeEvent2 = OneTimeEventTestData.CreateDefault(title: "2", date: DateOnlyHelper.Today.AddDays(1)).ToModel(user);
-        var oneTimeEvent3 = OneTimeEventTestData.CreateDefault(title: "3", date: DateOnlyHelper.Today.AddDays(-1)).ToModel(user);
+        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(title: "1", date: DateOnlyHelper.Today).ToModel();
+        var oneTimeEvent2 = OneTimeEventTestData.CreateDefault(title: "2", date: DateOnlyHelper.Today.AddDays(1)).ToModel();
+        var oneTimeEvent3 = OneTimeEventTestData.CreateDefault(title: "3", date: DateOnlyHelper.Today.AddDays(-1)).ToModel();
         
         var repeatedEvent1 = RepeatedEventTestData
             .CreateDefault(title: "4", firstOccurrence: DateOnlyHelper.Today, lastOccurrence: DateOnlyHelper.Today.AddDays(7))
-            .ToModel(user);
+            .ToModel();
         var repeatedEvent2 = RepeatedEventTestData
             .CreateDefault(title: "5", firstOccurrence: DateOnlyHelper.Today.AddDays(2), lastOccurrence: DateOnlyHelper.Today.AddDays(14))
-            .ToModel(user);
+            .ToModel();
         var repeatedEvent3 = RepeatedEventTestData
             .CreateDefault(title: "6", firstOccurrence: DateOnlyHelper.Today.AddDays(-14), lastOccurrence: DateOnlyHelper.Today.AddDays(-7))
-            .ToModel(user);
+            .ToModel();
 
         await Db.AddRangeAsync(oneTimeEvent1, oneTimeEvent2, oneTimeEvent3, repeatedEvent1, repeatedEvent2, repeatedEvent3);
         await Db.SaveChangesAsync();
@@ -112,22 +112,22 @@ public class PersonOverviewTest : InMemoryDbTest
         var user = UserTestData.CreateDefaultUser().ToModel();
         await Db.Users.AddAsync(user);
         
-        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(title: "1", date: DateOnlyHelper.Today).ToModel(user);
-        var oneTimeEvent2 = OneTimeEventTestData.CreateDefault(title: "2", date: DateOnlyHelper.Today.AddDays(-1)).ToModel(user);
-        var oneTimeEvent3 = OneTimeEventTestData.CreateDefault(title: "3", date: DateOnlyHelper.Today.AddDays(8)).ToModel(user);
+        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(title: "1", date: DateOnlyHelper.Today).ToModel();
+        var oneTimeEvent2 = OneTimeEventTestData.CreateDefault(title: "2", date: DateOnlyHelper.Today.AddDays(-1)).ToModel();
+        var oneTimeEvent3 = OneTimeEventTestData.CreateDefault(title: "3", date: DateOnlyHelper.Today.AddDays(8)).ToModel();
         
         var repeatedEvent1 = RepeatedEventTestData
             .CreateDefault(title: "4", firstOccurrence: DateOnlyHelper.Today, lastOccurrence: DateOnlyHelper.Today.AddDays(7))
-            .ToModel(user);
+            .ToModel();
         var repeatedEvent2 = RepeatedEventTestData
             .CreateDefault(title: "5", firstOccurrence: DateOnlyHelper.Today.AddDays(2), lastOccurrence: DateOnlyHelper.Today.AddDays(14))
-            .ToModel(user);
+            .ToModel();
         var repeatedEvent3 = RepeatedEventTestData
             .CreateDefault(title: "6", firstOccurrence: DateOnlyHelper.Today.AddDays(8), lastOccurrence: DateOnlyHelper.Today.AddDays(15))
-            .ToModel(user);
+            .ToModel();
         var repeatedEvent4 = RepeatedEventTestData
             .CreateDefault(title: "7", firstOccurrence: DateOnlyHelper.Today.AddDays(-8), lastOccurrence: DateOnlyHelper.Today.AddDays(-15))
-            .ToModel(user);
+            .ToModel();
 
         await Db.AddRangeAsync(oneTimeEvent1, oneTimeEvent2, oneTimeEvent3, repeatedEvent1, repeatedEvent2, repeatedEvent3, repeatedEvent4);
         await Db.SaveChangesAsync();

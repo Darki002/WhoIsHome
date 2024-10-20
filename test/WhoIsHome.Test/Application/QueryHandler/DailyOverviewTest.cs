@@ -42,13 +42,13 @@ public class DailyOverviewTest : InMemoryDbTest
         var user1 = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
         await Db.Users.AddAsync(user1);
 
-        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(date: DateOnlyHelper.Today).ToModel(user1);
+        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(date: DateOnlyHelper.Today).ToModel();
         await Db.OneTimeEvents.AddAsync(oneTimeEvent1);
 
         var oneTimeEvent2 = OneTimeEventTestData.CreateDefault(date: DateOnlyHelper.Today,
                 startTime: new TimeOnly(18, 00, 00),
                 endTime: new TimeOnly(19, 00, 00), dinnerTime: expectedDinnerTime)
-            .ToModel(user1);
+            .ToModel();
         await Db.OneTimeEvents.AddAsync(oneTimeEvent2);
 
         await Db.SaveChangesAsync();
@@ -73,13 +73,13 @@ public class DailyOverviewTest : InMemoryDbTest
 
         var repeatedEvent1 = RepeatedEventTestData
             .CreateDefault(firstOccurrence: DateOnlyHelper.Today, lastOccurrence: DateOnlyHelper.Today.AddDays(7))
-            .ToModel(user1);
+            .ToModel();
         await Db.RepeatedEvents.AddAsync(repeatedEvent1);
 
         var repeatedEvent2 = RepeatedEventTestData.CreateDefault(firstOccurrence: DateOnlyHelper.Today,
                 lastOccurrence: DateOnlyHelper.Today.AddDays(7), startTime: new TimeOnly(18, 00, 00),
                 endTime: new TimeOnly(19, 00, 00), dinnerTime: expectedDinnerTime)
-            .ToModel(user1);
+            .ToModel();
         await Db.RepeatedEvents.AddAsync(repeatedEvent2);
 
         await Db.SaveChangesAsync();
@@ -104,13 +104,13 @@ public class DailyOverviewTest : InMemoryDbTest
 
         var oneTimeEvent = OneTimeEventTestData
             .CreateDefault(date: DateOnlyHelper.Today)
-            .ToModel(user1);
+            .ToModel();
         await Db.OneTimeEvents.AddAsync(oneTimeEvent);
 
         var repeatedEvent = RepeatedEventTestData.CreateDefault(firstOccurrence: DateOnlyHelper.Today,
                 lastOccurrence: DateOnlyHelper.Today.AddDays(7), startTime: new TimeOnly(18, 00, 00),
                 endTime: new TimeOnly(19, 00, 00), dinnerTime: expectedDinnerTime)
-            .ToModel(user1);
+            .ToModel();
         await Db.RepeatedEvents.AddAsync(repeatedEvent);
 
         await Db.SaveChangesAsync();

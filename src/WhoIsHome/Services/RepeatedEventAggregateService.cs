@@ -14,7 +14,7 @@ public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserContex
     public async Task<RepeatedEvent> GetAsync(int id, CancellationToken cancellationToken)
     {
         var result = await context.RepeatedEvents
-            .Include(e => e.UserModel)
+            .Include(e => e.User)
             .AsNoTracking()
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
@@ -26,14 +26,13 @@ public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserContex
     public async Task DeleteAsync(int id, CancellationToken cancellationToken)
     {
         var result = await context.RepeatedEvents
-            .Include(repeatedEventModel => repeatedEventModel.UserModel)
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (result is null) throw new NotFoundException($"No RepeatedEvent found with the id {id}.");
 
-        if (!userContext.IsUserPermitted(result.UserModel.Id))
+        if (!userContext.IsUserPermitted(result.UserId))
         {
-            throw new ActionNotAllowedException($"User with ID {result.UserModel.Id} is not allowed to delete or modify the content of {id}");
+            throw new ActionNotAllowedException($"User with ID {result.UserId} is not allowed to delete or modify the content of {id}");
         }
         
         context.RepeatedEvents.Remove(result);
@@ -46,7 +45,7 @@ public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserContex
         var user = await context.Users.SingleAsync(u => u.Id == userContext.UserId, cancellationToken: cancellationToken);
         var repeatedEvent = RepeatedEvent
             .Create(title, firstOccurrence, lastOccurrence, startTime, endTime, presenceType, time, user.Id)
-            .ToModel(user);
+            .ToModel();
 
         var result = await context.RepeatedEvents.AddAsync(repeatedEvent, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
@@ -67,7 +66,7 @@ public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserContex
 
         aggregate.Update(title, firstOccurrence, lastOccurrence, startTime, endTime, presenceType, time);
         
-        var result = context.RepeatedEvents.Update(aggregate.ToModel(user));
+        var result = context.RepeatedEvents.Update(aggregate.ToModel());
         await context.SaveChangesAsync(cancellationToken);
         return result.Entity.ToAggregate();
     }

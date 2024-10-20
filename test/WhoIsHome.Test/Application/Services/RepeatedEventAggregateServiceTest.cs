@@ -152,8 +152,7 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
     
     private async Task SaveToDb(RepeatedEvent oneTimeEvent)
     {
-        var userModel = Db.Users.Single(u => u.Id == oneTimeEvent.UserId);
-        var model = oneTimeEvent.ToModel(userModel);
+        var model = oneTimeEvent.ToModel();
         await Db.RepeatedEvents.AddAsync(model);
         await Db.SaveChangesAsync();
         Db.ChangeTracker.Clear();
