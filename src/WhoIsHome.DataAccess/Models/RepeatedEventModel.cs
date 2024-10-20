@@ -10,7 +10,9 @@ namespace WhoIsHome.DataAccess.Models;
 [Table("RepeatedEvent")]
 public class RepeatedEventModel : DbModel
 {
-    [Required] [MaxLength(50)] public string Title { get; set; } = null!;
+    [Required] 
+    [MaxLength(50)] 
+    public string Title { get; set; } = null!;
     
     [Required]
     public DateOnly FirstOccurrence { get; set; }
