@@ -11,6 +11,8 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
     public DbSet<OneTimeEventModel> OneTimeEvents { get; set; }
     
     public DbSet<RepeatedEventModel> RepeatedEvents { get; set; }
+    
+    public DbSet<RefreshTokenModel> RefreshTokens { get; set; }
 }
 
 // Used for EF Core Migrations
