@@ -5,15 +5,23 @@ namespace WhoIsHome.AuthTokens;
 
 public class RefreshTokenService(WhoIsHomeContext context, IUserContext userContext)
 {
-    public RefreshToken GenerateToken()
+    public RefreshToken? GetForUser()
     {
-        var tokenString = CreateToken();
-        var token = RefreshToken.Create(userContext.UserId, tokenString);
-        return token;
-    }
+        var refreshTokenModel = context.RefreshTokens
+            .Where(t => t.UserId == userContext.UserId)
+            .MaxBy(t => t.Issued);
 
-    private static string CreateToken()
+        return refreshTokenModel?.ToRefreshToken();
+    }
+    
+    public async Task<RefreshToken> CreateTokenAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var token = RefreshToken.Create(userContext.UserId);
+        var model = token.ToModel();
+
+        var dbToken = await context.RefreshTokens.AddAsync(model, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
+
+        return dbToken.Entity.ToRefreshToken();
     }
 }
