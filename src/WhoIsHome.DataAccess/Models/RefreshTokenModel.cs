@@ -16,7 +16,7 @@ public class RefreshTokenModel : DbModel
     [Required]
     public DateTime Issued { get; set; }
     
-    public DateTime? ExpiredAt { get; set; }
+    public DateTime ExpiredAt { get; set; }
     
     [Required]
     public int UserId { get; set; }

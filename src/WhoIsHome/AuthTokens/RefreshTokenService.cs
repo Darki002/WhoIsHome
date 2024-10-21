@@ -4,7 +4,7 @@ using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.AuthTokens;
 
-public class RefreshTokenService(WhoIsHomeContext context)
+public class RefreshTokenService(WhoIsHomeContext context) : IRefreshTokenService
 {
     public async Task<RefreshToken> CreateTokenAsync(int userId, CancellationToken cancellationToken)
     {
@@ -23,24 +23,32 @@ public class RefreshTokenService(WhoIsHomeContext context)
         var newRefreshToken = token.Refresh();
         
         context.RefreshTokens.Update(token.ToModel());
-        await context.RefreshTokens.AddAsync(newRefreshToken.ToModel(), cancellationToken);
+        var dbToken = await context.RefreshTokens.AddAsync(newRefreshToken.ToModel(), cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
-        return await CreateTokenAsync(userId, cancellationToken);
+        return dbToken.Entity.ToRefreshToken();
     }
     
     private async Task<RefreshToken> GetValidRefreshToken(string tokenToCheck, int userId,
         CancellationToken cancellationToken)
     {
         var model = await context.RefreshTokens
+            .AsNoTracking()
             .SingleOrDefaultAsync(t => t.Token == tokenToCheck, cancellationToken);
         var token = model?.ToRefreshToken();
 
-        if (token is null || token.Validate(userId) is false)
+        if (token is null || token.IsValid(userId) is false)
         {
             throw new InvalidRefreshTokenException();
         }
 
         return token;
     }
+}
+
+public interface IRefreshTokenService
+{
+    Task<RefreshToken> CreateTokenAsync(int userId, CancellationToken cancellationToken);
+
+    Task<RefreshToken> RefreshAsync(string refreshToken, int userId, CancellationToken cancellationToken);
 }

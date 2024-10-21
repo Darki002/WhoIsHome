@@ -11,7 +11,7 @@ using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegiste
 
 namespace WhoIsHome.AuthTokens;
 
-public class JwtTokenService(IConfiguration configuration, RefreshTokenService refreshTokenService, ILogger<JwtTokenService> logger)
+public class JwtTokenService(IConfiguration configuration, IRefreshTokenService refreshTokenService, ILogger<JwtTokenService> logger)
 {
     public async Task<AuthToken> GenerateTokenAsync(User user, CancellationToken cancellationToken)
     {

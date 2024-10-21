@@ -19,7 +19,7 @@ public static class ServiceProviderConfig
         services.AddTransient<PersonOverviewQueryHandler>();
 
         services.AddTransient<JwtTokenService>();
-        services.AddScoped<RefreshTokenService>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         
         return services;
     } 
