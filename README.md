@@ -1,5 +1,5 @@
 # WhoIsHome
-Backend for [Android App](https://github.com/Darki002/WhoIsHome.Android)
+Backend for [Mobile App](https://github.com/Darki002/WhoIsHome.App)
 
 # API
 
