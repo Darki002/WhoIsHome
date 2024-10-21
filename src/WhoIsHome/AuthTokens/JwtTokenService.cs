@@ -16,7 +16,22 @@ public class JwtTokenService(IConfiguration configuration, RefreshTokenService r
     public async Task<AuthToken> GenerateTokenAsync(User user, CancellationToken cancellationToken)
     {
         var refreshToken = await refreshTokenService.CreateTokenAsync(user, cancellationToken);
+
+        var jwtToken = GenerateJwtToken(user);
+        return new AuthToken(jwtToken, refreshToken.Token);
+    }
+
+    public async Task<AuthToken> RefreshTokenAsync(User user, string token, CancellationToken cancellationToken)
+    {
+        var refreshToken = await refreshTokenService.GetValidRefreshToken(token, user.Id!.Value, cancellationToken);
+        var newRefreshToken = refreshToken.Refresh();
+        var jwtToken = GenerateJwtToken(user);
         
+        return new AuthToken(jwtToken, newRefreshToken.Token);
+    }
+
+    private string GenerateJwtToken(User user)
+    {
         var jwtSettings = configuration.GetSection("JwtSettings");
         
         var secretKey = EnvironmentHelper.GetVariable(EnvVariables.JwtSecretKey);
@@ -40,13 +55,6 @@ public class JwtTokenService(IConfiguration configuration, RefreshTokenService r
         );
         
         logger.LogInformation("New Token for User {Id} was generated", user.Id);
-        var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-        return new AuthToken(jwtToken, refreshToken.Token);
-    }
-
-    public async Task<AuthToken> RefreshAsync(User user, string token, CancellationToken cancellationToken)
-    {
-        var refreshToken = await refreshTokenService.GetValidRefreshToken(token, user.Id!.Value, cancellationToken);
-        refreshToken.Refresh();
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

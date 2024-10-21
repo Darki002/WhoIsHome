@@ -10,11 +10,13 @@ namespace WhoIsHome.DataAccess.Models;
 public class RefreshTokenModel : DbModel
 {
     [Required] 
-    [MaxLength(100)] // TODO How long is a token???
+    [MaxLength(60)]
     public string Token { get; set; } = null!;
     
     [Required]
     public DateTime Issued { get; set; }
+    
+    public DateTime? ExpiredAt { get; set; }
     
     [Required]
     public int UserId { get; set; }

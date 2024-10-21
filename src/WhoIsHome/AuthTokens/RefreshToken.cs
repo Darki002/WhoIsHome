@@ -14,16 +14,24 @@ public class RefreshToken(int? id, int userId, string token, DateTime issued, Da
 
     public DateTime? ExpiredAt { get; set; } = expiredAt;
 
-    public bool IsValid => GetExpireDate() <= DateTime.Now;
-
     public bool Validate(int requestUser)
     {
-        return requestUser == UserId && IsValid;
-    }
-    
-    public DateTime GetExpireDate()
-    {
-        return Issued.AddDays(ExpiresInDays);
+        if (requestUser != UserId)
+        {
+            return false;
+        }
+        
+        if (ExpiredAt.HasValue)
+        {
+            return false;
+        }
+
+        if (Issued.AddDays(ExpiresInDays) < DateTime.Now)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     public static RefreshToken Create(int userId)
@@ -37,8 +45,10 @@ public class RefreshToken(int? id, int userId, string token, DateTime issued, Da
         throw new NotImplementedException();
     }
 
-    public void Refresh()
+    public RefreshToken Refresh()
     {
         ExpiredAt = DateTime.Now;
+        var token = GenerateToken();
+        return new RefreshToken(null, UserId, token, DateTime.Now, null);
     }
 }
