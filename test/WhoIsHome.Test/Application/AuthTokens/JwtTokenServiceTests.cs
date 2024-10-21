@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using WhoIsHome.Aggregates;
 using WhoIsHome.AuthTokens;
+using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Test.Application.AuthTokens;
 
@@ -15,7 +16,17 @@ public class JwtTokenServiceTests
     [SetUp]
     public void SetUp()
     {
-        configMock = Mock.Of<IConfiguration>();
+        Environment.SetEnvironmentVariable(EnvVariables.JwtSecretKey, "hakjlshdfkljashdfkljahsdfkjhalksdhfkljashdfkljhaskljdfhakjlsdhfkjh");
+        var mockConfiguration = new Mock<IConfiguration>();
+        var sectionMock = new Mock<IConfigurationSection>();
+        
+        sectionMock.Setup(section => section["Issuer"]).Returns("TestIssuer");
+        sectionMock.Setup(section => section["Audience"]).Returns("TestAudience");
+        sectionMock.Setup(section => section["ExpiresInMinutes"]).Returns("60");
+        
+        mockConfiguration.Setup(config => config.GetSection("JwtSettings")).Returns(sectionMock.Object);
+
+        configMock = mockConfiguration.Object;
         loggerMock = Mock.Of<ILogger<JwtTokenService>>();
     }
     
