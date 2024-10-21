@@ -19,8 +19,14 @@ public class RefreshToken(int? id, int userId, string token, DateTime issued)
         return Issued.AddDays(ExpiresInDays);
     }
 
-    public static RefreshToken Create(int userId, string token)
+    public static RefreshToken Create(int userId)
     {
+        var token = GenerateToken();
         return new RefreshToken(null, userId, token, DateTime.Now);
+    }
+
+    private static string GenerateToken()
+    {
+        throw new NotImplementedException();
     }
 }
