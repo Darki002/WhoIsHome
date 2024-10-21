@@ -11,8 +11,7 @@ namespace WhoIsHome.WebApi.UserAuthentication;
 [Route("api/v1/[controller]")]
 public class AuthController(
     UserAggregateService userAggregateService, 
-    JwtTokenService jwtTokenService, 
-    RefreshTokenService refreshTokenService,
+    JwtTokenService jwtTokenService,
     IPasswordHasher<User> passwordHasher) : Controller
 {
     [HttpPost("Login")]
@@ -30,9 +29,8 @@ public class AuthController(
             return Unauthorized("Invalid email or password.");
         }
 
-        var refreshToken = await refreshTokenService.CreateTokenAsync(user, cancellationToken);
-        var token = jwtTokenService.GenerateTokenAsync(user);
-        return Ok(new { Token = token, RefreshToken = refreshToken });
+        var token = await jwtTokenService.GenerateTokenAsync(user, cancellationToken);
+        return Ok(new { token.JwtToken, token.RefreshToken });
     }
 
     [HttpPost("Register")]
@@ -50,7 +48,7 @@ public class AuthController(
         }
         catch (EmailInUseException)
         {
-            return BadRequest("Email is already in use!");
+            return BadRequest("Email is already in use.");
         }
     }
 
@@ -60,24 +58,14 @@ public class AuthController(
         try
         {
             var user = await userAggregateService.GetUserByEmailAsync(refreshDto.Email, cancellationToken);
-
-            if (user is null)
+            
+            if (user == null)
             {
-                return BadRequest($"User with the email {refreshDto.Email} does not exist.");
+                return Unauthorized("Invalid email.");
             }
             
-            var isValid = await refreshTokenService.GetValidRefreshToken(
-                refreshDto.RefreshToken, 
-                user.Id!.Value, 
-                cancellationToken);
-
-            if (isValid is false)
-            {
-                return BadRequest("Refresh Token does not exist.");
-            }
-            
-            var token = jwtTokenService.GenerateTokenAsync(user);
-            return Ok(new { Token = token });
+            var token = await jwtTokenService.RefreshTokenAsync(user, refreshDto.RefreshToken, cancellationToken);
+            return Ok(new { token.JwtToken, token.RefreshToken });
         }
         catch (InvalidRefreshTokenException)
         {

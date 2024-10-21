@@ -10,6 +10,7 @@ public static class Mapper
         {
             Token = refreshToken.Token,
             Issued = refreshToken.Issued,
+            ExpiredAt = refreshToken.ExpiredAt,
             UserId = refreshToken.UserId
         };
             
@@ -22,6 +23,6 @@ public static class Mapper
 
     public static RefreshToken ToRefreshToken(this RefreshTokenModel model)
     {
-        return new RefreshToken(model.Id,model.UserId, model.Token, model.Issued);
+        return new RefreshToken(model.Id,model.UserId, model.Token, model.Issued, model.ExpiredAt);
     }
 }
