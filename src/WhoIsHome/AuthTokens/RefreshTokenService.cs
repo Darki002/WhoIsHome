@@ -1,22 +1,26 @@
-﻿using WhoIsHome.DataAccess;
-using WhoIsHome.Shared.Authentication;
+﻿using Microsoft.EntityFrameworkCore;
+using WhoIsHome.Aggregates;
+using WhoIsHome.DataAccess;
 
 namespace WhoIsHome.AuthTokens;
 
-public class RefreshTokenService(WhoIsHomeContext context, IUserContext userContext)
+public class RefreshTokenService(WhoIsHomeContext context)
 {
-    public RefreshToken? GetForUser()
+    public async Task<bool> IsValidRefreshTokenAsync(string tokenToCheck, int userId,
+        CancellationToken cancellationToken)
     {
-        var refreshTokenModel = context.RefreshTokens
-            .Where(t => t.UserId == userContext.UserId)
-            .MaxBy(t => t.Issued);
+        var model = await context.RefreshTokens
+            .SingleOrDefaultAsync(t => t.Token == tokenToCheck, cancellationToken);
 
-        return refreshTokenModel?.ToRefreshToken();
+        var token = model?.ToRefreshToken();
+
+        if (token is null) return false;
+        return token.Validate(userId);
     }
-    
-    public async Task<RefreshToken> CreateTokenAsync(CancellationToken cancellationToken)
+
+    public async Task<RefreshToken> CreateTokenAsync(User user, CancellationToken cancellationToken)
     {
-        var token = RefreshToken.Create(userContext.UserId);
+        var token = RefreshToken.Create(user.Id!.Value);
         var model = token.ToModel();
 
         var dbToken = await context.RefreshTokens.AddAsync(model, cancellationToken);
