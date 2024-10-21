@@ -1,8 +1,6 @@
-﻿using WhoIsHome.Shared.Exceptions;
+﻿namespace WhoIsHome.AuthTokens;
 
-namespace WhoIsHome.AuthTokens;
-
-public class RefreshToken(int? id, int userId, string token, DateTime issued)
+public class RefreshToken(int? id, int userId, string token, DateTime issued, DateTime? expiredAt)
 {
     private const int ExpiresInDays = 12;
 
@@ -14,21 +12,13 @@ public class RefreshToken(int? id, int userId, string token, DateTime issued)
 
     public DateTime Issued { get; private set; } = issued;
 
+    public DateTime? ExpiredAt { get; set; } = expiredAt;
+
     public bool IsValid => GetExpireDate() <= DateTime.Now;
 
     public bool Validate(int requestUser)
     {
-        if (requestUser != UserId)
-        {
-            throw new ActionNotAllowedException("Invalid refresh token for this user");
-        }
-
-        if (IsValid is false)
-        {
-            throw new RefreshTokenExpiredException();
-        }
-
-        return true;
+        return requestUser == UserId && IsValid;
     }
     
     public DateTime GetExpireDate()
@@ -39,11 +29,16 @@ public class RefreshToken(int? id, int userId, string token, DateTime issued)
     public static RefreshToken Create(int userId)
     {
         var token = GenerateToken();
-        return new RefreshToken(null, userId, token, DateTime.Now);
+        return new RefreshToken(null, userId, token, DateTime.Now, null);
     }
 
     private static string GenerateToken()
     {
         throw new NotImplementedException();
+    }
+
+    public void Refresh()
+    {
+        ExpiredAt = DateTime.Now;
     }
 }

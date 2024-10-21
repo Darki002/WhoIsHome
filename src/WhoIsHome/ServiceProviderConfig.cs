@@ -18,6 +18,7 @@ public static class ServiceProviderConfig
         services.AddTransient<DailyOverviewQueryHandler>();
         services.AddTransient<PersonOverviewQueryHandler>();
 
+        services.AddTransient<JwtTokenService>();
         services.AddScoped<RefreshTokenService>();
         
         return services;

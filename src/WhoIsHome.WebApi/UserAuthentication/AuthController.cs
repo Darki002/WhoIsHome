@@ -31,7 +31,7 @@ public class AuthController(
         }
 
         var refreshToken = await refreshTokenService.CreateTokenAsync(user, cancellationToken);
-        var token = jwtTokenService.GenerateToken(user);
+        var token = jwtTokenService.GenerateTokenAsync(user);
         return Ok(new { Token = token, RefreshToken = refreshToken });
     }
 
@@ -66,7 +66,7 @@ public class AuthController(
                 return BadRequest($"User with the email {refreshDto.Email} does not exist.");
             }
             
-            var isValid = await refreshTokenService.IsValidRefreshTokenAsync(
+            var isValid = await refreshTokenService.GetValidRefreshToken(
                 refreshDto.RefreshToken, 
                 user.Id!.Value, 
                 cancellationToken);
@@ -76,10 +76,10 @@ public class AuthController(
                 return BadRequest("Refresh Token does not exist.");
             }
             
-            var token = jwtTokenService.GenerateToken(user);
+            var token = jwtTokenService.GenerateTokenAsync(user);
             return Ok(new { Token = token });
         }
-        catch (RefreshTokenExpiredException)
+        catch (InvalidRefreshTokenException)
         {
             return Unauthorized("Refresh Token is expired.");
         }

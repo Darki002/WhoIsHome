@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Aggregates;
 using WhoIsHome.DataAccess;
+using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.AuthTokens;
 
 public class RefreshTokenService(WhoIsHomeContext context)
 {
-    public async Task<bool> IsValidRefreshTokenAsync(string tokenToCheck, int userId,
+    public async Task<RefreshToken> GetValidRefreshToken(string tokenToCheck, int userId,
         CancellationToken cancellationToken)
     {
         var model = await context.RefreshTokens
@@ -14,8 +15,12 @@ public class RefreshTokenService(WhoIsHomeContext context)
 
         var token = model?.ToRefreshToken();
 
-        if (token is null) return false;
-        return token.Validate(userId);
+        if (token is null || token.Validate(userId) is false)
+        {
+            throw new InvalidRefreshTokenException();
+        }
+
+        return token;
     }
 
     public async Task<RefreshToken> CreateTokenAsync(User user, CancellationToken cancellationToken)
