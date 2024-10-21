@@ -15,7 +15,7 @@ public static class OneTimeEventMapper
 		model.StartTime,
 		model.EndTime,
 		dinnerTime,
-		model.User.Id);
+		model.UserId);
 	}
 
 	public static OneTimeEventModel ToModel(this OneTimeEvent aggregate)

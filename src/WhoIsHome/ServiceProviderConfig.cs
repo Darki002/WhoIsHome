@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using WhoIsHome.AuthTokens;
 using WhoIsHome.QueryHandler.DailyOverview;
 using WhoIsHome.QueryHandler.PersonOverview;
 using WhoIsHome.Services;
@@ -16,6 +17,9 @@ public static class ServiceProviderConfig
 
         services.AddTransient<DailyOverviewQueryHandler>();
         services.AddTransient<PersonOverviewQueryHandler>();
+
+        services.AddTransient<JwtTokenService>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         
         return services;
     } 

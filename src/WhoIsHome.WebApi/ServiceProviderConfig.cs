@@ -9,7 +9,6 @@ public static class ServiceProviderConfig
 {
     public static IServiceCollection AddWebApiServices(this IServiceCollection services)
     {
-        services.AddTransient<JwtTokenService>();
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         return services;
     }

@@ -7,12 +7,28 @@ using Microsoft.IdentityModel.Tokens;
 using WhoIsHome.Aggregates;
 using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
+using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
-namespace WhoIsHome.WebApi.UserAuthentication;
+namespace WhoIsHome.AuthTokens;
 
-public class JwtTokenService(IConfiguration configuration, ILogger<JwtTokenService> logger)
+public class JwtTokenService(IConfiguration configuration, IRefreshTokenService refreshTokenService, ILogger<JwtTokenService> logger)
 {
-    public string GenerateToken(User user)
+    public async Task<AuthToken> GenerateTokenAsync(User user, CancellationToken cancellationToken)
+    {
+        var refreshToken = await refreshTokenService.CreateTokenAsync(user.Id!.Value, cancellationToken);
+        var jwtToken = GenerateJwtToken(user);
+        return new AuthToken(jwtToken, refreshToken.Token);
+    }
+
+    public async Task<AuthToken> RefreshTokenAsync(User user, string token, CancellationToken cancellationToken)
+    {
+        var newRefreshToken = await refreshTokenService.RefreshAsync(token, user.Id!.Value, cancellationToken);
+        var jwtToken = GenerateJwtToken(user);
+        
+        return new AuthToken(jwtToken, newRefreshToken.Token);
+    }
+
+    private string GenerateJwtToken(User user)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
         
