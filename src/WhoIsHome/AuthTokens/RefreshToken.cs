@@ -1,8 +1,12 @@
-﻿namespace WhoIsHome.AuthTokens;
+﻿using System.Security.Cryptography;
+
+namespace WhoIsHome.AuthTokens;
 
 public class RefreshToken(int? id, int userId, string token, DateTime issued, DateTime? expiredAt)
 {
     private const int ExpiresInDays = 12;
+
+    private const int RefreshTokenLength = 64;
 
     public int? Id { get; private init; } = id;
 
@@ -40,15 +44,18 @@ public class RefreshToken(int? id, int userId, string token, DateTime issued, Da
         return new RefreshToken(null, userId, token, DateTime.Now, null);
     }
 
-    private static string GenerateToken()
-    {
-        throw new NotImplementedException();
-    }
-
     public RefreshToken Refresh()
     {
         ExpiredAt = DateTime.Now;
         var token = GenerateToken();
         return new RefreshToken(null, UserId, token, DateTime.Now, null);
+    }
+    
+    private static string GenerateToken()
+    {
+        var randomNumber = new byte[RefreshTokenLength];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
     }
 }

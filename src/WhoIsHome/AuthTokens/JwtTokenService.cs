@@ -15,15 +15,14 @@ public class JwtTokenService(IConfiguration configuration, RefreshTokenService r
 {
     public async Task<AuthToken> GenerateTokenAsync(User user, CancellationToken cancellationToken)
     {
-        var refreshToken = await refreshTokenService.CreateTokenAsync(user, cancellationToken);
+        var refreshToken = await refreshTokenService.CreateTokenAsync(user.Id!.Value, cancellationToken);
         var jwtToken = GenerateJwtToken(user);
         return new AuthToken(jwtToken, refreshToken.Token);
     }
 
     public async Task<AuthToken> RefreshTokenAsync(User user, string token, CancellationToken cancellationToken)
     {
-        var refreshToken = await refreshTokenService.GetValidRefreshToken(token, user.Id!.Value, cancellationToken);
-        var newRefreshToken = refreshToken.Refresh();
+        var newRefreshToken = await refreshTokenService.RefreshAsync(token, user.Id!.Value, cancellationToken);
         var jwtToken = GenerateJwtToken(user);
         
         return new AuthToken(jwtToken, newRefreshToken.Token);
