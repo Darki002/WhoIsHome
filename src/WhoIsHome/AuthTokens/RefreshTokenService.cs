@@ -8,35 +8,52 @@ public class RefreshTokenService(WhoIsHomeContext context) : IRefreshTokenServic
 {
     public async Task<RefreshToken> CreateTokenAsync(int userId, CancellationToken cancellationToken)
     {
-        var token = RefreshToken.Create(userId);
-        var model = token.ToModel();
+        RefreshToken token;
+        bool tokenExists;
+        
+        do
+        {
+            token = RefreshToken.Create(userId);
+            tokenExists = await context.RefreshTokens
+                .AsNoTracking()
+                .AnyAsync(t => t.Token == token.Token, cancellationToken: cancellationToken);
+        } while (tokenExists);
 
+        var model = token.ToModel();
         var dbToken = await context.RefreshTokens.AddAsync(model, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
-
         return dbToken.Entity.ToRefreshToken();
     }
 
     public async Task<RefreshToken> RefreshAsync(string refreshToken, int userId, CancellationToken cancellationToken)
     {
         var token = await GetValidRefreshToken(refreshToken, userId, cancellationToken);
-        var newRefreshToken = token.Refresh();
         
+        var newRefreshToken = token.Refresh();
+        var tokenExists = await context.RefreshTokens
+            .AsNoTracking()
+            .AnyAsync(t => t.Token == token.Token, cancellationToken: cancellationToken);
+        
+        while (tokenExists)
+        {
+            newRefreshToken = RefreshToken.Create(userId);
+            tokenExists = await context.RefreshTokens
+                .AsNoTracking()
+                .AnyAsync(t => t.Token == token.Token, cancellationToken: cancellationToken);
+        }
+
         context.RefreshTokens.Update(token.ToModel());
         var dbToken = await context.RefreshTokens.AddAsync(newRefreshToken.ToModel(), cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
-
         return dbToken.Entity.ToRefreshToken();
     }
-    
+
     private async Task<RefreshToken> GetValidRefreshToken(string tokenToCheck, int userId,
         CancellationToken cancellationToken)
     {
-        var model = await context.RefreshTokens
-            .AsNoTracking()
+        var model = await context.RefreshTokens.AsNoTracking()
             .SingleOrDefaultAsync(t => t.Token == tokenToCheck, cancellationToken);
         var token = model?.ToRefreshToken();
-
         if (token is null || token.IsValid(userId) is false)
         {
             throw new InvalidRefreshTokenException();
@@ -49,6 +66,5 @@ public class RefreshTokenService(WhoIsHomeContext context) : IRefreshTokenServic
 public interface IRefreshTokenService
 {
     Task<RefreshToken> CreateTokenAsync(int userId, CancellationToken cancellationToken);
-
     Task<RefreshToken> RefreshAsync(string refreshToken, int userId, CancellationToken cancellationToken);
 }
