@@ -31,8 +31,8 @@ public class JwtTokenService(IConfiguration configuration, IRefreshTokenService 
     private string GenerateJwtToken(User user)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
-        
-        var secretKey = EnvironmentHelper.GetVariable(EnvVariables.JwtSecretKey);
+
+        var secretKey = configuration.GetJwtSecretKey();
         
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
