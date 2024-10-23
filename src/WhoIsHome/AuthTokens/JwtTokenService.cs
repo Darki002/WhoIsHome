@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using WhoIsHome.Aggregates;
+using WhoIsHome.Shared.Configurations;
 using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
@@ -31,8 +32,8 @@ public class JwtTokenService(IConfiguration configuration, IRefreshTokenService 
     private string GenerateJwtToken(User user)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
-        
-        var secretKey = EnvironmentHelper.GetVariable(EnvVariables.JwtSecretKey);
+
+        var secretKey = configuration.GetJwtSecretKey();
         
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

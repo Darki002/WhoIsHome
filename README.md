@@ -12,17 +12,17 @@ For information about Authentication & Authorized read the following Documentati
 
 - `JWT_SECRET_KEY` : Key used for the JWT Authentication.
 - `API_KEY` : API Key used by the middleware in every request to Authorized.
-- `MYSQL_SERVER`: The SQL Server.
-- `MYSQL_PORT`: Port for the Database.
-- `MYSQL_DATABASE`: Database that will be used by the Application.
-- `MYSQL_USER`: The User that is being used by the app to connect to the db.
-- `MYSQL_PASSWORD`: The Password for the user that is being used by the app to connect to the db.
+- `MYSQL__SERVER`: The SQL Server.
+- `MYSQL__PORT`: Port for the Database.
+- `MYSQL__DATABASE`: Database that will be used by the Application.
+- `MYSQL__USER`: The User that is being used by the app to connect to the db.
+- `MYSQL__PASSWORD`: The Password for the user that is being used by the app to connect to the db.
 - `PROJECT_ID` : the Firebase projectId of your Firebase project. (Not in used yet)
 - `GOOGLE_APPLICATION_CREDENTIALS` : Google Authentication for Firebase. Read more [here](https://cloud.google.com/docs/authentication/provide-credentials-adc#wlif-key) (Not in used yet)
 
+*Note:* Some Environment Variables use two underscore, this is because all variables will be parsed added to the ASP.NET Configuration 
+
 ## Local Development
 
-For running the project locally the project uses "DotNetEnv".
-
-1. Create `.env` file in the `WhoIsHome.Host` project
-2. Add the Environment Variables in the `.env` file. For example `API_KEY=dev1234`
+- MySql DB running locally
+- Env Variables are already set in the `appsettings.Development.json` to the default values

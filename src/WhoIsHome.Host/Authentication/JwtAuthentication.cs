@@ -2,6 +2,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using WhoIsHome.Shared.Configurations;
 using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
 
@@ -13,7 +14,7 @@ public static class JwtAuthentication
         IConfiguration configuration)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
-        var secretKey = EnvironmentHelper.GetVariable(EnvVariables.JwtSecretKey);
+        var secretKey = configuration.GetJwtSecretKey();
 
         var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(secretKey));
 

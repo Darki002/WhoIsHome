@@ -30,16 +30,20 @@ public class RefreshTokenService(WhoIsHomeContext context) : IRefreshTokenServic
         var token = await GetValidRefreshToken(refreshToken, userId, cancellationToken);
         
         var newRefreshToken = token.Refresh();
+
+        var ka = context.RefreshTokens.AsNoTracking().ToList();
+        ka.ForEach(t => Console.WriteLine(t.Token));
+        
         var tokenExists = await context.RefreshTokens
             .AsNoTracking()
-            .AnyAsync(t => t.Token == token.Token, cancellationToken: cancellationToken);
+            .AnyAsync(t => t.Token == newRefreshToken.Token, cancellationToken: cancellationToken);
         
         while (tokenExists)
         {
             newRefreshToken = RefreshToken.Create(userId);
             tokenExists = await context.RefreshTokens
                 .AsNoTracking()
-                .AnyAsync(t => t.Token == token.Token, cancellationToken: cancellationToken);
+                .AnyAsync(t => t.Token == newRefreshToken.Token, cancellationToken: cancellationToken);
         }
 
         context.RefreshTokens.Update(token.ToModel());

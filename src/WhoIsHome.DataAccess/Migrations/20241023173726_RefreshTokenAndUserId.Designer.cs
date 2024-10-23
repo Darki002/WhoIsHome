@@ -11,8 +11,8 @@ using WhoIsHome.DataAccess;
 namespace WhoIsHome.DataAccess.Migrations
 {
     [DbContext(typeof(WhoIsHomeContext))]
-    [Migration("20241020182901_AddUserIdToModel")]
-    partial class AddUserIdToModel
+    [Migration("20241023173726_RefreshTokenAndUserId")]
+    partial class RefreshTokenAndUserId
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -56,6 +56,36 @@ namespace WhoIsHome.DataAccess.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Event");
+                });
+
+            modelBuilder.Entity("WhoIsHome.DataAccess.Models.RefreshTokenModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ExpiredAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("Issued")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshToken");
                 });
 
             modelBuilder.Entity("WhoIsHome.DataAccess.Models.RepeatedEventModel", b =>
@@ -127,6 +157,17 @@ namespace WhoIsHome.DataAccess.Migrations
                 });
 
             modelBuilder.Entity("WhoIsHome.DataAccess.Models.OneTimeEventModel", b =>
+                {
+                    b.HasOne("WhoIsHome.DataAccess.Models.UserModel", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WhoIsHome.DataAccess.Models.RefreshTokenModel", b =>
                 {
                     b.HasOne("WhoIsHome.DataAccess.Models.UserModel", "User")
                         .WithMany()

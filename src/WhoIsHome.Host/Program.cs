@@ -3,7 +3,7 @@ using WhoIsHome.Host.SetUp;
 
 var builder = WebApplication.CreateBuilder(args);
 
-DotNetEnv.Env.Load();
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddApplicationServices(builder.Configuration)
     .AddJwtAuthentication(builder.Configuration);

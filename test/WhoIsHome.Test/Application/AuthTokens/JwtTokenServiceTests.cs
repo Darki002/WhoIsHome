@@ -16,7 +16,6 @@ public class JwtTokenServiceTests
     [SetUp]
     public void SetUp()
     {
-        Environment.SetEnvironmentVariable(EnvVariables.JwtSecretKey, "hakjlshdfkljashdfkljahsdfkjhalksdhfkljashdfkljhaskljdfhakjlsdhfkjh");
         var mockConfiguration = new Mock<IConfiguration>();
         var sectionMock = new Mock<IConfigurationSection>();
         
@@ -25,7 +24,9 @@ public class JwtTokenServiceTests
         sectionMock.Setup(section => section["ExpiresInMinutes"]).Returns("60");
         
         mockConfiguration.Setup(config => config.GetSection("JwtSettings")).Returns(sectionMock.Object);
-
+        mockConfiguration.Setup(config => config["JWT_SECRET_KEY"])
+            .Returns("hakjlshdfkljashdfkljahsdfkjhalksdhfkljashdfkljhaskljdfhakjlsdhfkjh");
+        
         configMock = mockConfiguration.Object;
         loggerMock = Mock.Of<ILogger<JwtTokenService>>();
     }
