@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using WhoIsHome.Shared.Helper;
-using WhoIsHome.Shared.Types;
+using WhoIsHome.Shared.Configurations;
 
 namespace WhoIsHome.DataAccess;
 
@@ -19,12 +18,6 @@ public static class ServiceProviderConfig
     private static string BuildConnectionString(IConfiguration configuration)
     {
         var mysql = configuration.GetMySql();
-        var server = mysql.GetMySqlServer();
-        var port = mysql.GetMySqlPort();
-        var database = mysql.GetMySqlDatabase();
-        var user = mysql.GetMySqlUser();
-        var password = mysql.GetMySqlPassword();
-
-        return $"Server={server};Port={port};Database={database};User={user};Password={password};";
+        return $"Server={mysql.Server};Port={mysql.Port};Database={mysql.Database};User={mysql.User};Password={mysql.Password};";
     }
 }

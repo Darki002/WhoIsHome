@@ -2,6 +2,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using WhoIsHome.Shared.Configurations;
 using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
 

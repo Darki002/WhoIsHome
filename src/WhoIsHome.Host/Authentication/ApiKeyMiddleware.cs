@@ -1,4 +1,5 @@
-﻿using WhoIsHome.Shared.Helper;
+﻿using WhoIsHome.Shared.Configurations;
+using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Host.Authentication;
