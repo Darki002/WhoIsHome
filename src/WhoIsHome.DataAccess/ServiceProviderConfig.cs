@@ -18,11 +18,12 @@ public static class ServiceProviderConfig
 
     private static string BuildConnectionString(IConfiguration configuration)
     {
-        var server = configuration.GetMySqlServer();
-        var port = configuration.GetMySqlPort();
-        var database = configuration.GetMySqlDatabase();
-        var user = configuration.GetMySqlUser();
-        var password = configuration.GetMySqlPassword();
+        var mysql = configuration.GetMySql();
+        var server = mysql.GetMySqlServer();
+        var port = mysql.GetMySqlPort();
+        var database = mysql.GetMySqlDatabase();
+        var user = mysql.GetMySqlUser();
+        var password = mysql.GetMySqlPassword();
 
         return $"Server={server};Port={port};Database={database};User={user};Password={password};";
     }
