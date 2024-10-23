@@ -3,11 +3,6 @@ using WhoIsHome.Host.SetUp;
 
 var builder = WebApplication.CreateBuilder(args);
 
-if (builder.Environment.IsDevelopment())
-{
-    DotNetEnv.Env.Load();
-}
-
 builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddApplicationServices(builder.Configuration)

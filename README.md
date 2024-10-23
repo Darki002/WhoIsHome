@@ -24,7 +24,5 @@ For information about Authentication & Authorized read the following Documentati
 
 ## Local Development
 
-For running the project locally the project uses "DotNetEnv".
-
-1. Create `.env` file in the `WhoIsHome.Host` project
-2. Add the Environment Variables in the `.env` file. For example `API_KEY=dev1234`
+- MySql DB running locally
+- Env Variables are already set in the `appsettings.Development.json` to the default values
