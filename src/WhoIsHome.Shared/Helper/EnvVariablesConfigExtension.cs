@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using WhoIsHome.Shared.Exceptions;
 
-namespace WhoIsHome.Shared.Types;
+namespace WhoIsHome.Shared.Helper;
 
-public static class EnvVariables
+public static class EnvVariablesConfigExtension
 {
     /// <summary>
     /// Key used for the JWT Authentication

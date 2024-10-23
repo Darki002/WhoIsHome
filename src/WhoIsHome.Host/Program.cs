@@ -8,7 +8,7 @@ if (builder.Environment.IsDevelopment())
     DotNetEnv.Env.Load();
 }
 
-builder.Configuration.AddEnvironmentVariables(); // TODO Use Env var from the configs
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddApplicationServices(builder.Configuration)
     .AddJwtAuthentication(builder.Configuration);
