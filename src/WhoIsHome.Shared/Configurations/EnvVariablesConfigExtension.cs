@@ -20,7 +20,6 @@ public static class EnvVariablesConfigExtension
     /// <summary>
     /// MySql Config Section
     /// </summary>
-    /// <returns></returns>
     public static MySqlConfigSection GetMySql(this IConfiguration config) => new MySqlConfigSection(config.GetSection("MYSQL"));
     
     internal static string GetString(this IConfiguration config, string name)
