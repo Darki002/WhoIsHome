@@ -20,7 +20,7 @@ For information about Authentication & Authorized read the following Documentati
 - `PROJECT_ID` : the Firebase projectId of your Firebase project. (Not in used yet)
 - `GOOGLE_APPLICATION_CREDENTIALS` : Google Authentication for Firebase. Read more [here](https://cloud.google.com/docs/authentication/provide-credentials-adc#wlif-key) (Not in used yet)
 
-*Note:* Some Environment Variables use two underscore, this is because all variables will be parsed added to the ASP.NET Configuration 
+*Note:* Some Environment Variables use two underscore, this is due to how dotnet maps those onto the App Configuration 
 
 ## Local Development
 
