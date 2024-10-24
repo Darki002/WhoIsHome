@@ -6,10 +6,11 @@ using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.QueryHandler.PersonOverview;
 
-public class PersonOverviewQueryHandler(WhoIsHomeContext context)
+public class PersonOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contextFactory)
 {
     public async Task<PersonOverview> HandleAsync(int userId, CancellationToken cancellationToken)
     {
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var today = DateOnlyHelper.Today;
 
         var oneTimeEvents = (await context.OneTimeEvents

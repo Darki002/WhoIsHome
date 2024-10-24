@@ -7,10 +7,11 @@ using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Services;
 
-public class UserAggregateService(WhoIsHomeContext context, IPasswordHasher<User> passwordHasher)
+public class UserAggregateService(IDbContextFactory<WhoIsHomeContext> contextFactory, IPasswordHasher<User> passwordHasher)
 {
     public async Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
     {
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var user = await context.Users
             .Where(u => u.Email == email)
             .SingleOrDefaultAsync(cancellationToken);
@@ -19,6 +20,7 @@ public class UserAggregateService(WhoIsHomeContext context, IPasswordHasher<User
 
     public async Task<User> CreateUserAsync(string userName, string email, string password, CancellationToken cancellationToken)
     {
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var isEmailInUse = context.Users.Any(u => u.Email == email);
 
         if (isEmailInUse)

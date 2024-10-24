@@ -16,7 +16,7 @@ public class UserAggregateServiceTest : InMemoryDbTest
     [SetUp]
     public void SetUp()
     {
-        service = new UserAggregateService(Db, new PasswordHasher<User>());
+        service = new UserAggregateService(DbFactory, new PasswordHasher<User>());
     }
     
     [TestFixture]

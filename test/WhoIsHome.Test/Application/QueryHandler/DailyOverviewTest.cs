@@ -11,7 +11,7 @@ public class DailyOverviewTest : InMemoryDbTest
     [SetUp]
     public void SetUp()
     {
-        queryHandler = new DailyOverviewQueryHandler(Db);
+        queryHandler = new DailyOverviewQueryHandler(DbFactory);
     }
 
     private DailyOverviewQueryHandler queryHandler;

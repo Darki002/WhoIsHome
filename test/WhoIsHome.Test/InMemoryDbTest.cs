@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Internal;
+using Moq;
 using WhoIsHome.DataAccess;
 
 namespace WhoIsHome.Test;
@@ -7,6 +10,8 @@ namespace WhoIsHome.Test;
 public abstract class InMemoryDbTest
 {
     protected WhoIsHomeContext Db { get; private set; }
+
+    protected IDbContextFactory<WhoIsHomeContext> DbFactory { get; private set; }
 
     private DbContextOptions<WhoIsHomeContext> options = null!;
 
@@ -29,6 +34,12 @@ public abstract class InMemoryDbTest
         await Db.Database.EnsureCreatedAsync();
         
         await DbSetUpAsync();
+
+        var factoryMock = new Mock<IDbContextFactory<WhoIsHomeContext>>();
+        factoryMock
+            .Setup(d => d.CreateDbContextAsync(CancellationToken.None))
+            .ReturnsAsync(() => Db);
+        DbFactory = factoryMock.Object;
     }
 
     // Optional Override for Set Up in test

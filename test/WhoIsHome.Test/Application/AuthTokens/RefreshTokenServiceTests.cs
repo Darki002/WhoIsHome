@@ -10,7 +10,7 @@ public class RefreshTokenServiceTests : InMemoryDbTest
     [SetUp]
     public void SetUp()
     {
-        service = new RefreshTokenService(Db);
+        service = new RefreshTokenService(DbFactory);
     }
     
     [TestFixture]

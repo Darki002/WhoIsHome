@@ -18,7 +18,7 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
     {
         userContextFake = new UserContextFake();
         userContextFake.SetUser(user, 1);
-        service = new RepeatedEventAggregateService(Db, userContextFake);
+        service = new RepeatedEventAggregateService(DbFactory, userContextFake);
     }
 
     protected override async Task DbSetUpAsync()

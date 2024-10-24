@@ -6,10 +6,11 @@ using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.QueryHandler.DailyOverview;
 
-public class DailyOverviewQueryHandler(WhoIsHomeContext context)
+public class DailyOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contextFactory)
 {
     public async Task<IReadOnlyCollection<DailyOverview>> HandleAsync(CancellationToken cancellationToken)
     {
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var users = (await context.Users.ToListAsync(cancellationToken))
             .Select(m => m.ToAggregate());
 
