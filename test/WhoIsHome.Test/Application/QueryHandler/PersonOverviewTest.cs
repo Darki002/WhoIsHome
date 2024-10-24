@@ -11,7 +11,7 @@ public class PersonOverviewTest : InMemoryDbTest
     [SetUp]
     public void SetUp()
     {
-        queryHandler = new PersonOverviewQueryHandler(Db);
+        queryHandler = new PersonOverviewQueryHandler(DbFactory);
     }
 
     private PersonOverviewQueryHandler queryHandler;

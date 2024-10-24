@@ -8,11 +8,12 @@ using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Services;
 
-public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserContext userContext)
+public class OneTimeEventAggregateService(IDbContextFactory<WhoIsHomeContext> contextFactory, IUserContext userContext)
     : IAggregateService<OneTimeEvent>
 {
     public async Task<OneTimeEvent> GetAsync(int id, CancellationToken cancellationToken)
     {
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var result = await context.OneTimeEvents
             .Include(e => e.User)
             .AsNoTracking()
@@ -25,6 +26,7 @@ public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserContext
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken)
     {
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var result = await context.OneTimeEvents
             .Include(oneTimeEventModel => oneTimeEventModel.User)
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
@@ -46,6 +48,7 @@ public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserContext
         var oneTimeEvent = OneTimeEvent.Create(title, date, startTime, endTime, presenceType, time, userContext.UserId)
             .ToModel();
 
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var result = await context.OneTimeEvents.AddAsync(oneTimeEvent, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
         return result.Entity.ToAggregate();
@@ -55,6 +58,7 @@ public class OneTimeEventAggregateService(WhoIsHomeContext context, IUserContext
         TimeOnly endTime, PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
     {
         var aggregate = await GetAsync(id, cancellationToken);
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var user = await context.Users.SingleAsync(u => u.Id == aggregate.UserId, cancellationToken: cancellationToken);
 
         if (!userContext.IsUserPermitted(user.Id))

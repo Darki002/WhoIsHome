@@ -9,7 +9,7 @@ namespace WhoIsHome.Host.Authentication;
 
 public class UserContext(
     IHttpContextAccessor httpContextAccessor,
-    WhoIsHomeContext context,
+    IDbContextFactory<WhoIsHomeContext> contextFactory,
     ILogger<UserContext> logger) : IUserContext
 {
     private AuthenticatedUser? authenticatedUserCache = null;
@@ -36,6 +36,7 @@ public class UserContext(
             return authenticatedUserCache;
         }
 
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var user = await context.Users.AsNoTracking().SingleAsync(u => u.Id == UserId, cancellationToken);
 
         CheckEmailAddress(user);

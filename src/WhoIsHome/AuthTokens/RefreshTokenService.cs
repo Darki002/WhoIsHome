@@ -4,10 +4,12 @@ using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.AuthTokens;
 
-public class RefreshTokenService(WhoIsHomeContext context) : IRefreshTokenService
+public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFactory) : IRefreshTokenService
 {
     public async Task<RefreshToken> CreateTokenAsync(int userId, CancellationToken cancellationToken)
     {
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        
         RefreshToken token;
         bool tokenExists;
         
@@ -31,6 +33,7 @@ public class RefreshTokenService(WhoIsHomeContext context) : IRefreshTokenServic
         
         var newRefreshToken = token.Refresh();
 
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var ka = context.RefreshTokens.AsNoTracking().ToList();
         ka.ForEach(t => Console.WriteLine(t.Token));
         
@@ -55,7 +58,9 @@ public class RefreshTokenService(WhoIsHomeContext context) : IRefreshTokenServic
     private async Task<RefreshToken> GetValidRefreshToken(string tokenToCheck, int userId,
         CancellationToken cancellationToken)
     {
-        var model = await context.RefreshTokens.AsNoTracking()
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        var model = await context.RefreshTokens
+            .AsNoTracking()
             .SingleOrDefaultAsync(t => t.Token == tokenToCheck, cancellationToken);
         var token = model?.ToRefreshToken();
         if (token is null || token.IsValid(userId) is false)

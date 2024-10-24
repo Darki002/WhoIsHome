@@ -2,17 +2,18 @@
 using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.DataAccess;
-using WhoIsHome.DataAccess.Models;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Services;
 
-public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserContext userContext) : IAggregateService<RepeatedEvent>
+public class RepeatedEventAggregateService(
+    IDbContextFactory<WhoIsHomeContext> contextFactory, IUserContext userContext) : IAggregateService<RepeatedEvent>
 {
     public async Task<RepeatedEvent> GetAsync(int id, CancellationToken cancellationToken)
     {
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var result = await context.RepeatedEvents
             .Include(e => e.User)
             .AsNoTracking()
@@ -25,6 +26,7 @@ public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserContex
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken)
     {
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var result = await context.RepeatedEvents
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
@@ -42,6 +44,7 @@ public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserContex
     public async Task<RepeatedEvent> CreateAsync(string title, DateOnly firstOccurrence, DateOnly lastOccurrence,
         TimeOnly startTime, TimeOnly endTime, PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
     {
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var user = await context.Users.SingleAsync(u => u.Id == userContext.UserId, cancellationToken: cancellationToken);
         var repeatedEvent = RepeatedEvent
             .Create(title, firstOccurrence, lastOccurrence, startTime, endTime, presenceType, time, user.Id)
@@ -57,6 +60,8 @@ public class RepeatedEventAggregateService(WhoIsHomeContext context, IUserContex
         CancellationToken cancellationToken)
     {
         var aggregate = await GetAsync(id, cancellationToken);
+        
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var user = await context.Users.SingleAsync(u => u.Id == aggregate.UserId, cancellationToken: cancellationToken);
         
         if (!userContext.IsUserPermitted(user.Id))
