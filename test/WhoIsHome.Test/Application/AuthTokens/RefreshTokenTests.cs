@@ -56,23 +56,10 @@ public class RefreshTokenTests
             var token = RefreshToken.Create(1);
             
             // Act
-            var isValid = token.IsValid(1);
+            var isValid = token.IsValid();
             
             // Assert
             isValid.Should().BeTrue();
-        }
-        
-        [Test]
-        public void RetunrsFalse_WhenUserIdDoesNotMatch()
-        {
-            // Arrange
-            var token = RefreshToken.Create(1);
-            
-            // Act
-            var isValid = token.IsValid(2);
-            
-            // Assert
-            isValid.Should().BeFalse();
         }
         
         [Test]
@@ -85,7 +72,7 @@ public class RefreshTokenTests
             token.Refresh();
             
             // Act
-            var isValid = token.IsValid(1);
+            var isValid = token.IsValid();
             
             // Assert
             isValid.Should().BeFalse();

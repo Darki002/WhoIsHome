@@ -12,7 +12,7 @@ using OneTimeEventModel = WhoIsHome.WebApi.Models.Request.OneTimeEventModel;
 namespace WhoIsHome.WebApi.AggregatesControllers;
 
 public class OneTimeEventController(
-    OneTimeEventAggregateService oneTimeEventAggregateService, IUserContext userContext)
+    IOneTimeEventAggregateService oneTimeEventAggregateService, IUserContext userContext)
     : AggregateControllerBase<OneTimeEvent, OneTimeEventModelResponse>(oneTimeEventAggregateService, userContext)
 {
     [HttpPost]

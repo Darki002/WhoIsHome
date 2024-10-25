@@ -7,7 +7,7 @@ using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Services;
 
-public class UserAggregateService(IDbContextFactory<WhoIsHomeContext> contextFactory, IPasswordHasher<User> passwordHasher)
+internal class UserAggregateService(IDbContextFactory<WhoIsHomeContext> contextFactory, IPasswordHasher<User> passwordHasher) : IUserAggregateService
 {
     public async Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
     {
@@ -39,16 +39,30 @@ public class UserAggregateService(IDbContextFactory<WhoIsHomeContext> contextFac
         return createdUser.ToAggregate();
     }
 
-    public async Task<User> GetUserAsync(int userId, CancellationToken cancellationToken)
+    public async Task<User> GetAsync(int id, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-        var userModel = await context.Users.SingleOrDefaultAsync(u =>  u.Id == userId, cancellationToken);
+        var userModel = await context.Users.SingleOrDefaultAsync(u =>  u.Id == id, cancellationToken);
 
         if (userModel is null)
         {
-            throw new NotFoundException($"User with Id {userId} does not exist");
+            throw new NotFoundException($"User with Id {id} does not exist");
         }
         
         return userModel.ToAggregate();
+    }
+
+    public async Task DeleteAsync(int id, CancellationToken cancellationToken)
+    {
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        var userModel = await context.Users.SingleOrDefaultAsync(u =>  u.Id == id, cancellationToken);
+
+        if (userModel is null)
+        {
+            throw new NotFoundException($"User with Id {id} does not exist");
+        }
+
+        context.Users.Remove(userModel);
+        await context.SaveChangesAsync(cancellationToken);
     }
 }

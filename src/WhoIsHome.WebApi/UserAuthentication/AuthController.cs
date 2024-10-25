@@ -10,7 +10,7 @@ namespace WhoIsHome.WebApi.UserAuthentication;
 [ApiController]
 [Route("api/v1/[controller]")]
 public class AuthController(
-    UserAggregateService userAggregateService, 
+    IUserAggregateService userAggregateService, 
     JwtTokenService jwtTokenService,
     IPasswordHasher<User> passwordHasher) : Controller
 {

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using WhoIsHome.Aggregates;
 using WhoIsHome.AuthTokens;
-using WhoIsHome.Shared.Types;
+using WhoIsHome.Services;
 
 namespace WhoIsHome.Test.Application.AuthTokens;
 
@@ -12,10 +12,16 @@ public class JwtTokenServiceTests
 {
     private IConfiguration configMock;
     private ILogger<JwtTokenService> loggerMock;
+    private IUserAggregateService userAggregateService;
     
     [SetUp]
     public void SetUp()
     {
+        var mockUserService = new Mock<IUserAggregateService>();
+
+        mockUserService.Setup(u => u.GetAsync(1, CancellationToken.None))
+            .ReturnsAsync(() => new User(1, "Test", "test@whoishome.dev", "test"));
+        
         var mockConfiguration = new Mock<IConfiguration>();
         var sectionMock = new Mock<IConfigurationSection>();
         
@@ -28,6 +34,7 @@ public class JwtTokenServiceTests
             .Returns("hakjlshdfkljashdfkljahsdfkjhalksdhfkljashdfkljhaskljdfhakjlsdhfkjh");
         
         configMock = mockConfiguration.Object;
+        userAggregateService = mockUserService.Object;
         loggerMock = Mock.Of<ILogger<JwtTokenService>>();
     }
     
@@ -66,24 +73,24 @@ public class JwtTokenServiceTests
             const string oldToken = "old-token";
             var refreshService = new Mock<IRefreshTokenService>();
             refreshService
-                .Setup(s => s.RefreshAsync(oldToken, 1, CancellationToken.None))
+                .Setup(s => s.RefreshAsync(oldToken, CancellationToken.None))
                 .ReturnsAsync(() => RefreshToken.Create(1));
 
             var service = CreateService(refreshService.Object);
             var user = new User(1, "", "", "");
             
             // Act
-            var result = await service.RefreshTokenAsync(user, oldToken, CancellationToken.None);
+            var result = await service.RefreshTokenAsync(oldToken, CancellationToken.None);
             
             // Assert
             result.JwtToken.Should().NotBeEmpty();
             result.RefreshToken.Should().NotBeEmpty();
-            refreshService.Verify(s => s.RefreshAsync(oldToken, 1, CancellationToken.None));
+            refreshService.Verify(s => s.RefreshAsync(oldToken,  CancellationToken.None));
         }
     }
 
     private JwtTokenService CreateService(IRefreshTokenService refreshTokenService)
     {
-        return new JwtTokenService(configMock, refreshTokenService, loggerMock);
+        return new JwtTokenService(configMock, refreshTokenService, userAggregateService, loggerMock);
     }
 }

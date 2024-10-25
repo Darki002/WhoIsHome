@@ -41,7 +41,7 @@ public class RefreshTokenServiceTests : InMemoryDbTest
             await SaveToDbAsync(token);
             
             // Act
-            var result = await service.RefreshAsync(token.Token, 1, CancellationToken.None);
+            var result = await service.RefreshAsync(token.Token, CancellationToken.None);
             
             // Assert
             result.Id.Should().Be(2);

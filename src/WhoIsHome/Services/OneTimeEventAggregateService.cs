@@ -8,8 +8,8 @@ using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Services;
 
-public class OneTimeEventAggregateService(IDbContextFactory<WhoIsHomeContext> contextFactory, IUserContext userContext)
-    : IAggregateService<OneTimeEvent>
+internal class OneTimeEventAggregateService(IDbContextFactory<WhoIsHomeContext> contextFactory, IUserContext userContext)
+    : IOneTimeEventAggregateService
 {
     public async Task<OneTimeEvent> GetAsync(int id, CancellationToken cancellationToken)
     {
