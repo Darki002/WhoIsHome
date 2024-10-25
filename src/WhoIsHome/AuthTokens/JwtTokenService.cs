@@ -1,10 +1,13 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using WhoIsHome.Aggregates;
+using WhoIsHome.DataAccess;
+using WhoIsHome.Services;
 using WhoIsHome.Shared.Configurations;
 using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
@@ -12,7 +15,7 @@ using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegiste
 
 namespace WhoIsHome.AuthTokens;
 
-public class JwtTokenService(IConfiguration configuration, IRefreshTokenService refreshTokenService, ILogger<JwtTokenService> logger)
+public class JwtTokenService(IConfiguration configuration, IRefreshTokenService refreshTokenService, UserAggregateService userAggregateService, ILogger<JwtTokenService> logger)
 {
     public async Task<AuthToken> GenerateTokenAsync(User user, CancellationToken cancellationToken)
     {
@@ -21,9 +24,10 @@ public class JwtTokenService(IConfiguration configuration, IRefreshTokenService 
         return new AuthToken(jwtToken, refreshToken.Token);
     }
 
-    public async Task<AuthToken> RefreshTokenAsync(User user, string token, CancellationToken cancellationToken)
+    public async Task<AuthToken> RefreshTokenAsync(string token, CancellationToken cancellationToken)
     {
-        var newRefreshToken = await refreshTokenService.RefreshAsync(token, user.Id!.Value, cancellationToken);
+        var newRefreshToken = await refreshTokenService.RefreshAsync(token, cancellationToken);
+        var user = await userAggregateService.GetUserAsync(newRefreshToken.UserId, cancellationToken);
         var jwtToken = GenerateJwtToken(user);
         
         return new AuthToken(jwtToken, newRefreshToken.Token);

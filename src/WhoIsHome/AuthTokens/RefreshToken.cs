@@ -18,19 +18,9 @@ public class RefreshToken(int? id, int userId, string token, DateTime issued, Da
 
     public DateTime ExpiredAt { get; private set; } = expiredAt;
 
-    public bool IsValid(int requestUser)
+    public bool IsValid()
     {
-        if (requestUser != UserId)
-        {
-            return false;
-        }
-        
-        if (ExpiredAt < DateTime.Now)
-        {
-            return false;
-        }
-
-        return true;
+        return ExpiredAt >= DateTime.Now;
     }
 
     public static RefreshToken Create(int userId)

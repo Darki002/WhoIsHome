@@ -53,18 +53,11 @@ public class AuthController(
     }
 
     [HttpPost("Refresh")]
-    public async Task<IActionResult> Refresh(RefreshDto refreshDto, CancellationToken cancellationToken)
+    public async Task<IActionResult> Refresh([FromHeader(Name = "RefreshToken")] string refreshToken, CancellationToken cancellationToken)
     {
         try
         {
-            var user = await userAggregateService.GetUserByEmailAsync(refreshDto.Email, cancellationToken);
-            
-            if (user == null)
-            {
-                return Unauthorized("Invalid email.");
-            }
-            
-            var token = await jwtTokenService.RefreshTokenAsync(user, refreshDto.RefreshToken, cancellationToken);
+            var token = await jwtTokenService.RefreshTokenAsync(refreshToken, cancellationToken);
             return Ok(new { token.JwtToken, token.RefreshToken });
         }
         catch (InvalidRefreshTokenException)

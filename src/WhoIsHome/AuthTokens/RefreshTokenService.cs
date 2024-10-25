@@ -27,9 +27,9 @@ public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFact
         return dbToken.Entity.ToRefreshToken();
     }
 
-    public async Task<RefreshToken> RefreshAsync(string refreshToken, int userId, CancellationToken cancellationToken)
+    public async Task<RefreshToken> RefreshAsync(string refreshToken, CancellationToken cancellationToken)
     {
-        var token = await GetValidRefreshToken(refreshToken, userId, cancellationToken);
+        var token = await GetValidRefreshToken(refreshToken, cancellationToken);
         
         var newRefreshToken = token.Refresh();
 
@@ -43,7 +43,7 @@ public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFact
         
         while (tokenExists)
         {
-            newRefreshToken = RefreshToken.Create(userId);
+            newRefreshToken = RefreshToken.Create(token.UserId);
             tokenExists = await context.RefreshTokens
                 .AsNoTracking()
                 .AnyAsync(t => t.Token == newRefreshToken.Token, cancellationToken: cancellationToken);
@@ -55,15 +55,14 @@ public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFact
         return dbToken.Entity.ToRefreshToken();
     }
 
-    private async Task<RefreshToken> GetValidRefreshToken(string tokenToCheck, int userId,
-        CancellationToken cancellationToken)
+    private async Task<RefreshToken> GetValidRefreshToken(string tokenToCheck, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var model = await context.RefreshTokens
             .AsNoTracking()
             .SingleOrDefaultAsync(t => t.Token == tokenToCheck, cancellationToken);
         var token = model?.ToRefreshToken();
-        if (token is null || token.IsValid(userId) is false)
+        if (token is null || token.IsValid() is false)
         {
             throw new InvalidRefreshTokenException();
         }
@@ -75,5 +74,5 @@ public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFact
 public interface IRefreshTokenService
 {
     Task<RefreshToken> CreateTokenAsync(int userId, CancellationToken cancellationToken);
-    Task<RefreshToken> RefreshAsync(string refreshToken, int userId, CancellationToken cancellationToken);
+    Task<RefreshToken> RefreshAsync(string refreshToken, CancellationToken cancellationToken);
 }

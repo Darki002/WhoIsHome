@@ -38,4 +38,17 @@ public class UserAggregateService(IDbContextFactory<WhoIsHomeContext> contextFac
         var createdUser = await context.Users.SingleAsync(u => u.Email == email, cancellationToken);
         return createdUser.ToAggregate();
     }
+
+    public async Task<User> GetUserAsync(int userId, CancellationToken cancellationToken)
+    {
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        var userModel = await context.Users.SingleOrDefaultAsync(u =>  u.Id == userId, cancellationToken);
+
+        if (userModel is null)
+        {
+            throw new NotFoundException($"User with Id {userId} does not exist");
+        }
+        
+        return userModel.ToAggregate();
+    }
 }
