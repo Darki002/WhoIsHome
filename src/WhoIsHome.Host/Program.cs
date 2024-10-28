@@ -5,7 +5,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
 
-builder.Services.AddApplicationServices(builder.Configuration)
+builder.Services
+    .AddWihCors()
+    .AddApplicationServices(builder.Configuration)
     .AddJwtAuthentication(builder.Configuration);
 
 builder.Logging.ClearProviders();
