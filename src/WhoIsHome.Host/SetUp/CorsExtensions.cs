@@ -1,8 +1,8 @@
 namespace WhoIsHome.Host.SetUp;
 
-public static class WihCors
+public static class CorsExtensions
 {
-    public static IServiceCollection AddWihCors(this IServiceCollection service)
+    public static IServiceCollection AddCorsPolicy(this IServiceCollection service)
     {
         service.AddCors(options =>
         {
@@ -15,5 +15,10 @@ public static class WihCors
         });
 
         return service;
+    }
+
+    public static void UseCorsPolicy(this WebApplication app)
+    {
+        app.UseCors("AllowAll");
     }
 }

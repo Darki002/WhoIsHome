@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using WhoIsHome.Aggregates;
 using WhoIsHome.AuthTokens;
 using WhoIsHome.Services;
@@ -12,7 +13,8 @@ namespace WhoIsHome.WebApi.UserAuthentication;
 public class AuthController(
     IUserAggregateService userAggregateService, 
     JwtTokenService jwtTokenService,
-    IPasswordHasher<User> passwordHasher) : Controller
+    IPasswordHasher<User> passwordHasher,
+    ILogger<AuthController> logger) : Controller
 {
     [HttpPost("Login")]
     public async Task<IActionResult> Login(LoginDto loginDto, CancellationToken cancellationToken)
@@ -20,12 +22,14 @@ public class AuthController(
         var user = await userAggregateService.GetUserByEmailAsync(loginDto.Email, cancellationToken);
         if (user == null)
         {
+            logger.LogInformation("Login Attempt failed, since no user was found");
             return Unauthorized("Invalid email or password.");
         }
 
         var result = passwordHasher.VerifyHashedPassword(user, user.Password, loginDto.Password);
         if (result == PasswordVerificationResult.Failed)
         {
+            logger.LogInformation("Login Attempt failed because the email or password was incorrect.");
             return Unauthorized("Invalid email or password.");
         }
 
