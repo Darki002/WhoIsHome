@@ -14,13 +14,13 @@ public class MySqlConfigSection(IConfigurationSection section)
     /// Key: MYSQL__PORT
     /// Port for the Database.
     /// </summary>
-    public string Port => section.GetString("PORT");
+    public string Port => section.GetStringOrDefault("PORT", "3306");
     
     /// <summary>
     /// Key: MYSQL__DATABASE
     /// Database that will be used by the Application.
     /// </summary>
-    public string Database => section.GetString("DATABASE");
+    public string Database => section.GetStringOrDefault("DATABASE", "WohIsHome");
     
     /// <summary>
     /// Key: MYSQL__USER

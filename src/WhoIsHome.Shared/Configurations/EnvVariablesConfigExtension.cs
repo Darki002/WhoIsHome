@@ -26,4 +26,9 @@ public static class EnvVariablesConfigExtension
     {
         return config[name] ?? throw new EnvironmentHelperException($"Missing Config for key {name}", name);
     }
+
+    internal static string GetStringOrDefault(this IConfiguration config, string name, string defaultValue)  
+    {
+        return config[name] ?? defaultValue;
+    }
 }
