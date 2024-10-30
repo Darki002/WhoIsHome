@@ -25,7 +25,7 @@ The *RefreshToken* is long valid and can be used to get a new JWT Token. This al
 
 ### Get a Token
 
-Make a request to `/Auth/Login`, will also Invalidate any other *RefreshToken* from this user.
+Make a request to `/Auth/Login`, will also Invalidate any other *RefreshToken* from this user, so only the newly generated *RefreshToken* is valid.
 
 ### How to use
 
