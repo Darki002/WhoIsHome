@@ -26,7 +26,7 @@ public class MySqlConfigSection(IConfigurationSection section)
     /// Key: MYSQL__USER
     /// The User that is being used by the app to connect to the db.
     /// </summary>
-    public string User => section.GetString("USER");
+    public string User => section.GetStringOrDefault("USER", "root");
     
     /// <summary>
     /// Key: MYSQL__PASSWORD
