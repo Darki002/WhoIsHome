@@ -10,15 +10,18 @@ For information about Authentication & Authorized read the following Documentati
 
 # Environment Variables
 
-- `JWT_SECRET_KEY` : Key used for the JWT Authentication.
-- `API_KEY` : API Key used by the middleware in every request to Authorized.
-- `MYSQL__SERVER`: The SQL Server.
-- `MYSQL__PORT`: Port for the Database. *Default: `3306`*
-- `MYSQL__DATABASE`: Database that will be used by the Application.
-- `MYSQL__USER`: The User that is being used by the app to connect to the db. *Default: `WhoIsHome`*
-- `MYSQL__PASSWORD`: The Password for the user that is being used by the app to connect to the db.
-- `PROJECT_ID` : the Firebase projectId of your Firebase project. (Not in used yet)
-- `GOOGLE_APPLICATION_CREDENTIALS` : Google Authentication for Firebase. Read more [here](https://cloud.google.com/docs/authentication/provide-credentials-adc#wlif-key) (Not in used yet)
+| Environment Variable             | Description                                                                                 | Default Value      |
+|----------------------------------|---------------------------------------------------------------------------------------------|--------------------|
+| `JWT_SECRET_KEY`                 | Key used for the JWT Authentication.                                                        | -                  |
+| `API_KEY`                        | API Key used by the middleware in every request to Authorized.                              | -                  |
+| `MYSQL__SERVER`                  | The SQL Server.                                                                             | -                  |
+| `MYSQL__PORT`                    | Port for the Database.                                                                      | 3306               |
+| `MYSQL__DATABASE`                | Database that will be used by the Application.                                              | WhoIsHome          |
+| `MYSQL__USER`                    | The User that is being used by the app to connect to the db.                                | root               |
+| `MYSQL__PASSWORD`                | The Password for the user that is being used by the app to connect to the db.               | -                  |
+| `PROJECT_ID`                     | The Firebase `projectId` of your Firebase project. *(Not in use yet)*                       | -                  |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Google Authentication for Firebase. [Read more here](https://cloud.google.com/docs/authentication/provide-credentials-adc#wlif-key) *(Not in use yet)* | - |
+
 
 *Note:* Some Environment Variables use two underscore, this is due to how dotnet maps those onto the App Configuration 
 
