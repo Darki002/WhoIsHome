@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using WhoIsHome.DataAccess;
 using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.AuthTokens;
 
-public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFactory) : IRefreshTokenService
+public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFactory, ILogger<RefreshTokenService> logger) : IRefreshTokenService
 {
     public async Task<RefreshToken> CreateTokenAsync(int userId, CancellationToken cancellationToken)
     {
@@ -24,6 +25,9 @@ public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFact
         var model = token.ToModel();
         var dbToken = await context.RefreshTokens.AddAsync(model, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
+        
+        logger.LogInformation("New Refresh Token was Generated for User {Id}", userId);
+        
         return dbToken.Entity.ToRefreshToken();
     }
 

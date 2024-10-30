@@ -10,7 +10,7 @@ namespace WhoIsHome.DataAccess.Models;
 public class RefreshTokenModel : DbModel
 {
     [Required] 
-    [MaxLength(64)]
+    [MaxLength(100)]
     public string Token { get; set; } = null!;
     
     [Required]

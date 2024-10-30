@@ -1,3 +1,6 @@
+using Microsoft.Extensions.Logging;
+using Moq;
+using NUnit.Framework.Internal;
 using WhoIsHome.AuthTokens;
 
 namespace WhoIsHome.Test.Application.AuthTokens;
@@ -10,7 +13,8 @@ public class RefreshTokenServiceTests : InMemoryDbTest
     [SetUp]
     public void SetUp()
     {
-        service = new RefreshTokenService(DbFactory);
+        var logger = Mock.Of<ILogger<RefreshTokenService>>();
+        service = new RefreshTokenService(DbFactory, logger);
     }
     
     [TestFixture]
