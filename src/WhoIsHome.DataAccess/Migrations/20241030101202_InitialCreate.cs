@@ -43,14 +43,37 @@ namespace WhoIsHome.DataAccess.Migrations
                     EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     PresenceType = table.Column<int>(type: "int", nullable: false),
                     DinnerTime = table.Column<TimeOnly>(type: "time", nullable: true),
-                    UserModelId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Event", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Event_User_UserModelId",
-                        column: x => x.UserModelId,
+                        name: "FK_Event_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "RefreshToken",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Token = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false),
+                    Issued = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    ExpiredAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshToken", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshToken_User_UserId",
+                        column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -70,14 +93,14 @@ namespace WhoIsHome.DataAccess.Migrations
                     EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     PresenceType = table.Column<int>(type: "int", nullable: false),
                     DinnerTime = table.Column<TimeOnly>(type: "time", nullable: true),
-                    UserModelId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RepeatedEvent", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RepeatedEvent_User_UserModelId",
-                        column: x => x.UserModelId,
+                        name: "FK_RepeatedEvent_User_UserId",
+                        column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -85,14 +108,25 @@ namespace WhoIsHome.DataAccess.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Event_UserModelId",
+                name: "IX_Event_UserId",
                 table: "Event",
-                column: "UserModelId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RepeatedEvent_UserModelId",
+                name: "IX_RefreshToken_Token",
+                table: "RefreshToken",
+                column: "Token",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshToken_UserId",
+                table: "RefreshToken",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RepeatedEvent_UserId",
                 table: "RepeatedEvent",
-                column: "UserModelId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_Email",
@@ -106,6 +140,9 @@ namespace WhoIsHome.DataAccess.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Event");
+
+            migrationBuilder.DropTable(
+                name: "RefreshToken");
 
             migrationBuilder.DropTable(
                 name: "RepeatedEvent");

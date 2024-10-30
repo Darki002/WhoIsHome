@@ -11,7 +11,7 @@ using WhoIsHome.DataAccess;
 namespace WhoIsHome.DataAccess.Migrations
 {
     [DbContext(typeof(WhoIsHomeContext))]
-    [Migration("20241009145737_InitialCreate")]
+    [Migration("20241030101202_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -48,14 +48,44 @@ namespace WhoIsHome.DataAccess.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<int>("UserModelId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserModelId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Event");
+                });
+
+            modelBuilder.Entity("WhoIsHome.DataAccess.Models.RefreshTokenModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ExpiredAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("Issued")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshToken");
                 });
 
             modelBuilder.Entity("WhoIsHome.DataAccess.Models.RepeatedEventModel", b =>
@@ -87,12 +117,12 @@ namespace WhoIsHome.DataAccess.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<int>("UserModelId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserModelId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("RepeatedEvent");
                 });
@@ -128,24 +158,35 @@ namespace WhoIsHome.DataAccess.Migrations
 
             modelBuilder.Entity("WhoIsHome.DataAccess.Models.OneTimeEventModel", b =>
                 {
-                    b.HasOne("WhoIsHome.DataAccess.Models.UserModel", "UserModel")
+                    b.HasOne("WhoIsHome.DataAccess.Models.UserModel", "User")
                         .WithMany()
-                        .HasForeignKey("UserModelId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("UserModel");
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WhoIsHome.DataAccess.Models.RefreshTokenModel", b =>
+                {
+                    b.HasOne("WhoIsHome.DataAccess.Models.UserModel", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("WhoIsHome.DataAccess.Models.RepeatedEventModel", b =>
                 {
-                    b.HasOne("WhoIsHome.DataAccess.Models.UserModel", "UserModel")
+                    b.HasOne("WhoIsHome.DataAccess.Models.UserModel", "User")
                         .WithMany()
-                        .HasForeignKey("UserModelId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("UserModel");
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

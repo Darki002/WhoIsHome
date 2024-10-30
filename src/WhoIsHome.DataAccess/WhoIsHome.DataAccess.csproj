@@ -18,4 +18,8 @@
       <ProjectReference Include="..\WhoIsHome.Shared\WhoIsHome.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Migrations\" />
+    </ItemGroup>
+
 </Project>
