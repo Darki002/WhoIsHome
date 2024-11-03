@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WhoIsHome.Aggregates;
@@ -11,7 +12,7 @@ using WhoIsHome.WebApi.Models;
 namespace WhoIsHome.WebApi.UserAuthentication;
 
 [ApiController]
-[Route("api/v1/[controller]")]
+[Route("api/v1/[controller]/[action]")]
 public class AuthController(
     IUserAggregateService userAggregateService, 
     JwtTokenService jwtTokenService,
@@ -19,16 +20,16 @@ public class AuthController(
     IPasswordHasher<User> passwordHasher,
     ILogger<AuthController> logger) : Controller
 {
-    [HttpGet("me")]
+    [HttpGet]
+    [Authorize]
     public async Task<IActionResult> Me(CancellationToken cancellationToken)
     {
-        var userId = userContext.UserId;
-        var user = await userAggregateService.GetAsync(userId, cancellationToken);
+        var user = await userAggregateService.GetAsync(userContext.UserId, cancellationToken);
         var response = UserModel.From(user);
         return Ok(response);
     }
     
-    [HttpPost("login")]
+    [HttpPost]
     public async Task<IActionResult> Login(LoginDto loginDto, CancellationToken cancellationToken)
     {
         var user = await userAggregateService.GetUserByEmailAsync(loginDto.Email, cancellationToken);
@@ -49,7 +50,7 @@ public class AuthController(
         return Ok(new { token.JwtToken, token.RefreshToken });
     }
 
-    [HttpPost("register")]
+    [HttpPost]
     public async Task<IActionResult> Register(RegisterDto registerDto, CancellationToken cancellationToken)
     {
         try
@@ -68,7 +69,7 @@ public class AuthController(
         }
     }
 
-    [HttpPost("refresh")]
+    [HttpPost]
     public async Task<IActionResult> Refresh([FromHeader(Name = "RefreshToken")] string refreshToken, CancellationToken cancellationToken)
     {
         try
