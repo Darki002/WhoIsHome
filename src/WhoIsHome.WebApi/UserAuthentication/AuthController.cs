@@ -11,7 +11,7 @@ using WhoIsHome.WebApi.Models;
 namespace WhoIsHome.WebApi.UserAuthentication;
 
 [ApiController]
-[Route("api/v1/[controller]")]
+[Route("api/v1/auth")]
 public class AuthController(
     IUserAggregateService userAggregateService, 
     JwtTokenService jwtTokenService,
