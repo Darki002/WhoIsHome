@@ -12,7 +12,7 @@ using WhoIsHome.WebApi.Models;
 namespace WhoIsHome.WebApi.UserAuthentication;
 
 [ApiController]
-[Route("api/v1/auth")]
+[Route("api/v1/[controller]/[action]")]
 public class AuthController(
     IUserAggregateService userAggregateService, 
     JwtTokenService jwtTokenService,
@@ -29,7 +29,7 @@ public class AuthController(
         return Ok(response);
     }
     
-    [HttpPost("login")]
+    [HttpPost]
     public async Task<IActionResult> Login(LoginDto loginDto, CancellationToken cancellationToken)
     {
         var user = await userAggregateService.GetUserByEmailAsync(loginDto.Email, cancellationToken);
@@ -50,7 +50,7 @@ public class AuthController(
         return Ok(new { token.JwtToken, token.RefreshToken });
     }
 
-    [HttpPost("register")]
+    [HttpPost]
     public async Task<IActionResult> Register(RegisterDto registerDto, CancellationToken cancellationToken)
     {
         try
@@ -69,7 +69,7 @@ public class AuthController(
         }
     }
 
-    [HttpPost("refresh")]
+    [HttpPost]
     public async Task<IActionResult> Refresh([FromHeader(Name = "RefreshToken")] string refreshToken, CancellationToken cancellationToken)
     {
         try
