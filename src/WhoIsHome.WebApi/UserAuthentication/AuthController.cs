@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WhoIsHome.Aggregates;
@@ -19,11 +20,11 @@ public class AuthController(
     IPasswordHasher<User> passwordHasher,
     ILogger<AuthController> logger) : Controller
 {
-    [HttpGet("me")]
+    [HttpGet]
+    [Authorize]
     public async Task<IActionResult> Me(CancellationToken cancellationToken)
     {
-        var userId = userContext.UserId;
-        var user = await userAggregateService.GetAsync(userId, cancellationToken);
+        var user = await userAggregateService.GetAsync(userContext.UserId, cancellationToken);
         var response = UserModel.From(user);
         return Ok(response);
     }
