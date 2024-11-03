@@ -4,7 +4,9 @@ using Microsoft.Extensions.Logging;
 using WhoIsHome.Aggregates;
 using WhoIsHome.AuthTokens;
 using WhoIsHome.Services;
+using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
+using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi.UserAuthentication;
 
@@ -13,10 +15,20 @@ namespace WhoIsHome.WebApi.UserAuthentication;
 public class AuthController(
     IUserAggregateService userAggregateService, 
     JwtTokenService jwtTokenService,
+    IUserContext userContext,
     IPasswordHasher<User> passwordHasher,
     ILogger<AuthController> logger) : Controller
 {
-    [HttpPost("Login")]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me(CancellationToken cancellationToken)
+    {
+        var userId = userContext.UserId;
+        var user = await userAggregateService.GetAsync(userId, cancellationToken);
+        var response = UserModel.From(user);
+        return Ok(response);
+    }
+    
+    [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto loginDto, CancellationToken cancellationToken)
     {
         var user = await userAggregateService.GetUserByEmailAsync(loginDto.Email, cancellationToken);
@@ -29,7 +41,7 @@ public class AuthController(
         var result = passwordHasher.VerifyHashedPassword(user, user.Password, loginDto.Password);
         if (result == PasswordVerificationResult.Failed)
         {
-            logger.LogInformation("Login Attempt failed because the email or password was incorrect.");
+            logger.LogInformation("Login Attempt failed because the email or password was incorrect");
             return Unauthorized("Invalid email or password.");
         }
 
@@ -37,7 +49,7 @@ public class AuthController(
         return Ok(new { token.JwtToken, token.RefreshToken });
     }
 
-    [HttpPost("Register")]
+    [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto registerDto, CancellationToken cancellationToken)
     {
         try
@@ -56,7 +68,7 @@ public class AuthController(
         }
     }
 
-    [HttpPost("Refresh")]
+    [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromHeader(Name = "RefreshToken")] string refreshToken, CancellationToken cancellationToken)
     {
         try
