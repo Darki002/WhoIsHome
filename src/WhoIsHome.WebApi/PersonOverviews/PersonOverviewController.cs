@@ -7,17 +7,16 @@ namespace WhoIsHome.WebApi.PersonOverviews;
 
 public class PersonOverviewController(PersonOverviewQueryHandler queryHandler, IUserContext userContext) : WhoIsHomeControllerBase<PersonOverview, UserOverviewModel>
 {
+    [HttpGet]
+    public async Task<ActionResult<UserOverviewModel>> GetCurrentPersonOverviewAsync(CancellationToken cancellationToken)
+    {
+        return await GetPersonOverviewAsync(userContext.UserId, cancellationToken);
+    }
+    
     [HttpGet("{userId}")]
     public async Task<ActionResult<UserOverviewModel>> GetPersonOverviewAsync(int userId, CancellationToken cancellationToken)
     {
         var result = await queryHandler.HandleAsync(userId, cancellationToken);
-        return await BuildResponseAsync(result);
-    }
-    
-    [HttpGet("Me")]
-    public async Task<ActionResult<UserOverviewModel>> GetCurrentPersonOverviewAsync(CancellationToken cancellationToken)
-    {
-        var result = await queryHandler.HandleAsync(userContext.UserId, cancellationToken);
         return await BuildResponseAsync(result);
     }
     
