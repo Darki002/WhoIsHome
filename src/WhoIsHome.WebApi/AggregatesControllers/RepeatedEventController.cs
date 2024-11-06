@@ -3,17 +3,16 @@ using WhoIsHome.Aggregates;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Helper;
-using WhoIsHome.WebApi.Models.New;
-using WhoIsHome.WebApi.Models.Request;
+using WhoIsHome.WebApi.Models.Dto;
 using WhoIsHome.WebApi.Models.Response;
 
 namespace WhoIsHome.WebApi.AggregatesControllers;
 
 public class RepeatedEventController(IRepeatedEventAggregateService repeatedEventAggregateService, IUserContext userContext)
-    : AggregateControllerBase<RepeatedEvent, RepeatedEventModelResponse>(repeatedEventAggregateService, userContext)
+    : AggregateControllerBase<RepeatedEvent, RepeatedEventModel>(repeatedEventAggregateService, userContext)
 {
     [HttpPost]
-    public async Task<ActionResult<RepeatedEventModelResponse>> CreateEvent([FromBody] RepeatedEventModelDto eventModelDto,
+    public async Task<ActionResult<RepeatedEventModel>> CreateEvent([FromBody] RepeatedEventModelDto eventModelDto,
         CancellationToken cancellationToken)
     {
         var result = await repeatedEventAggregateService.CreateAsync(
@@ -29,12 +28,14 @@ public class RepeatedEventController(IRepeatedEventAggregateService repeatedEven
         return await BuildResponseAsync(result);
     }
 
-    [HttpPatch]
-    public async Task<ActionResult<RepeatedEventModelResponse>> UpdateEvent([FromBody] RepeatedEventModel eventModel,
+    [HttpPatch("{id:int}")]
+    public async Task<ActionResult<RepeatedEventModel>> UpdateEvent(
+        int id,
+        [FromBody] RepeatedEventModelDto eventModel,
         CancellationToken cancellationToken)
     {
         var result = await repeatedEventAggregateService.UpdateAsync(
-            id: eventModel.Id,
+            id: id,
             title: eventModel.Title,
             firstOccurrence: eventModel.FirstOccurrence,
             lastOccurrence: eventModel.LastOccurrence,
@@ -47,6 +48,6 @@ public class RepeatedEventController(IRepeatedEventAggregateService repeatedEven
         return await BuildResponseAsync(result);
     }
 
-    protected override Task<RepeatedEventModelResponse> ConvertToModelAsync(RepeatedEvent data, User user) =>
-        Task.FromResult(RepeatedEventModelResponse.From(data, user));
+    protected override Task<RepeatedEventModel> ConvertToModelAsync(RepeatedEvent data, User user) =>
+        Task.FromResult(RepeatedEventModel.From(data, user));
 }

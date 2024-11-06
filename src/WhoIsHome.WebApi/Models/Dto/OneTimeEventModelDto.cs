@@ -1,4 +1,4 @@
-﻿namespace WhoIsHome.WebApi.Models.New;
+﻿namespace WhoIsHome.WebApi.Models.Dto;
 
 public class OneTimeEventModelDto
 {

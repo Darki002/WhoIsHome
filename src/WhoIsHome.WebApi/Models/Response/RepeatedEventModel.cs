@@ -1,14 +1,17 @@
 ﻿using WhoIsHome.Aggregates;
+using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.WebApi.Models.Response;
 
-public class OneTimeEventModelResponse
+public class RepeatedEventModel
 {
     public required int Id { get; set; }
 
     public required string Title { get; set; }
     
-    public required DateOnly Date { get; set; }
+    public required DateOnly FirstOccurrence { get; set; }
+    
+    public required DateOnly LastOccurrence { get; set; }
 
     public required TimeOnly StartTime { get; set; }
 
@@ -20,13 +23,14 @@ public class OneTimeEventModelResponse
 
     public required int UserId { get; set; }
     
-    public static OneTimeEventModelResponse From(OneTimeEvent data, User user)
+    public static RepeatedEventModel From(RepeatedEvent data, User user)
     {
-        return new OneTimeEventModelResponse
+        return new RepeatedEventModel
         {
             Id = data.Id!.Value,
             Title = data.Title,
-            Date = data.Date,
+            FirstOccurrence = data.FirstOccurrence,
+            LastOccurrence = data.LastOccurrence,
             StartTime = data.StartTime,
             EndTime = data.EndTime,
             PresenceType = data.DinnerTime.PresenceType.ToString(),
