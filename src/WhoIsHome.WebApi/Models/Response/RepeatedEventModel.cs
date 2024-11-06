@@ -3,7 +3,7 @@ using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.WebApi.Models.Response;
 
-public class RepeatedEventModelResponse
+public class RepeatedEventModel
 {
     public required int Id { get; set; }
 
@@ -21,11 +21,11 @@ public class RepeatedEventModelResponse
 
     public TimeOnly? DinnerTime { get; set; } = null;
 
-    public required UserModel User { get; set; }
+    public required int UserId { get; set; }
     
-    public static RepeatedEventModelResponse From(RepeatedEvent data, User user)
+    public static RepeatedEventModel From(RepeatedEvent data, User user)
     {
-        return new RepeatedEventModelResponse
+        return new RepeatedEventModel
         {
             Id = data.Id!.Value,
             Title = data.Title,
@@ -35,7 +35,7 @@ public class RepeatedEventModelResponse
             EndTime = data.EndTime,
             PresenceType = data.DinnerTime.PresenceType.ToString(),
             DinnerTime = data.DinnerTime.Time,
-            User = UserModel.From(user)
+            UserId = user.Id!.Value
         };
     }
 }

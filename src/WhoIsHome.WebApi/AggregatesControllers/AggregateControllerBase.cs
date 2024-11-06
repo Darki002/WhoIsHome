@@ -7,14 +7,14 @@ namespace WhoIsHome.WebApi.AggregatesControllers;
 
 public abstract class AggregateControllerBase<T, TModel>(IAggregateService<T> aggregateService, IUserContext userContext) : WhoIsHomeControllerBase<T, TModel>
 {
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<ActionResult<TModel>> Get(int id, CancellationToken cancellationToken)
     {
         var result = await aggregateService.GetAsync(id, cancellationToken);
         return await BuildResponseAsync(result);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     public async Task<ActionResult<TModel>> Delete(int id, CancellationToken cancellationToken)
     {
         await aggregateService.DeleteAsync(id, cancellationToken);
