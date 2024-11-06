@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.JsonWebTokens;
 using WhoIsHome.DataAccess;
 using WhoIsHome.DataAccess.Models;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace WhoIsHome.Host.Authentication;
 
@@ -39,8 +40,6 @@ public class UserContext(
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var user = await context.Users.AsNoTracking().SingleAsync(u => u.Id == UserId, cancellationToken);
 
-        CheckEmailAddress(user);
-
         authenticatedUserCache = user.MapFromDb();
         return authenticatedUserCache;
     }
@@ -54,20 +53,9 @@ public class UserContext(
 
     private int? GetIdFromClaims()
     {
-        var idString = httpContextAccessor.HttpContext?.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        var idString = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         idCache = idString is not null ? int.Parse(idString) : null;
         return idCache;
-    }
-
-    private void CheckEmailAddress(UserModel user)
-    {
-        var email = httpContextAccessor.HttpContext?.User.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
-        if (user.Email != email)
-        {
-            logger.LogInformation("(Invalid Claims) | For User {UserId} with unexpected Email {Email}", user.Id,
-                email);
-            throw new InvalidClaimsException("Email Address in the Request must match the Email of the User.");
-        }
     }
 }
 

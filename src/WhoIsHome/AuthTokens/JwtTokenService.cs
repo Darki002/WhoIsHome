@@ -1,17 +1,12 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using WhoIsHome.Aggregates;
-using WhoIsHome.DataAccess;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Configurations;
-using WhoIsHome.Shared.Helper;
-using WhoIsHome.Shared.Types;
-using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace WhoIsHome.AuthTokens;
 
@@ -44,8 +39,7 @@ public class JwtTokenService(IConfiguration configuration, IRefreshTokenService 
         
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()!),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()!),
             new Claim("role", "User")
         };
         
