@@ -40,7 +40,7 @@ public class JwtTokenService(IConfiguration configuration, IRefreshTokenService 
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()!),
-            new Claim("role", "User")
+            new Claim(ClaimTypes.Role, "User")
         };
         
         var token = new JwtSecurityToken(
