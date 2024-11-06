@@ -16,16 +16,16 @@ public class OneTimeEventController(
     : AggregateControllerBase<OneTimeEvent, OneTimeEventModelResponse>(oneTimeEventAggregateService, userContext)
 {
     [HttpPost]
-    public async Task<ActionResult<OneTimeEventModelResponse>> CreateEvent([FromBody] NewOneTimeEventModel eventModel,
+    public async Task<ActionResult<OneTimeEventModelResponse>> CreateEvent([FromBody] OneTimeEventModelDto eventModelDto,
         CancellationToken cancellationToken)
     {
         var result = await oneTimeEventAggregateService.CreateAsync(
-            title: eventModel.Title,
-            date: eventModel.Date,
-            startTime: eventModel.StartTime,
-            endTime: eventModel.EndTime,
-            presenceType: PresenceTypeHelper.FromString(eventModel.PresenceType),
-            time: eventModel.DinnerTime,
+            title: eventModelDto.Title,
+            date: eventModelDto.Date,
+            startTime: eventModelDto.StartTime,
+            endTime: eventModelDto.EndTime,
+            presenceType: PresenceTypeHelper.FromString(eventModelDto.PresenceType),
+            time: eventModelDto.DinnerTime,
             cancellationToken: cancellationToken);
 
         return await BuildResponseAsync(result);

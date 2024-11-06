@@ -1,9 +1,6 @@
-﻿using WhoIsHome.Aggregates;
-using WhoIsHome.Shared.Types;
+﻿namespace WhoIsHome.WebApi.Models.New;
 
-namespace WhoIsHome.WebApi.Models.New;
-
-public class NewRepeatedEventModel
+public class RepeatedEventModelDto
 {
     public required string Title { get; set; }
     

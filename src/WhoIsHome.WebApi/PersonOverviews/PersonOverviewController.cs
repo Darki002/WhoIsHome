@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.QueryHandler.PersonOverview;
 using WhoIsHome.Shared.Authentication;
-using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi.PersonOverviews;
 
@@ -24,7 +23,7 @@ public class PersonOverviewController(PersonOverviewQueryHandler queryHandler, I
     {
         var model = new UserOverviewModel
         {
-            User = UserModel.From(data.User),
+            UserId = data.User.Id!.Value,
             Today = data.Today.Select(PersonOverviewEventModel.From).ToList(),
             ThisWeek = data.ThisWeek.Select(PersonOverviewEventModel.From).ToList(),
             FutureEvents = data.FutureEvents.Select(PersonOverviewEventModel.From).ToList()

@@ -21,7 +21,7 @@ public class RepeatedEventModelResponse
 
     public TimeOnly? DinnerTime { get; set; } = null;
 
-    public required UserModel User { get; set; }
+    public required int UserId { get; set; }
     
     public static RepeatedEventModelResponse From(RepeatedEvent data, User user)
     {
@@ -35,7 +35,7 @@ public class RepeatedEventModelResponse
             EndTime = data.EndTime,
             PresenceType = data.DinnerTime.PresenceType.ToString(),
             DinnerTime = data.DinnerTime.Time,
-            User = UserModel.From(user)
+            UserId = user.Id!.Value
         };
     }
 }

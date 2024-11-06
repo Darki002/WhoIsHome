@@ -1,10 +1,8 @@
-﻿using WhoIsHome.WebApi.Models;
-
-namespace WhoIsHome.WebApi.PersonOverviews;
+﻿namespace WhoIsHome.WebApi.PersonOverviews;
 
 public record UserOverviewModel
 {
-    public required UserModel User { get; init; }
+    public required int UserId { get; init; }
     
     public required IReadOnlyList<PersonOverviewEventModel> Today { get; init; }
     

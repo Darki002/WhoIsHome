@@ -1,5 +1,4 @@
 ﻿using WhoIsHome.Aggregates;
-using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.WebApi.Models.Response;
 
@@ -19,7 +18,7 @@ public class OneTimeEventModelResponse
 
     public TimeOnly? DinnerTime { get; set; } = null;
 
-    public required UserModel User { get; set; }
+    public required int UserId { get; set; }
     
     public static OneTimeEventModelResponse From(OneTimeEvent data, User user)
     {
@@ -32,7 +31,7 @@ public class OneTimeEventModelResponse
             EndTime = data.EndTime,
             PresenceType = data.DinnerTime.PresenceType.ToString(),
             DinnerTime = data.DinnerTime.Time,
-            User = UserModel.From(user)
+            UserId = user.Id!.Value
         };
     }
 }

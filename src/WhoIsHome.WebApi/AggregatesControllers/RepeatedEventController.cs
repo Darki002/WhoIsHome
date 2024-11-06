@@ -13,17 +13,17 @@ public class RepeatedEventController(IRepeatedEventAggregateService repeatedEven
     : AggregateControllerBase<RepeatedEvent, RepeatedEventModelResponse>(repeatedEventAggregateService, userContext)
 {
     [HttpPost]
-    public async Task<ActionResult<RepeatedEventModelResponse>> CreateEvent([FromBody] NewRepeatedEventModel eventModel,
+    public async Task<ActionResult<RepeatedEventModelResponse>> CreateEvent([FromBody] RepeatedEventModelDto eventModelDto,
         CancellationToken cancellationToken)
     {
         var result = await repeatedEventAggregateService.CreateAsync(
-            title: eventModel.Title,
-            firstOccurrence: eventModel.FirstOccurrence,
-            lastOccurrence: eventModel.LastOccurrence,
-            startTime: eventModel.StartTime,
-            endTime: eventModel.EndTime,
-            presenceType: PresenceTypeHelper.FromString(eventModel.PresenceType),
-            time: eventModel.DinnerTime,
+            title: eventModelDto.Title,
+            firstOccurrence: eventModelDto.FirstOccurrence,
+            lastOccurrence: eventModelDto.LastOccurrence,
+            startTime: eventModelDto.StartTime,
+            endTime: eventModelDto.EndTime,
+            presenceType: PresenceTypeHelper.FromString(eventModelDto.PresenceType),
+            time: eventModelDto.DinnerTime,
             cancellationToken: cancellationToken);
 
         return await BuildResponseAsync(result);
