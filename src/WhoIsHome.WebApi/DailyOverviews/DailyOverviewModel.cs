@@ -4,7 +4,7 @@ namespace WhoIsHome.WebApi.DailyOverviews;
 
 public record DailyOverviewModel
 {
-    public required int UserId { get; set; }
+    public required DailyOverviewUser User { get; set; }
 
     public required bool IsAtHome { get; set; }
 
@@ -14,9 +14,11 @@ public record DailyOverviewModel
     {
         return new DailyOverviewModel
         {
-            UserId = dailyOverview.User.Id!.Value,
+            User = new DailyOverviewUser(dailyOverview.User.Id!.Value, dailyOverview.User.UserName),
             IsAtHome = dailyOverview.IsAtHome,
             DinnerTime = dailyOverview.DinnerTime
         };
     }
 }
+
+public record DailyOverviewUser(int id, string Username);
