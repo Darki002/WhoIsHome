@@ -6,8 +6,6 @@ public static class ApplicationBuilderExtensions
 {
     public static void ConfigureApplication(this WebApplication app)
     {
-        if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
-
         app.UseSwagger();
         app.UseSwaggerUI();
         
