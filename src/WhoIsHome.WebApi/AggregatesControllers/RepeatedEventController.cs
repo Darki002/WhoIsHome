@@ -30,7 +30,7 @@ public class RepeatedEventController(IRepeatedEventAggregateService repeatedEven
         return await BuildResponseAsync(result);
     }
 
-    [HttpPut]
+    [HttpPatch]
     public async Task<ActionResult<RepeatedEventModelResponse>> UpdateEvent([FromBody] RepeatedEventModel eventModel,
         CancellationToken cancellationToken)
     {

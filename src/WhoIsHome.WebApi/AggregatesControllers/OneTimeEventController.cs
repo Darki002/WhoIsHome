@@ -31,7 +31,7 @@ public class OneTimeEventController(
         return await BuildResponseAsync(result);
     }
 
-    [HttpPut]
+    [HttpPatch]
     public async Task<ActionResult<OneTimeEventModelResponse>> UpdateEvent([FromBody] OneTimeEventModel eventModel,
         CancellationToken cancellationToken)
     {
