@@ -1,15 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.QueryHandler.PersonOverview;
+using WhoIsHome.Shared.Authentication;
 using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi.PersonOverviews;
 
-public class PersonOverviewController(PersonOverviewQueryHandler queryHandler) : WhoIsHomeControllerBase<PersonOverview, UserOverviewModel>
+public class PersonOverviewController(PersonOverviewQueryHandler queryHandler, IUserContext userContext) : WhoIsHomeControllerBase<PersonOverview, UserOverviewModel>
 {
-    [HttpGet("{personId}")]
-    public async Task<ActionResult<UserOverviewModel>> GetPersonOverviewAsync(int personId, CancellationToken cancellationToken)
+    [HttpGet]
+    public async Task<ActionResult<UserOverviewModel>> GetCurrentPersonOverviewAsync(CancellationToken cancellationToken)
     {
-        var result = await queryHandler.HandleAsync(personId, cancellationToken);
+        return await GetPersonOverviewAsync(userContext.UserId, cancellationToken);
+    }
+    
+    [HttpGet("{userId}")]
+    public async Task<ActionResult<UserOverviewModel>> GetPersonOverviewAsync(int userId, CancellationToken cancellationToken)
+    {
+        var result = await queryHandler.HandleAsync(userId, cancellationToken);
         return await BuildResponseAsync(result);
     }
     
