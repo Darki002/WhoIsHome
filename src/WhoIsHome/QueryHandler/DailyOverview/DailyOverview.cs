@@ -7,17 +7,15 @@ public class DailyOverview
 {
     public required User User { get; init; }
 
-    public bool IsAtHome { get; init; } = true;
+    public bool IsAtHome { get; private init; } = true;
 
-    public TimeOnly? DinnerTime { get; init; }
+    public TimeOnly? DinnerTime { get; private init; } = null!;
 
     public static DailyOverview Empty(User user)
     {
         return new DailyOverview
         {
-            User = user,
-            IsAtHome = false,
-            DinnerTime = null
+            User = user
         };
     }
 
