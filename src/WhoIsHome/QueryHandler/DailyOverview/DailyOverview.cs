@@ -9,7 +9,7 @@ public class DailyOverview
 
     public bool IsAtHome { get; private init; } = true;
 
-    public TimeOnly? DinnerTime { get; private init; } = null!;
+    public TimeOnly? DinnerTime { get; private init; } = null;
 
     public static DailyOverview Empty(User user)
     {
