@@ -1,6 +1,6 @@
 using WhoIsHome.QueryHandler.DailyOverview;
 
-namespace WhoIsHome.WebApi.DailyOverviews;
+namespace WhoIsHome.WebApi.QueryServices.DailyOverviews;
 
 public record DailyOverviewModel
 {

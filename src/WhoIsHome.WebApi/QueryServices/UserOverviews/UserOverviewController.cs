@@ -2,23 +2,25 @@
 using WhoIsHome.QueryHandler.UserOverview;
 using WhoIsHome.Shared.Authentication;
 
-namespace WhoIsHome.WebApi.UserOverviews;
+namespace WhoIsHome.WebApi.QueryServices.UserOverviews;
 
-public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUserContext userContext) : WhoIsHomeControllerBase<UserOverview, UserOverviewModel>
+public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUserContext userContext)
+    : WhoIsHomeControllerBase<UserOverview, UserOverviewModel>
 {
     [HttpGet]
     public async Task<ActionResult<UserOverviewModel>> GetCurrentUserOverviewAsync(CancellationToken cancellationToken)
     {
         return await GetUserOverviewAsync(userContext.UserId, cancellationToken);
     }
-    
+
     [HttpGet("{userId:int}")]
-    public async Task<ActionResult<UserOverviewModel>> GetUserOverviewAsync(int userId, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserOverviewModel>> GetUserOverviewAsync(int userId,
+        CancellationToken cancellationToken)
     {
         var result = await queryHandler.HandleAsync(userId, cancellationToken);
         return await BuildResponseAsync(result);
     }
-    
+
     protected override Task<UserOverviewModel> ConvertToModelAsync(UserOverview data)
     {
         var model = new UserOverviewModel
