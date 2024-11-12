@@ -12,7 +12,7 @@ public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUser
         return await GetUserOverviewAsync(userContext.UserId, cancellationToken);
     }
     
-    [HttpGet("{userId}")]
+    [HttpGet("{userId:int}")]
     public async Task<ActionResult<UserOverviewModel>> GetUserOverviewAsync(int userId, CancellationToken cancellationToken)
     {
         var result = await queryHandler.HandleAsync(userId, cancellationToken);
@@ -23,7 +23,7 @@ public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUser
     {
         var model = new UserOverviewModel
         {
-            UserId = data.User.Id!.Value,
+            User = new UserOverviewModel.UserModel(data.User.Id!.Value, data.User.UserName),
             Today = data.Today.Select(UserOverviewEventModel.From).ToList(),
             ThisWeek = data.ThisWeek.Select(UserOverviewEventModel.From).ToList(),
             FutureEvents = data.FutureEvents.Select(UserOverviewEventModel.From).ToList()
