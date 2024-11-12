@@ -23,7 +23,7 @@ public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUser
     {
         var model = new UserOverviewModel
         {
-            User = new UserOverviewModel.UserModel(data.User.Id!.Value, data.User.UserName),
+            UserId = data.User.Id!.Value,
             Today = data.Today.Select(UserOverviewEventModel.From).ToList(),
             ThisWeek = data.ThisWeek.Select(UserOverviewEventModel.From).ToList(),
             FutureEvents = data.FutureEvents.Select(UserOverviewEventModel.From).ToList()

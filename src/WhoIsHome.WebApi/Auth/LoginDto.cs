@@ -1,4 +1,4 @@
-﻿namespace WhoIsHome.WebApi.UserAuthentication;
+﻿namespace WhoIsHome.WebApi.Auth;
 
 public class LoginDto
 {

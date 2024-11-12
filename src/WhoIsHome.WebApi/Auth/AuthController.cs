@@ -9,7 +9,7 @@ using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.WebApi.Models;
 
-namespace WhoIsHome.WebApi.UserAuthentication;
+namespace WhoIsHome.WebApi.Auth;
 
 [ApiController]
 [Route("api/v1/[controller]/[action]")]
