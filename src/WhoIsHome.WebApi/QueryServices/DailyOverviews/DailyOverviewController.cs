@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.QueryHandler.DailyOverview;
 
-namespace WhoIsHome.WebApi.DailyOverviews;
+namespace WhoIsHome.WebApi.QueryServices.DailyOverviews;
 
 public class DailyOverviewController(DailyOverviewQueryHandler queryHandler)
     : WhoIsHomeControllerBase<IReadOnlyCollection<DailyOverview>, IReadOnlyCollection<DailyOverviewModel>>
@@ -17,7 +17,7 @@ public class DailyOverviewController(DailyOverviewQueryHandler queryHandler)
     protected override Task<IReadOnlyCollection<DailyOverviewModel>> ConvertToModelAsync(
         IReadOnlyCollection<DailyOverview> data)
     {
-        var result =data
+        var result = data
             .Select(DailyOverviewModel.From)
             .ToList();
 

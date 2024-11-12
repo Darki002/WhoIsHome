@@ -9,7 +9,7 @@ using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.WebApi.Models;
 
-namespace WhoIsHome.WebApi.UserAuthentication;
+namespace WhoIsHome.WebApi.Auth;
 
 [ApiController]
 [Route("api/v1/[controller]/[action]")]
@@ -20,15 +20,6 @@ public class AuthController(
     IPasswordHasher<User> passwordHasher,
     ILogger<AuthController> logger) : Controller
 {
-    [HttpGet]
-    [Authorize]
-    public async Task<IActionResult> Me(CancellationToken cancellationToken)
-    {
-        var user = await userAggregateService.GetAsync(userContext.UserId, cancellationToken);
-        var response = UserModel.From(user);
-        return Ok(response);
-    }
-    
     [HttpPost]
     public async Task<IActionResult> Login(LoginDto loginDto, CancellationToken cancellationToken)
     {

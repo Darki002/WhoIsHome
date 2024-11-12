@@ -1,19 +1,19 @@
 ﻿using WhoIsHome.QueryHandler.UserOverview;
 
-namespace WhoIsHome.WebApi.UserOverviews;
+namespace WhoIsHome.WebApi.QueryServices.UserOverviews;
 
 public record UserOverviewEventModel
 {
     public required int Id { get; init; }
-    
+
     public required string Title { get; init; }
-    
+
     public required DateOnly Date { get; init; }
-    
+
     public required TimeOnly StartTime { get; init; }
-    
+
     public required TimeOnly EndTime { get; init; }
-    
+
     public required string EventType { get; init; }
 
     public static UserOverviewEventModel From(UserOverviewEvent userOverviewEvent)

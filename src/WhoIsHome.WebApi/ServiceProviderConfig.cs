@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using WhoIsHome.Aggregates;
-using WhoIsHome.WebApi.UserAuthentication;
 
 namespace WhoIsHome.WebApi;
 
