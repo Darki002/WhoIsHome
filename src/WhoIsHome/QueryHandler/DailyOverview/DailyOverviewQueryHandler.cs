@@ -77,14 +77,14 @@ public class DailyOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> conte
             }
 
             var nextEvent = eventByUser.Value.MaxBy(e => e.DinnerTime.Time);
-            var personPresence = GetPersonPresence(nextEvent, eventByUser.Key);
-            result.Add(personPresence);
+            var userPresence = GetUserPresence(nextEvent, eventByUser.Key);
+            result.Add(userPresence);
         }
 
         return result;
     }
 
-    private static DailyOverview GetPersonPresence(EventBase? eventBase, User user)
+    private static DailyOverview GetUserPresence(EventBase? eventBase, User user)
     {
         return eventBase == null ? DailyOverview.Empty(user) : DailyOverview.From(user, eventBase.DinnerTime);
     }

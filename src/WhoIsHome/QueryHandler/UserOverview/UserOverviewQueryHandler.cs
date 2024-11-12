@@ -4,11 +4,11 @@ using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.DataAccess;
 using WhoIsHome.Shared.Helper;
 
-namespace WhoIsHome.QueryHandler.PersonOverview;
+namespace WhoIsHome.QueryHandler.UserOverview;
 
-public class PersonOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contextFactory)
+public class UserOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contextFactory)
 {
-    public async Task<PersonOverview> HandleAsync(int userId, CancellationToken cancellationToken)
+    public async Task<UserOverview> HandleAsync(int userId, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var today = DateOnlyHelper.Today;
@@ -30,7 +30,7 @@ public class PersonOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> cont
         userEvents.AddRange(repeatedEvents);
 
         var todaysEvents = userEvents.Where(e => e.IsToday)
-            .Select(e => new PersonOverviewEvent
+            .Select(e => new UserOverviewEvent
             {
                 Id = e.Id!.Value,
                 Title = e.Title,
@@ -49,7 +49,7 @@ public class PersonOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> cont
 
         var thisWeeksEvents = futureEvents
             .Where(e => e.Next.IsThisWeek())
-            .Select(e => new PersonOverviewEvent
+            .Select(e => new UserOverviewEvent
             {
                 Id = e.Event.Id!.Value,
                 Title = e.Event.Title,
@@ -62,7 +62,7 @@ public class PersonOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> cont
 
         var eventsAfterThisWeek = futureEvents
             .Where(e => !e.Next.IsThisWeek())
-            .Select(e => new PersonOverviewEvent
+            .Select(e => new UserOverviewEvent
             {
                 Id = e.Event.Id!.Value,
                 Title = e.Event.Title,
@@ -77,7 +77,7 @@ public class PersonOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> cont
                 .SingleAsync(u => u.Id == userId, cancellationToken))
             .ToAggregate();
 
-        return new PersonOverview
+        return new UserOverview
         {
             User = user,
             Today = todaysEvents,

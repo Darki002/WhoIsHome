@@ -1,6 +1,6 @@
 ﻿using WhoIsHome.Aggregates;
 
-namespace WhoIsHome.QueryHandler.PersonOverview;
+namespace WhoIsHome.QueryHandler.UserOverview;
 
 public enum EventType
 {

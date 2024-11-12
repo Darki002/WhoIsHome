@@ -17,7 +17,7 @@ public class DailyOverviewTest : InMemoryDbTest
     private DailyOverviewQueryHandler queryHandler;
 
     [Test]
-    public async Task ReturnsDailyOverview_ForEveryPerson()
+    public async Task ReturnsDailyOverview_ForEveryUser()
     {
         // Arrange
         var user1 = UserTestData.CreateDefaultUser(email: "test1@whoishome.dev");

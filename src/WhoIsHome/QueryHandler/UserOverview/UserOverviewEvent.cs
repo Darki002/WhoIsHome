@@ -1,6 +1,6 @@
-namespace WhoIsHome.QueryHandler.PersonOverview;
+namespace WhoIsHome.QueryHandler.UserOverview;
 
-public class PersonOverviewEvent
+public class UserOverviewEvent
 {
     public required int Id { get; init; }
     

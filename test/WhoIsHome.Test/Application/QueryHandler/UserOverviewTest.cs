@@ -1,23 +1,23 @@
 using WhoIsHome.Aggregates.Mappers;
-using WhoIsHome.QueryHandler.PersonOverview;
+using WhoIsHome.QueryHandler.UserOverview;
 using WhoIsHome.Shared.Helper;
 using WhoIsHome.Test.TestData;
 
 namespace WhoIsHome.Test.Application.QueryHandler;
 
 [TestFixture]
-public class PersonOverviewTest : InMemoryDbTest
+public class UserOverviewTest : InMemoryDbTest
 {
     [SetUp]
     public void SetUp()
     {
-        queryHandler = new PersonOverviewQueryHandler(DbFactory);
+        queryHandler = new UserOverviewQueryHandler(DbFactory);
     }
 
-    private PersonOverviewQueryHandler queryHandler;
+    private UserOverviewQueryHandler queryHandler;
 
     [Test]
-    public async Task ReturnsOverview_FromExpectedPerson()
+    public async Task ReturnsOverview_FromExpectedUser()
     {
         // Arrange
         var user = UserTestData.CreateDefaultUser();
@@ -60,9 +60,9 @@ public class PersonOverviewTest : InMemoryDbTest
         
         // Assert
         result.Today.Should().HaveCount(2);
-        foreach (var personOverviewEvent in result.Today)
+        foreach (var userOverviewEvent in result.Today)
         {
-            Console.WriteLine(personOverviewEvent.Title);
+            Console.WriteLine(userOverviewEvent.Title);
         }
         result.Today.Should().ContainSingle(e => e.Title == "1");
         result.Today.Should().ContainSingle(e => e.Title == "4");
@@ -97,9 +97,9 @@ public class PersonOverviewTest : InMemoryDbTest
         
         // Assert
         result.Today.Should().HaveCount(2);
-        foreach (var personOverviewEvent in result.Today)
+        foreach (var UserOverviewEvent in result.Today)
         {
-            Console.WriteLine(personOverviewEvent.Title);
+            Console.WriteLine(UserOverviewEvent.Title);
         }
         result.ThisWeek.Should().ContainSingle(e => e.Title == "2");
         result.ThisWeek.Should().ContainSingle(e => e.Title == "5");
@@ -137,9 +137,9 @@ public class PersonOverviewTest : InMemoryDbTest
         
         // Assert
         result.Today.Should().HaveCount(2);
-        foreach (var personOverviewEvent in result.Today)
+        foreach (var UserOverviewEvent in result.Today)
         {
-            Console.WriteLine(personOverviewEvent.Title);
+            Console.WriteLine(UserOverviewEvent.Title);
         }
         result.FutureEvents.Should().ContainSingle(e => e.Title == "3");
         result.FutureEvents.Should().ContainSingle(e => e.Title == "6");

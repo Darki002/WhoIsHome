@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using WhoIsHome.AuthTokens;
 using WhoIsHome.QueryHandler.DailyOverview;
-using WhoIsHome.QueryHandler.PersonOverview;
+using WhoIsHome.QueryHandler.UserOverview;
 using WhoIsHome.Services;
 
 namespace WhoIsHome;
@@ -16,7 +16,7 @@ public static class ServiceProviderConfig
         services.AddScoped<IUserAggregateService, UserAggregateService>();
 
         services.AddTransient<DailyOverviewQueryHandler>();
-        services.AddTransient<PersonOverviewQueryHandler>();
+        services.AddTransient<UserOverviewQueryHandler>();
 
         services.AddTransient<JwtTokenService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
