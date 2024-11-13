@@ -6,17 +6,16 @@ using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi;
 
-[ApiController]
 public class UserController(IUserContext context, IUserAggregateService service) 
     : WhoIsHomeControllerBase<User, UserModel>
 {
-    [HttpGet("/Me")]
+    [HttpGet("Me")]
     public async Task<ActionResult<UserModel>> GetMe(CancellationToken cancellationToken)
     {
         return await GetUser(context.UserId, cancellationToken);
     }
     
-    [HttpGet("/{id:int}")]
+    [HttpGet("{id:int}")]
     public async Task<ActionResult<UserModel>> GetUser(int id, CancellationToken cancellationToken)
     {
         var user = await service.GetAsync(id, cancellationToken);
