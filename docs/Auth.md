@@ -6,6 +6,7 @@ The API uses two Middlewares to prevent others from access it without permission
 
 - Used by: all Endpoints
 - Header Key: `X-API-KEY`
+- Header Value: API Key
 
 Must provide the API Key in the Header with the key `X-API-KEY` that was defined in the `API_KEY` environment variables. 
 
@@ -13,7 +14,8 @@ Must provide the API Key in the Header with the key `X-API-KEY` that was defined
 
 - Used by: all except the `AuthController`
 - Valid Duration: 1 houre
-- Header Key: `Authorization` Value: `Bearer: token...`
+- Header Key: `Authorization`
+- Header Value: `Bearer: token` *Bearer Scheme*
 
 Must first login via the Login Endpoint and receive a token that is valid for 60min. With the token you can then access all resources as the logged in User. This will also make sure that the user can only perform actions that he is allowed to.
 
