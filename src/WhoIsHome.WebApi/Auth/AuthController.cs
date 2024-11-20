@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WhoIsHome.Aggregates;
 using WhoIsHome.AuthTokens;
 using WhoIsHome.Services;
-using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
-using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi.Auth;
 
@@ -16,7 +13,6 @@ namespace WhoIsHome.WebApi.Auth;
 public class AuthController(
     IUserAggregateService userAggregateService, 
     JwtTokenService jwtTokenService,
-    IUserContext userContext,
     IPasswordHasher<User> passwordHasher,
     ILogger<AuthController> logger) : Controller
 {
