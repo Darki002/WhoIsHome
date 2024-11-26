@@ -2,13 +2,6 @@
 
 public static class DateOnlyHelper
 {
-    public static DateOnly Today => DateOnly.FromDateTime(DateTime.Today);
-    
-    public static bool IsThisWeek(this DateOnly dateOnly)
-    {
-        return dateOnly.IsSameWeek(DateTime.Today);
-    }
-
     public static bool IsSameWeek(this DateOnly dateOnly, DateTime dateTime)
     {
         var date1 = dateOnly.ToDateTime(TimeOnly.MinValue);
@@ -18,12 +11,6 @@ public static class DateOnlyHelper
         var d2 = date2.StartOfWeek();
 
         return d1 == d2;
-    }
-    
-    public static bool IsSameWeek(this DateOnly dateOnly, DateOnly dateOnly2)
-    {
-        var dateTime = dateOnly2.ToDateTime(TimeOnly.MinValue);
-        return dateOnly.IsSameWeek(dateTime);
     }
     
     public static DateTime StartOfWeek(this DateTime dt)
