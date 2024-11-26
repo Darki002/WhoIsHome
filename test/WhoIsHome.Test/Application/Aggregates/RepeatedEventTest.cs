@@ -1,6 +1,5 @@
 using WhoIsHome.Aggregates;
 using WhoIsHome.Shared.Exceptions;
-using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
 // ReSharper disable LocalVariableHidesMember
 
