@@ -188,13 +188,13 @@ public class RepeatedEventTest
         public void ReturnsTrue_WhenEventIsToday()
         {
             // Arrange
-            var firstOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(-7));
-            var lastOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(7));
+            var firstOccurrence = new DateOnly(2024, 11, 1);
+            var lastOccurrence = new DateOnly(2024, 11, 14);
             var dinnerTime = new DinnerTime(PresenceType, time);
             var oneTimeEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
             
             // Act
-            var result = oneTimeEvent.IsToday;
+            var result = oneTimeEvent.IsEventAt(new DateOnly(2024, 11, 7));
             
             // Assert
             result.Should().BeTrue();
@@ -204,13 +204,13 @@ public class RepeatedEventTest
         public void ReturnsTrue_WhenFirstOccurenceIsToday()
         {
             // Arrange
-            var firstOccurrence = DateOnly.FromDateTime(DateTime.Today);
-            var lastOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(14));
+            var firstOccurrence = new DateOnly(2024, 11, 1);
+            var lastOccurrence = new DateOnly(2024, 11, 14);
             var dinnerTime = new DinnerTime(PresenceType, time);
             var oneTimeEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
             
             // Act
-            var result = oneTimeEvent.IsToday;
+            var result = oneTimeEvent.IsEventAt(firstOccurrence);
             
             // Assert
             result.Should().BeTrue();
@@ -220,13 +220,13 @@ public class RepeatedEventTest
         public void ReturnsTrue_WhenLastOccurenceIsToday()
         {
             // Arrange
-            var firstOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(-14));
-            var lastOccurrence = DateOnly.FromDateTime(DateTime.Today);
+            var firstOccurrence = new DateOnly(2024, 11, 1);
+            var lastOccurrence = new DateOnly(2024, 11, 14);
             var dinnerTime = new DinnerTime(PresenceType, time);
             var oneTimeEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
             
             // Act
-            var result = oneTimeEvent.IsToday;
+            var result = oneTimeEvent.IsEventAt(lastOccurrence);
             
             // Assert
             result.Should().BeTrue();
@@ -236,13 +236,13 @@ public class RepeatedEventTest
         public void ReturnsFalse_WhenEventIsBeforeFirstOccurence()
         {
             // Arrange
-            var firstOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(3));
-            var lastOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(10));
+            var firstOccurrence = new DateOnly(2024, 11, 3);
+            var lastOccurrence = new DateOnly(2024, 11, 10);
             var dinnerTime = new DinnerTime(PresenceType, time);
             var oneTimeEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
             
             // Act
-            var result = oneTimeEvent.IsToday;
+            var result = oneTimeEvent.IsEventAt(new DateOnly(2024, 11, 1));
             
             // Assert
             result.Should().BeFalse();
@@ -252,13 +252,13 @@ public class RepeatedEventTest
         public void ReturnsFalse_WhenEventIsAfterLastOccurence()
         {
             // Arrange
-            var firstOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(-14));
-            var lastOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(-7));
+            var firstOccurrence = new DateOnly(2024, 11, 1);
+            var lastOccurrence = new DateOnly(2024, 11, 7);
             var dinnerTime = new DinnerTime(PresenceType, time);
             var oneTimeEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
             
             // Act
-            var result = oneTimeEvent.IsToday;
+            var result = oneTimeEvent.IsEventAt(new DateOnly(2024, 11, 14));
             
             // Assert
             result.Should().BeFalse();
@@ -272,13 +272,13 @@ public class RepeatedEventTest
         public void ThrowsInvalidOperationException_WhenTodayIsAfterLastOccurence()
         {
             // Arrange
-            var firstOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(-21));
-            var lastOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(-7));
+            var firstOccurrence = new DateOnly(2024, 11, 1);
+            var lastOccurrence = new DateOnly(2024, 11, 14);
             var dinnerTime = new DinnerTime(PresenceType, time);
             var repeatedEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
              
             // Act
-            var act = () => repeatedEvent.GetNextOccurrence();
+            var act = () => repeatedEvent.GetNextOccurrence(new DateOnly(2024, 11, 21));
              
             // Assert
             act.Should().Throw<InvalidOperationException>();
@@ -293,16 +293,18 @@ public class RepeatedEventTest
         public void ReturnsExpectedOccurence(int firstDayShift, int lastDayShift, int expectedDayShift)
         {
             // Arrange
-            var expected = DateOnly.FromDateTime(DateTime.Today.AddDays(expectedDayShift));
+            var date = new DateOnly(2024, 11, 1);
             
-            var firstOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(firstDayShift));
-            var lastOccurrence = DateOnly.FromDateTime(DateTime.Today.AddDays(lastDayShift));
+            var expected = date.AddDays(expectedDayShift);
+            
+            var firstOccurrence = date.AddDays(firstDayShift);
+            var lastOccurrence = date.AddDays(lastDayShift);
             
             var dinnerTime = new DinnerTime(PresenceType, time);
             var repeatedEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
              
             // Act
-            var result = repeatedEvent.GetNextOccurrence();
+            var result = repeatedEvent.GetNextOccurrence(date);
              
             // Assert
             result.Should().Be(expected);
@@ -316,19 +318,21 @@ public class RepeatedEventTest
         public void IsAtHomeIsTrue_AndNextOccurenceReturnsExpectedDate(int firstDayShift, int lastDayShift, int expectedDayShift)
         {
             // Arrange
-            var expected = DateOnlyHelper.Today.AddDays(expectedDayShift);
+            var date = new DateOnly(2024, 11, 1);
             
-            var firstOccurrence = DateOnlyHelper.Today.AddDays(firstDayShift);
-            var lastOccurrence = DateOnlyHelper.Today.AddDays(lastDayShift);
+            var expected = date.AddDays(expectedDayShift);
+            
+            var firstOccurrence = date.AddDays(firstDayShift);
+            var lastOccurrence = date.AddDays(lastDayShift);
             
             var dinnerTime = new DinnerTime(PresenceType, time);
             var repeatedEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
              
             // Act
-            var result = repeatedEvent.GetNextOccurrence();
+            var result = repeatedEvent.GetNextOccurrence(date);
              
             // Assert
-            repeatedEvent.IsToday.Should().BeTrue();
+            repeatedEvent.IsEventAt(date).Should().BeTrue();
             result.Should().Be(expected);
         }
     }

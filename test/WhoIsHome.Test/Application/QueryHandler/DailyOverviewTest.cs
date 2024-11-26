@@ -8,10 +8,12 @@ namespace WhoIsHome.Test.Application.QueryHandler;
 [TestFixture]
 public class DailyOverviewTest : InMemoryDbTest
 {
+    private readonly DateTimeProviderFake dateTimeProviderFake = new DateTimeProviderFake();
+    
     [SetUp]
     public void SetUp()
     {
-        queryHandler = new DailyOverviewQueryHandler(DbFactory);
+        queryHandler = new DailyOverviewQueryHandler(DbFactory, dateTimeProviderFake);
     }
 
     private DailyOverviewQueryHandler queryHandler;
@@ -42,10 +44,10 @@ public class DailyOverviewTest : InMemoryDbTest
         var user1 = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
         await Db.Users.AddAsync(user1);
 
-        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(date: DateOnlyHelper.Today).ToModel();
+        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(date: dateTimeProviderFake.CurrentDate).ToModel();
         await Db.OneTimeEvents.AddAsync(oneTimeEvent1);
 
-        var oneTimeEvent2 = OneTimeEventTestData.CreateDefault(date: DateOnlyHelper.Today,
+        var oneTimeEvent2 = OneTimeEventTestData.CreateDefault(date: dateTimeProviderFake.CurrentDate,
                 startTime: new TimeOnly(18, 00, 00),
                 endTime: new TimeOnly(19, 00, 00), dinnerTime: expectedDinnerTime)
             .ToModel();
@@ -72,12 +74,12 @@ public class DailyOverviewTest : InMemoryDbTest
         await Db.Users.AddAsync(user1);
 
         var repeatedEvent1 = RepeatedEventTestData
-            .CreateDefault(firstOccurrence: DateOnlyHelper.Today, lastOccurrence: DateOnlyHelper.Today.AddDays(7))
+            .CreateDefault(firstOccurrence: dateTimeProviderFake.CurrentDate, lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7))
             .ToModel();
         await Db.RepeatedEvents.AddAsync(repeatedEvent1);
 
-        var repeatedEvent2 = RepeatedEventTestData.CreateDefault(firstOccurrence: DateOnlyHelper.Today,
-                lastOccurrence: DateOnlyHelper.Today.AddDays(7), startTime: new TimeOnly(18, 00, 00),
+        var repeatedEvent2 = RepeatedEventTestData.CreateDefault(firstOccurrence: dateTimeProviderFake.CurrentDate,
+                lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7), startTime: new TimeOnly(18, 00, 00),
                 endTime: new TimeOnly(19, 00, 00), dinnerTime: expectedDinnerTime)
             .ToModel();
         await Db.RepeatedEvents.AddAsync(repeatedEvent2);
@@ -103,12 +105,12 @@ public class DailyOverviewTest : InMemoryDbTest
         await Db.Users.AddAsync(user1);
 
         var oneTimeEvent = OneTimeEventTestData
-            .CreateDefault(date: DateOnlyHelper.Today)
+            .CreateDefault(date: dateTimeProviderFake.CurrentDate)
             .ToModel();
         await Db.OneTimeEvents.AddAsync(oneTimeEvent);
 
-        var repeatedEvent = RepeatedEventTestData.CreateDefault(firstOccurrence: DateOnlyHelper.Today,
-                lastOccurrence: DateOnlyHelper.Today.AddDays(7), startTime: new TimeOnly(18, 00, 00),
+        var repeatedEvent = RepeatedEventTestData.CreateDefault(firstOccurrence: dateTimeProviderFake.CurrentDate,
+                lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7), startTime: new TimeOnly(18, 00, 00),
                 endTime: new TimeOnly(19, 00, 00), dinnerTime: expectedDinnerTime)
             .ToModel();
         await Db.RepeatedEvents.AddAsync(repeatedEvent);

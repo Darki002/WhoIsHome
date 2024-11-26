@@ -158,12 +158,12 @@ public class OneTimeEventTest
         public void ReturnsTrue_WhenEventIsToday()
         {
             // Arrange
-            var date = DateOnly.FromDateTime(DateTime.Today);
+            var date = new DateOnly(2024, 11, 26);
             var dinnerTime = new DinnerTime(PresenceType, time);
             var oneTimeEvent = new OneTimeEvent(null, Title, date, startTime, endTime, dinnerTime, UserId);
 
             // Act
-            var result = oneTimeEvent.IsToday;
+            var result = oneTimeEvent.IsEventAt(date);
 
             // Assert
             result.Should().BeTrue();
@@ -173,12 +173,12 @@ public class OneTimeEventTest
         public void ReturnsFalse_WhenEventIsYesterday()
         {
             // Arrange
-            var date = DateOnly.FromDateTime(DateTime.Today.AddDays(-1));
+            var date = new DateOnly(2024, 11, 26);
             var dinnerTime = new DinnerTime(PresenceType, time);
             var oneTimeEvent = new OneTimeEvent(null, Title, date, startTime, endTime, dinnerTime, UserId);
 
             // Act
-            var result = oneTimeEvent.IsToday;
+            var result = oneTimeEvent.IsEventAt(new DateOnly(2024, 11, 25));
 
             // Assert
             result.Should().BeFalse();
@@ -188,12 +188,12 @@ public class OneTimeEventTest
         public void ReturnsFalse_WhenEventIsTomorrow()
         {
             // Arrange
-            var date = DateOnly.FromDateTime(DateTime.Today.AddDays(1));
+            var date = new DateOnly(2024, 11, 26);
             var dinnerTime = new DinnerTime(PresenceType, time);
             var oneTimeEvent = new OneTimeEvent(null, Title, date, startTime, endTime, dinnerTime, UserId);
 
             // Act
-            var result = oneTimeEvent.IsToday;
+            var result = oneTimeEvent.IsEventAt(new DateOnly(2024, 11, 27));
 
             // Assert
             result.Should().BeFalse();
@@ -207,12 +207,12 @@ public class OneTimeEventTest
         public void ReturnsDateOnly_ThatRepresentsTheOccurenceDate()
         {
             // Arrange
-            var date = DateOnly.FromDateTime(DateTime.Today);
+            var date = new DateOnly(2024, 11, 26);
             var dinnerTime = new DinnerTime(PresenceType, time);
             var oneTimeEvent = new OneTimeEvent(null, Title, date, startTime, endTime, dinnerTime, UserId);
 
             // Act
-            var result = oneTimeEvent.GetNextOccurrence();
+            var result = oneTimeEvent.GetNextOccurrence(date);
 
             // Assert
             result.Should().Be(date);
@@ -222,15 +222,15 @@ public class OneTimeEventTest
         public void IsAtHomeIsTrue_AndNextOccurenceReturnsExpectedDate()
         {
             // Arrange
-            var date = DateOnlyHelper.Today;
+            var date = new DateOnly(2024, 11, 26);
             var dinnerTime = new DinnerTime(PresenceType, time);
             var oneTimeEvent = new OneTimeEvent(null, Title, date, startTime, endTime, dinnerTime, UserId);
 
             // Act
-            var result = oneTimeEvent.GetNextOccurrence();
+            var result = oneTimeEvent.GetNextOccurrence(date);
 
             // Assert
-            oneTimeEvent.IsToday.Should().BeTrue();
+            oneTimeEvent.IsEventAt(date).Should().BeTrue();
             result.Should().Be(date);
         }
     }
