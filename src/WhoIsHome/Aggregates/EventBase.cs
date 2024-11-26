@@ -24,8 +24,6 @@ public abstract class EventBase(
 
     public int UserId { get; } = userId;
 
-    public bool IsToday => IsEventToday();
-
     protected static void ValidateBase(
         string title,
         TimeOnly startTime,
@@ -61,7 +59,7 @@ public abstract class EventBase(
         }
     }
 
-    protected abstract bool IsEventToday();
+    public abstract bool IsEventAt(DateOnly date);
 
-    public abstract DateOnly GetNextOccurrence();
+    public abstract DateOnly GetNextOccurrence(DateOnly date);
 }

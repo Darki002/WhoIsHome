@@ -48,8 +48,8 @@ public class OneTimeEvent(
         EndTime = endTime;
         DinnerTime = dinnerTime;
     }
-    
-    protected override bool IsEventToday() => Date == DateOnlyHelper.Today;
 
-    public override DateOnly GetNextOccurrence() => Date;
+    public override bool IsEventAt(DateOnly date) => Date == date;
+
+    public override DateOnly GetNextOccurrence(DateOnly _) => Date;
 }

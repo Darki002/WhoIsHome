@@ -59,35 +59,33 @@ public class RepeatedEvent(
         EndTime = endTime;
         DinnerTime = dinnerTime;
     }
-    
-    protected override bool IsEventToday()
+
+    public override bool IsEventAt(DateOnly date)
     {
         return DateTime.Now.DayOfWeek == FirstOccurrence.DayOfWeek &&
-               DateOnlyHelper.Today >= FirstOccurrence &&
-               DateOnlyHelper.Today <= LastOccurrence;
+               date >= FirstOccurrence &&
+               date <= LastOccurrence;
     }
 
-    public override DateOnly GetNextOccurrence()
+    public override DateOnly GetNextOccurrence(DateOnly date)
     {
-        var today = DateOnlyHelper.Today;
-
-        if (today > LastOccurrence)
+        if (date > LastOccurrence)
         {
             throw new InvalidOperationException("Can't get the next occurrence of an Event that is in the past.");
         }
 
-        if (FirstOccurrence > today)
+        if (FirstOccurrence > date)
         {
             return FirstOccurrence;
         }
 
-        if (IsToday)
+        if (IsEventAt(date))
         {
-            return today;
+            return date;
         }
         
-        var daysUntilNextOccurence = today.DaysUntilNext(FirstOccurrence.DayOfWeek);
-        return today.AddDays(daysUntilNextOccurence);
+        var daysUntilNextOccurence = date.DaysUntilNext(FirstOccurrence.DayOfWeek);
+        return date.AddDays(daysUntilNextOccurence);
     }
 
     private static void ValidateOccurrence(DateOnly firstOccurrence,  DateOnly lastOccurrence)

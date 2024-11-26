@@ -6,12 +6,12 @@ using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.QueryHandler.UserOverview;
 
-public class UserOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contextFactory)
+public class UserOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contextFactory, IDateTimeProvider dateTimeProvider)
 {
     public async Task<UserOverview> HandleAsync(int userId, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-        var today = DateOnlyHelper.Today;
+        var today = dateTimeProvider.CurrentDate;
 
         var oneTimeEvents = (await context.OneTimeEvents
                 .Where(e => e.Date >= today)
@@ -29,12 +29,12 @@ public class UserOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contex
         userEvents.AddRange(oneTimeEvents);
         userEvents.AddRange(repeatedEvents);
 
-        var todaysEvents = userEvents.Where(e => e.IsToday)
+        var todaysEvents = userEvents.Where(e => e.IsEventAt(dateTimeProvider.CurrentDate))
             .Select(e => new UserOverviewEvent
             {
                 Id = e.Id!.Value,
                 Title = e.Title,
-                Date = e.GetNextOccurrence(),
+                Date = e.GetNextOccurrence(dateTimeProvider.CurrentDate),
                 StartTime = e.StartTime,
                 EndTime = e.EndTime,
                 EventType = EventTypeHelper.FromType(e)
@@ -42,13 +42,13 @@ public class UserOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contex
             .ToList();
 
         var futureEvents = userEvents
-            .Where(e => !e.IsToday)
-            .Select(e => (Event: e, Next: e.GetNextOccurrence()))
+            .Where(e => !e.IsEventAt(dateTimeProvider.CurrentDate))
+            .Select(e => (Event: e, Next: e.GetNextOccurrence(dateTimeProvider.CurrentDate)))
             .Where(e => e.Next > today)
             .ToList();
 
         var thisWeeksEvents = futureEvents
-            .Where(e => e.Next.IsThisWeek())
+            .Where(e => e.Next.IsSameWeek(dateTimeProvider.Now))
             .Select(e => new UserOverviewEvent
             {
                 Id = e.Event.Id!.Value,
@@ -61,7 +61,7 @@ public class UserOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contex
             .ToList();
 
         var eventsAfterThisWeek = futureEvents
-            .Where(e => !e.Next.IsThisWeek())
+            .Where(e => !e.Next.IsSameWeek(dateTimeProvider.Now))
             .Select(e => new UserOverviewEvent
             {
                 Id = e.Event.Id!.Value,
