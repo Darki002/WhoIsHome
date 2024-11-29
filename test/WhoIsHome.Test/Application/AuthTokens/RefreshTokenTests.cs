@@ -68,10 +68,14 @@ public class RefreshTokenTests
         public void RetunrsFalse_WhenExpiredIsSet()
         {
             // Arrange
+            var fake = new DateTimeProviderFake();
+            
             var issued = new DateTime(2024, 10, 21);
-            var expiresAt = dateTimeProviderFake.Now.AddHours(1);
-            var token = new RefreshToken(1, 1, "", issued, expiresAt, dateTimeProviderFake);
+            var expiresAt = fake.Now.AddHours(1);
+            var token = new RefreshToken(1, 1, "", issued, expiresAt, fake);
             token.Refresh();
+
+            fake.Now = fake.Now.AddMinutes(1);
             
             // Act
             var isValid = token.IsValid();
