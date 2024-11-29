@@ -1,8 +1,9 @@
 ﻿using System.Security.Cryptography;
+using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.AuthTokens;
 
-public class RefreshToken(int? id, int userId, string token, DateTime issued, DateTime expiredAt)
+public class RefreshToken(int? id, int userId, string token, DateTime issued, DateTime expiredAt, IDateTimeProvider dateTimeProvider)
 {
     private const int ExpiresInDays = 14;
 
@@ -20,21 +21,21 @@ public class RefreshToken(int? id, int userId, string token, DateTime issued, Da
 
     public bool IsValid()
     {
-        return ExpiredAt >= DateTime.Now;
+        return ExpiredAt >= dateTimeProvider.Now;
     }
 
-    public static RefreshToken Create(int userId)
+    public static RefreshToken Create(int userId, IDateTimeProvider dateTimeProvider)
     {
         var token = GenerateToken();
-        var issues = DateTime.Now;
-        var expiresAt = DateTime.Now.AddDays(ExpiresInDays);
-        return new RefreshToken(null, userId, token, issues, expiresAt);
+        var issues = dateTimeProvider.Now;
+        var expiresAt = dateTimeProvider.Now.AddDays(ExpiresInDays);
+        return new RefreshToken(null, userId, token, issues, expiresAt, dateTimeProvider);
     }
 
     public RefreshToken Refresh()
     {
-        ExpiredAt = DateTime.Now;
-        return Create(UserId);
+        ExpiredAt = dateTimeProvider.Now;
+        return Create(UserId, dateTimeProvider);
     }
     
     private static string GenerateToken()

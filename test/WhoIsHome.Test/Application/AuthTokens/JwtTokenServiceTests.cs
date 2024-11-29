@@ -10,6 +10,8 @@ namespace WhoIsHome.Test.Application.AuthTokens;
 [TestFixture]
 public class JwtTokenServiceTests
 {
+    private readonly DateTimeProviderFake dateTimeProviderFake = new();
+    
     private IConfiguration configMock;
     private ILogger<JwtTokenService> loggerMock;
     private IUserAggregateService userAggregateService;
@@ -48,7 +50,7 @@ public class JwtTokenServiceTests
             var refreshService = new Mock<IRefreshTokenService>();
             refreshService
                 .Setup(s => s.CreateTokenAsync(1, CancellationToken.None))
-                .ReturnsAsync(() => RefreshToken.Create(1));
+                .ReturnsAsync(() => RefreshToken.Create(1, dateTimeProviderFake));
 
             var service = CreateService(refreshService.Object);
             var user = new User(1, "", "", "");
@@ -74,7 +76,7 @@ public class JwtTokenServiceTests
             var refreshService = new Mock<IRefreshTokenService>();
             refreshService
                 .Setup(s => s.RefreshAsync(oldToken, CancellationToken.None))
-                .ReturnsAsync(() => RefreshToken.Create(1));
+                .ReturnsAsync(() => RefreshToken.Create(1, dateTimeProviderFake));
 
             var service = CreateService(refreshService.Object);
             var user = new User(1, "", "", "");

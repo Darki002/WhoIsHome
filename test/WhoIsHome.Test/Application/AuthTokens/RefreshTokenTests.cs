@@ -5,55 +5,57 @@ namespace WhoIsHome.Test.Application.AuthTokens;
 [TestFixture]
 public class RefreshTokenTests
 {
+    private readonly DateTimeProviderFake dateTimeProviderFake = new();
+    
     [TestFixture]
-    private class Create
+    private class Create : RefreshTokenTests
     {
         [Test]
         public void ReturnsNewToken()
         {
             // Act
-            var token = RefreshToken.Create(1);
+            var token = RefreshToken.Create(1, dateTimeProviderFake);
             
             // Assert
             token.Id.Should().BeNull();
             token.UserId.Should().Be(1);
             token.Token.Should().NotBeEmpty();
-            token.Issued.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(5));
-            token.ExpiredAt.Should().BeCloseTo(DateTime.Now.AddDays(14), TimeSpan.FromSeconds(5));
+            token.Issued.Should().Be(dateTimeProviderFake.Now);
+            token.ExpiredAt.Should().Be(dateTimeProviderFake.Now.AddDays(14));
         }
     }
     
     [TestFixture]
-    private class Refresh
+    private class Refresh : RefreshTokenTests
     {
         [Test]
         public void InvalidatesOldToken_ReturnsNewToken()
         {
             // Arrange
-            var token = RefreshToken.Create(1);
+            var token = RefreshToken.Create(1, dateTimeProviderFake);
             
             // Act
             var newToken = token.Refresh();
             
             // Assert
-            token.ExpiredAt.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(5));
+            token.ExpiredAt.Should().Be(dateTimeProviderFake.Now);
             
             newToken.Id.Should().BeNull();
             newToken.UserId.Should().Be(1);
             newToken.Token.Should().NotBeEmpty();
-            newToken.Issued.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(5));
-            newToken.ExpiredAt.Should().BeCloseTo(DateTime.Now.AddDays(14), TimeSpan.FromSeconds(5));
+            newToken.Issued.Should().Be(dateTimeProviderFake.Now);
+            newToken.ExpiredAt.Should().Be(dateTimeProviderFake.Now.AddDays(14));
         }
     }
     
     [TestFixture]
-    private class IsValid
+    private class IsValid : RefreshTokenTests
     {
         [Test]
         public void RetunrsTrue_WhenTokenIsValid()
         {
             // Arrange
-            var token = RefreshToken.Create(1);
+            var token = RefreshToken.Create(1, dateTimeProviderFake);
             
             // Act
             var isValid = token.IsValid();
@@ -67,8 +69,8 @@ public class RefreshTokenTests
         {
             // Arrange
             var issued = new DateTime(2024, 10, 21);
-            var expiresAt = DateTime.Now.AddHours(1);
-            var token = new RefreshToken(1, 1, "", issued, expiresAt);
+            var expiresAt = dateTimeProviderFake.Now.AddHours(1);
+            var token = new RefreshToken(1, 1, "", issued, expiresAt, dateTimeProviderFake);
             token.Refresh();
             
             // Act
