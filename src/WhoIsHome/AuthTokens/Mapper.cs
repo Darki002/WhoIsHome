@@ -1,4 +1,5 @@
 ﻿using WhoIsHome.DataAccess.Models;
+using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.AuthTokens;
 
@@ -21,8 +22,8 @@ public static class Mapper
         return model;
     }
 
-    public static RefreshToken ToRefreshToken(this RefreshTokenModel model)
+    public static RefreshToken ToRefreshToken(this RefreshTokenModel model, IDateTimeProvider dateTimeProvider)
     {
-        return new RefreshToken(model.Id,model.UserId, model.Token, model.Issued, model.ExpiredAt);
+        return new RefreshToken(model.Id,model.UserId, model.Token, model.Issued, model.ExpiredAt, dateTimeProvider);
     }
 }
