@@ -98,7 +98,7 @@ public class UserOverviewTest : InMemoryDbTest
         var result = await queryHandler.HandleAsync(1, CancellationToken.None);
         
         // Assert
-        result.Today.Should().HaveCount(2);
+        result.ThisWeek.Should().HaveCount(2);
         foreach (var userOverviewEvent in result.Today)
         {
             Console.WriteLine(userOverviewEvent.Title);
@@ -138,7 +138,7 @@ public class UserOverviewTest : InMemoryDbTest
         var result = await queryHandler.HandleAsync(1, CancellationToken.None);
         
         // Assert
-        result.Today.Should().HaveCount(2);
+        result.FutureEvents.Should().HaveCount(2);
         foreach (var userOverviewEvent in result.Today)
         {
             Console.WriteLine(userOverviewEvent.Title);
