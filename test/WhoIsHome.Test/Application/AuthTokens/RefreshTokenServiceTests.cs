@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using Moq;
-using NUnit.Framework.Internal;
 using WhoIsHome.AuthTokens;
 
 namespace WhoIsHome.Test.Application.AuthTokens;
@@ -8,13 +7,15 @@ namespace WhoIsHome.Test.Application.AuthTokens;
 [TestFixture]
 public class RefreshTokenServiceTests : InMemoryDbTest
 {
+    private readonly DateTimeProviderFake dateTimeProviderFake = new();
+    
     private RefreshTokenService service = null!;
 
     [SetUp]
     public void SetUp()
     {
         var logger = Mock.Of<ILogger<RefreshTokenService>>();
-        service = new RefreshTokenService(DbFactory, logger);
+        service = new RefreshTokenService(DbFactory, dateTimeProviderFake, logger);
     }
     
     [TestFixture]
@@ -41,7 +42,7 @@ public class RefreshTokenServiceTests : InMemoryDbTest
         public async Task SaveNewTokenToDb()
         {
             // Arrange
-            var token = RefreshToken.Create(1);
+            var token = RefreshToken.Create(1, dateTimeProviderFake);
             await SaveToDbAsync(token);
             
             // Act

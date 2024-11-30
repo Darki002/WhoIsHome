@@ -15,8 +15,6 @@ public class RepeatedEvent(
     int userId)
     : EventBase(id, title, startTime, endTime, dinnerTime, userId)
 {
-    private const int OccurrenceFrequency = 7;
-    
     public DateOnly FirstOccurrence { get; set; } = firstOccurrence;
 
     public DateOnly LastOccurrence { get; set; } = lastOccurrence;
@@ -62,7 +60,7 @@ public class RepeatedEvent(
 
     public override bool IsEventAt(DateOnly date)
     {
-        return DateTime.Now.DayOfWeek == FirstOccurrence.DayOfWeek &&
+        return date.DayOfWeek == FirstOccurrence.DayOfWeek &&
                date >= FirstOccurrence &&
                date <= LastOccurrence;
     }

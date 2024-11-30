@@ -1,6 +1,5 @@
 using WhoIsHome.Aggregates;
 using WhoIsHome.Shared.Exceptions;
-using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
 // ReSharper disable LocalVariableHidesMember
 
@@ -189,12 +188,12 @@ public class RepeatedEventTest
         {
             // Arrange
             var firstOccurrence = new DateOnly(2024, 11, 1);
-            var lastOccurrence = new DateOnly(2024, 11, 14);
+            var lastOccurrence = new DateOnly(2024, 11, 15);
             var dinnerTime = new DinnerTime(PresenceType, time);
             var oneTimeEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
             
             // Act
-            var result = oneTimeEvent.IsEventAt(new DateOnly(2024, 11, 7));
+            var result = oneTimeEvent.IsEventAt(new DateOnly(2024, 11, 8));
             
             // Assert
             result.Should().BeTrue();
@@ -221,7 +220,7 @@ public class RepeatedEventTest
         {
             // Arrange
             var firstOccurrence = new DateOnly(2024, 11, 1);
-            var lastOccurrence = new DateOnly(2024, 11, 14);
+            var lastOccurrence = new DateOnly(2024, 11, 15);
             var dinnerTime = new DinnerTime(PresenceType, time);
             var oneTimeEvent = new RepeatedEvent(null, Title, firstOccurrence, lastOccurrence, startTime, endTime, dinnerTime, UserId);
             
