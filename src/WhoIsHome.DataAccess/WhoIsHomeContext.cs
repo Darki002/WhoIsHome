@@ -13,6 +13,65 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
     public DbSet<RepeatedEventModel> RepeatedEvents { get; set; }
     
     public DbSet<RefreshTokenModel> RefreshTokens { get; set; }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // OneTimeEventModel
+        modelBuilder.Entity<OneTimeEventModel>()
+            .Property(e => e.Date)
+            .HasConversion(
+                d => d.ToDateTime(TimeOnly.MinValue),
+                d => DateOnly.FromDateTime(d));
+    
+        modelBuilder.Entity<OneTimeEventModel>()
+            .Property(e => e.StartTime)
+            .HasConversion(
+                t => t.ToTimeSpan(),
+                t => TimeOnly.FromTimeSpan(t));
+    
+        modelBuilder.Entity<OneTimeEventModel>()
+            .Property(e => e.EndTime)
+            .HasConversion(
+                t => t.ToTimeSpan(),
+                t => TimeOnly.FromTimeSpan(t));
+    
+        modelBuilder.Entity<OneTimeEventModel>()
+            .Property(e => e.DinnerTime)
+            .HasConversion(
+                t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,
+                t => t.HasValue ? TimeOnly.FromTimeSpan(t.Value) : null);
+        
+        // RepeatedEventModel
+        modelBuilder.Entity<RepeatedEventModel>()
+            .Property(e => e.FirstOccurrence)
+            .HasConversion(
+                d => d.ToDateTime(TimeOnly.MinValue),
+                d => DateOnly.FromDateTime(d));
+        
+        modelBuilder.Entity<RepeatedEventModel>()
+            .Property(e => e.LastOccurrence)
+            .HasConversion(
+                d => d.ToDateTime(TimeOnly.MinValue),
+                d => DateOnly.FromDateTime(d));
+    
+        modelBuilder.Entity<RepeatedEventModel>()
+            .Property(e => e.StartTime)
+            .HasConversion(
+                t => t.ToTimeSpan(),
+                t => TimeOnly.FromTimeSpan(t));
+    
+        modelBuilder.Entity<RepeatedEventModel>()
+            .Property(e => e.EndTime)
+            .HasConversion(
+                t => t.ToTimeSpan(),
+                t => TimeOnly.FromTimeSpan(t));
+    
+        modelBuilder.Entity<RepeatedEventModel>()
+            .Property(e => e.DinnerTime)
+            .HasConversion(
+                t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,
+                t => t.HasValue ? TimeOnly.FromTimeSpan(t.Value) : null);
+    }
 }
 
 // Used for EF Core Migrations
