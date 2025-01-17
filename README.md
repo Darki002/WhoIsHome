@@ -1,10 +1,10 @@
 # WhoIsHome
-Backend for [Mobile App](https://github.com/Darki002/WhoIsHome.App)
+This is the Backend Service used for the Mobile App of the WhoIsHome project. See the Documentation there for how to run/download the mobile app: https://github.com/Darki002/WhoIsHome.App
 
 # API
 
 This Project uses Swagger for the API Documentation. You can start up the project locally 
-and the swagger you should open automatically or use "localhost:7165/swagger/index.html"
+and the swagger UI you should open automatically or go to "localhost:7165/swagger/index.html"
 
 For information about Authentication & Authorized read the following Documentation: [AuthDocs](./docs/Auth.md)
 
@@ -27,5 +27,5 @@ For information about Authentication & Authorized read the following Documentati
 
 ## Local Development
 
-- MySql DB running locally
-- Env Variables are already set in the `appsettings.Development.json` to the default values
+- Make sure a MySql DB instance is running on your machine
+- Env Variables are already set in the `appsettings.Development.json` to the default values. Change them if needed
