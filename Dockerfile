@@ -13,7 +13,7 @@ RUN dotnet publish -c Release --no-restore --output ./out
 
 ### Build RUN Image ###
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/src/WhoIsHome.Host/out ./
 
