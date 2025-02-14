@@ -16,5 +16,5 @@ builder.Logging.AddConsole();
 var app = builder.Build();
 app.UseCorsPolicy();
 app.ConfigureApplication();
-app.ConfigureDatabase();
+await app.ConfigureDatabase();
 app.Run();
