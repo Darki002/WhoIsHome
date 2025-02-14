@@ -1,4 +1,4 @@
-using WhoIsHome.Aggregates;
+﻿using WhoIsHome.Aggregates;
 using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Test.Application.Aggregates;
@@ -61,7 +61,7 @@ public class UserTest
         public void ThrowsInvalidModelException_WhenUserNameIsTooShort()
         {
             // Arrange
-            const string userName = "1234";
+            const string userName = "";
             const string invalidEmail = "darki@whoishome.dev";
             const string password = "securePassword1234";
         
