@@ -7,7 +7,7 @@ namespace WhoIsHome.Aggregates;
 
 public class User : AggregateBase
 {
-    private const int UserNameMinLength = 5;
+    private const int UserNameMinLength = 1;
     private const int UserNameMaxLength = 30;
 
     public int? Id { get; }
