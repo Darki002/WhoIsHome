@@ -5,9 +5,9 @@ namespace WhoIsHome.Aggregates;
 
 public class DinnerTime(PresenceType presenceType, TimeOnly? time = null)
 {
-    public PresenceType PresenceType { get; set; } = presenceType;
+    public PresenceType PresenceType { get; } = presenceType;
 
-    public TimeOnly? Time { get; set; } = time;
+    public TimeOnly? Time { get; } = time;
 
     public bool IsAtHome => PresenceType != PresenceType.NotPresent;
 

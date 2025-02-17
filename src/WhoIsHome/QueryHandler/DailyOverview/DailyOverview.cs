@@ -2,7 +2,6 @@ using WhoIsHome.Aggregates;
 
 namespace WhoIsHome.QueryHandler.DailyOverview;
 
-// TODO: overthink this shit!!! Test it, seems to be wrong
 public class DailyOverview
 {
     public required User User { get; init; }
