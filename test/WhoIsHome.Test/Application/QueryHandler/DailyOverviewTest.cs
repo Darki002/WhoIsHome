@@ -128,6 +128,29 @@ public class DailyOverviewTest : InMemoryDbTest
     }
     
     [Test]
+    public async Task ReturnsNotAtHome_WhenTheOnlyEventTodayIsHasNotPresenceType()
+    {
+        // Arrange
+        var user1 = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
+        await Db.Users.AddAsync(user1);
+
+        var oneTimeEvent = OneTimeEventTestData
+            .CreateWithNotPresent(date: dateTimeProviderFake.CurrentDate)
+            .ToModel();
+        await Db.OneTimeEvents.AddAsync(oneTimeEvent);
+
+        await Db.SaveChangesAsync();
+
+        // Act
+        var result = await queryHandler.HandleAsync(CancellationToken.None);
+
+        // Assert
+        result.Should().HaveCount(1);
+        result.Single().IsAtHome.Should().BeFalse();
+        result.Single().DinnerTime.Should().BeNull();
+    }
+    
+    [Test]
     public async Task ReturnsNotAtHome_WhenAnyEventTodayIsHasNotPresenceType()
     {
         // Arrange
@@ -138,6 +161,11 @@ public class DailyOverviewTest : InMemoryDbTest
             .CreateWithNotPresent(date: dateTimeProviderFake.CurrentDate)
             .ToModel();
         await Db.OneTimeEvents.AddAsync(oneTimeEvent);
+        
+        var oneTimeEvent2 = OneTimeEventTestData
+            .CreateDefault(date: dateTimeProviderFake.CurrentDate)
+            .ToModel();
+        await Db.OneTimeEvents.AddAsync(oneTimeEvent2);
 
         await Db.SaveChangesAsync();
 
