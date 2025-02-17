@@ -1,6 +1,7 @@
 using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.QueryHandler.DailyOverview;
 using WhoIsHome.Shared.Helper;
+using WhoIsHome.Shared.Types;
 using WhoIsHome.Test.TestData;
 
 namespace WhoIsHome.Test.Application.QueryHandler;
@@ -124,5 +125,28 @@ public class DailyOverviewTest : InMemoryDbTest
         result.Should().HaveCount(1);
         result.Single().IsAtHome.Should().BeTrue();
         result.Single().DinnerTime.Should().Be(expectedDinnerTime);
+    }
+    
+    [Test]
+    public async Task ReturnsNotAtHome_WhenAnyEventTodayIsHasNotPresenceType()
+    {
+        // Arrange
+        var user1 = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
+        await Db.Users.AddAsync(user1);
+
+        var oneTimeEvent = OneTimeEventTestData
+            .CreateWithNotPresent(date: dateTimeProviderFake.CurrentDate)
+            .ToModel();
+        await Db.OneTimeEvents.AddAsync(oneTimeEvent);
+
+        await Db.SaveChangesAsync();
+
+        // Act
+        var result = await queryHandler.HandleAsync(CancellationToken.None);
+
+        // Assert
+        result.Should().HaveCount(1);
+        result.Single().IsAtHome.Should().BeFalse();
+        result.Single().DinnerTime.Should().BeNull();
     }
 }
