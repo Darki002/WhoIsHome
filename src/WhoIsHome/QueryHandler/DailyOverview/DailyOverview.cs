@@ -18,6 +18,16 @@ public class DailyOverview
         };
     }
 
+    public static DailyOverview From(User user, TimeOnly time)
+    {
+        return new DailyOverview
+        {
+            User = user,
+            IsAtHome = true,
+            DinnerTime = time
+        };
+    }
+
     public static DailyOverview From(User user, DinnerTime dinnerTime)
     {
         return new DailyOverview

@@ -83,9 +83,28 @@ public class DailyOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> conte
                 continue;
             }
 
-            var nextEvent = eventByUser.Value.MaxBy(e => e.DinnerTime.Time);
-            var userPresence = GetUserPresence(nextEvent, eventByUser.Key);
-            result.Add(userPresence);
+            if (eventByUser.Value.Any(e => e.DinnerTime.PresenceType == PresenceType.Late))
+            {
+                var nextEvent = eventByUser.Value.MaxBy(e => e.DinnerTime.Time);
+                var userPresence = GetUserPresence(nextEvent, eventByUser.Key);
+                result.Add(userPresence);
+                continue;
+            }
+
+            if (eventByUser.Value.Any(e => e.DinnerTime.PresenceType == PresenceType.Default))
+            {
+                var settings = await context.UserSettings
+                    .SingleOrDefaultAsync(s => s.UserId == eventByUser.Key.Id, cancellationToken);
+
+
+                if (settings?.DefaultDinnerTime is not null)
+                {
+                    var userPresence = DailyOverview.From(eventByUser.Key, settings.DefaultDinnerTime.Value);
+                    result.Add(userPresence);
+                }
+            }
+            
+            result.Add(DailyOverview.Empty(eventByUser.Key));
         }
 
         return result;
@@ -96,7 +115,7 @@ public class DailyOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> conte
         return eventBase == null ? DailyOverview.Empty(user) : DailyOverview.From(user, eventBase.DinnerTime);
     }
 
-    private bool TryGetNotPresence(IReadOnlyCollection<EventBase> events, out DinnerTime? dinnerTime)
+    private static bool TryGetNotPresence(IReadOnlyCollection<EventBase> events, out DinnerTime? dinnerTime)
     {
         var result = events.FirstOrDefault(e => e.DinnerTime.PresenceType == PresenceType.NotPresent);
         dinnerTime = result?.DinnerTime;
