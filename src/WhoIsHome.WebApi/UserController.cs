@@ -21,6 +21,14 @@ public class UserController(IUserContext context, IUserAggregateService service)
         var user = await service.GetAsync(id, cancellationToken);
         return await BuildResponseAsync(user);
     }
+
+    [HttpPatch("settings")]
+    public async Task<ActionResult<UserSettingsDto>> Settings(UserSettingsDto userSettingsDto, CancellationToken cancellationToken)
+    {
+        // TODO: update/create settings for current user
+        // TODO: create the service to do so
+        throw new NotImplementedException();
+    }
     
     protected override Task<UserModel> ConvertToModelAsync(User data)
     {
