@@ -21,12 +21,4 @@ public abstract class AggregateControllerBase<T, TModel>(IAggregateService<T> ag
         await aggregateService.DeleteAsync(id, cancellationToken);
         return Ok();
     }
-
-    protected override async Task<TModel> ConvertToModelAsync(T data)
-    {
-        var user = await userContext.GetCurrentUserAsync();
-        return await ConvertToModelAsync(data, user.ToUser());
-    }
-
-    protected abstract Task<TModel> ConvertToModelAsync(T data, User user);
 }
