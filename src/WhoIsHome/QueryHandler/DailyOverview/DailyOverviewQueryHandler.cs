@@ -60,7 +60,9 @@ public class DailyOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> conte
             }
             if (repeatedEvents.TryGetValue(user.Id!.Value, out var userRepeatedEvents))
             {
-                userEvents.AddRange(userRepeatedEvents);
+                
+                userEvents.AddRange(userRepeatedEvents
+                    .Where(r => r.IsEventAt(today)));
             }
             
             eventsByUsers.Add(user, userEvents);
@@ -96,7 +98,7 @@ public class DailyOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> conte
         return eventBase == null ? DailyOverview.Empty(user) : DailyOverview.From(user, eventBase.DinnerTime);
     }
 
-    private bool TryGetNotPresence(IReadOnlyCollection<EventBase> events, out DinnerTime? dinnerTime)
+    private static bool TryGetNotPresence(IReadOnlyCollection<EventBase> events, out DinnerTime? dinnerTime)
     {
         var result = events.FirstOrDefault(e => e.DinnerTime.PresenceType == PresenceType.NotPresent);
         dinnerTime = result?.DinnerTime;

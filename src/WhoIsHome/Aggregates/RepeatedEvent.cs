@@ -65,25 +65,25 @@ public class RepeatedEvent(
                date <= LastOccurrence;
     }
 
-    public override DateOnly GetNextOccurrence(DateOnly date)
+    public override DateOnly GetNextOccurrence(DateOnly today)
     {
-        if (date > LastOccurrence)
+        if (today > LastOccurrence)
         {
             throw new InvalidOperationException("Can't get the next occurrence of an Event that is in the past.");
         }
 
-        if (FirstOccurrence > date)
+        if (FirstOccurrence > today)
         {
             return FirstOccurrence;
         }
 
-        if (IsEventAt(date))
+        if (IsEventAt(today))
         {
-            return date;
+            return today;
         }
         
-        var daysUntilNextOccurence = date.DaysUntilNext(FirstOccurrence.DayOfWeek);
-        return date.AddDays(daysUntilNextOccurence);
+        var daysUntilNextOccurence = today.DaysUntilNext(FirstOccurrence.DayOfWeek);
+        return today.AddDays(daysUntilNextOccurence);
     }
 
     private static void ValidateOccurrence(DateOnly firstOccurrence,  DateOnly lastOccurrence)
