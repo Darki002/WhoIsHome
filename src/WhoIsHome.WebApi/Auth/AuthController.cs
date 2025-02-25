@@ -64,9 +64,10 @@ public class AuthController(
             var token = await jwtTokenService.RefreshTokenAsync(refreshToken, cancellationToken);
             return Ok(new { token.JwtToken, token.RefreshToken });
         }
-        catch (InvalidRefreshTokenException)
+        catch (InvalidRefreshTokenException e)
         {
-            return Unauthorized("Refresh Token is expired.");
+            logger.LogInformation("Refresh Token is Invalid. ExpiredAt: {ExpiredAt} | Reason: {Message}", e.ExpiredAt, e.Message);
+            return Unauthorized("Refresh Token is Invalid.");
         }
     }
 }

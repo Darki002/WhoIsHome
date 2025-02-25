@@ -66,10 +66,17 @@ public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFact
         var model = await context.RefreshTokens
             .AsNoTracking()
             .SingleOrDefaultAsync(t => t.Token == tokenToCheck, cancellationToken);
-        var token = model?.ToRefreshToken(dateTimeProvider);
-        if (token is null || token.IsValid() is false)
+        
+        if (model is null)
         {
-            throw new InvalidRefreshTokenException();
+            throw new InvalidRefreshTokenException("No Token was found", null);
+        }
+        
+        var token = model.ToRefreshToken(dateTimeProvider);
+
+        if (token.IsValid() is false)
+        {
+            throw new InvalidRefreshTokenException("Token is invalid", token.ExpiredAt);
         }
 
         return token;
