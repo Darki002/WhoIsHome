@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using WhoIsHome.Aggregates;
 using WhoIsHome.AuthTokens;
 using WhoIsHome.Services;
+using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.WebApi.Auth;
@@ -14,6 +15,7 @@ public class AuthController(
     IUserAggregateService userAggregateService, 
     JwtTokenService jwtTokenService,
     IPasswordHasher<User> passwordHasher,
+    IUserContext userContext,
     ILogger<AuthController> logger) : Controller
 {
     [HttpPost]
@@ -69,5 +71,12 @@ public class AuthController(
             logger.LogInformation("Refresh Token is Invalid. ExpiredAt: {ExpiredAt} | Reason: {Message}", e.ExpiredAt, e.Message);
             return Unauthorized("Refresh Token is Invalid.");
         }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
+    {
+        await jwtTokenService.LogOutAsync(userContext.UserId, cancellationToken);
+        return Ok();
     }
 }
