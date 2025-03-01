@@ -12,7 +12,7 @@ public class ApiKeyMiddleware(RequestDelegate next, ILogger<ApiKeyMiddleware> lo
     {
         if (!context.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
         {
-            logger.LogInformation("Unauthorized access with missing API Key");
+            logger.LogWarning("No API Key is configured");
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsync("API Key is missing.");
             return;
