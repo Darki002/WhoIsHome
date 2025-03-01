@@ -49,12 +49,6 @@ public static class JwtAuthentication
                         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
                         logger.LogError("Authentication failed: {Message}", context.Exception.Message);
                         return Task.CompletedTask;
-                    },
-                    OnTokenValidated = context =>
-                    {
-                        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
-                        logger.LogInformation("Token validated successfully");
-                        return Task.CompletedTask;
                     }
                 };
             });
