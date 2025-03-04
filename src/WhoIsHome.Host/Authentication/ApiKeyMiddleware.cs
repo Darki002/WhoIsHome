@@ -22,7 +22,7 @@ public class ApiKeyMiddleware(RequestDelegate next, ILogger<ApiKeyMiddleware> lo
         {
             logger.LogInformation("Unauthorized access with wrong API Key");
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsync("Unauthorized access.");
+            await context.Response.WriteAsync("Unauthorized access (invalid API Key)");
             return;
         }
 
