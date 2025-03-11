@@ -31,7 +31,7 @@ public class OneTimeEventModel
             EndTime = data.EndTime,
             PresenceType = data.DinnerTime.PresenceType.ToString(),
             DinnerTime = data.DinnerTime.Time,
-            UserId = data.Id!.Value
+            UserId = data.UserId
         };
     }
 }
