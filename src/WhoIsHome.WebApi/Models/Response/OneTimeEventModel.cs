@@ -20,7 +20,7 @@ public class OneTimeEventModel
 
     public required int UserId { get; set; }
     
-    public static OneTimeEventModel From(OneTimeEvent data, User user)
+    public static OneTimeEventModel From(OneTimeEvent data)
     {
         return new OneTimeEventModel
         {
@@ -31,7 +31,7 @@ public class OneTimeEventModel
             EndTime = data.EndTime,
             PresenceType = data.DinnerTime.PresenceType.ToString(),
             DinnerTime = data.DinnerTime.Time,
-            UserId = user.Id!.Value
+            UserId = data.UserId
         };
     }
 }

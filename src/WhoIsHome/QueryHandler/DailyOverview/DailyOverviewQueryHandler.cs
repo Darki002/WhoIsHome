@@ -60,7 +60,9 @@ public class DailyOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> conte
             }
             if (repeatedEvents.TryGetValue(user.Id!.Value, out var userRepeatedEvents))
             {
-                userEvents.AddRange(userRepeatedEvents);
+                
+                userEvents.AddRange(userRepeatedEvents
+                    .Where(r => r.IsEventAt(today)));
             }
             
             eventsByUsers.Add(user, userEvents);

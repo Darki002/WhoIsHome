@@ -23,7 +23,7 @@ public class RepeatedEventModel
 
     public required int UserId { get; set; }
     
-    public static RepeatedEventModel From(RepeatedEvent data, User user)
+    public static RepeatedEventModel From(RepeatedEvent data)
     {
         return new RepeatedEventModel
         {
@@ -35,7 +35,7 @@ public class RepeatedEventModel
             EndTime = data.EndTime,
             PresenceType = data.DinnerTime.PresenceType.ToString(),
             DinnerTime = data.DinnerTime.Time,
-            UserId = user.Id!.Value
+            UserId = data.UserId
         };
     }
 }

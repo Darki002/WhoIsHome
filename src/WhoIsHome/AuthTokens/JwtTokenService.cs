@@ -54,4 +54,9 @@ public class JwtTokenService(IConfiguration configuration, IRefreshTokenService 
         logger.LogInformation("New Token for User {Id} was generated", user.Id);
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public async Task LogOutAsync(int userId, CancellationToken cancellationToken)
+    {
+        await refreshTokenService.LogOutAsync(userId, cancellationToken);
+    }
 }

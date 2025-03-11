@@ -60,16 +60,39 @@ public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFact
         return dbToken.Entity.ToRefreshToken(dateTimeProvider);
     }
 
+    public async Task LogOutAsync(int userId, CancellationToken cancellationToken)
+    {
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        var tokens = await context.RefreshTokens
+            .Where(t => t.UserId == userId)
+            .Where(t => t.ExpiredAt >= dateTimeProvider.Now)
+            .ToListAsync(cancellationToken);
+
+        foreach (var token in tokens)
+        {
+            token.ExpiredAt = dateTimeProvider.Now;
+        }
+        context.RefreshTokens.UpdateRange(tokens);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
     private async Task<RefreshToken> GetValidRefreshToken(string tokenToCheck, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var model = await context.RefreshTokens
             .AsNoTracking()
             .SingleOrDefaultAsync(t => t.Token == tokenToCheck, cancellationToken);
-        var token = model?.ToRefreshToken(dateTimeProvider);
-        if (token is null || token.IsValid() is false)
+        
+        if (model is null)
         {
-            throw new InvalidRefreshTokenException();
+            throw new InvalidRefreshTokenException("No Token was found", null);
+        }
+        
+        var token = model.ToRefreshToken(dateTimeProvider);
+
+        if (token.IsValid() is false)
+        {
+            throw new InvalidRefreshTokenException("Token is invalid", token.ExpiredAt);
         }
 
         return token;
@@ -80,4 +103,5 @@ public interface IRefreshTokenService
 {
     Task<RefreshToken> CreateTokenAsync(int userId, CancellationToken cancellationToken);
     Task<RefreshToken> RefreshAsync(string refreshToken, CancellationToken cancellationToken);
+    Task LogOutAsync(int userId, CancellationToken cancellationToken);
 }

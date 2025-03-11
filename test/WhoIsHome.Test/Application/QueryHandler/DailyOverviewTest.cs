@@ -1,5 +1,6 @@
 using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.QueryHandler.DailyOverview;
+using WhoIsHome.Shared.Types;
 using WhoIsHome.Test.TestData;
 
 namespace WhoIsHome.Test.Application.QueryHandler;
@@ -73,13 +74,17 @@ public class DailyOverviewTest : InMemoryDbTest
         await Db.Users.AddAsync(user1);
 
         var repeatedEvent1 = RepeatedEventTestData
-            .CreateDefault(firstOccurrence: dateTimeProviderFake.CurrentDate, lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7))
+            .CreateDefault(firstOccurrence: dateTimeProviderFake.CurrentDate, 
+                lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7), 
+                userId: 1)
             .ToModel();
         await Db.RepeatedEvents.AddAsync(repeatedEvent1);
 
         var repeatedEvent2 = RepeatedEventTestData.CreateDefault(firstOccurrence: dateTimeProviderFake.CurrentDate,
                 lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7), startTime: new TimeOnly(18, 00, 00),
-                endTime: new TimeOnly(19, 00, 00), dinnerTime: expectedDinnerTime)
+                endTime: new TimeOnly(19, 00, 00), 
+                dinnerTime: expectedDinnerTime,
+                userId: 1)
             .ToModel();
         await Db.RepeatedEvents.AddAsync(repeatedEvent2);
 
@@ -90,6 +95,7 @@ public class DailyOverviewTest : InMemoryDbTest
 
         // Assert
         result.Should().HaveCount(1);
+        result.Single().User.Id.Should().Be(1);
         result.Single().IsAtHome.Should().BeTrue();
         result.Single().DinnerTime.Should().Be(expectedDinnerTime);
     }
@@ -123,6 +129,32 @@ public class DailyOverviewTest : InMemoryDbTest
         result.Should().HaveCount(1);
         result.Single().IsAtHome.Should().BeTrue();
         result.Single().DinnerTime.Should().Be(expectedDinnerTime);
+    }
+    
+    [Test]
+    public async Task ReturnsExpectedDailyOverview_WithNotPresentRepeatingNotToday()
+    {
+        // Arrange
+        var user = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
+        await Db.Users.AddAsync(user);
+
+        var repeatedEvent = RepeatedEventTestData.NotPresent(
+                firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-2),
+                lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(5), 
+                startTime: new TimeOnly(18, 00, 00),
+                endTime: new TimeOnly(19, 00, 00))
+            .ToModel();
+        await Db.RepeatedEvents.AddAsync(repeatedEvent);
+
+        await Db.SaveChangesAsync();
+
+        // Act
+        var result = await queryHandler.HandleAsync(CancellationToken.None);
+
+        // Assert
+        result.Should().HaveCount(1);
+        result.Single().IsAtHome.Should().BeTrue();
+        result.Single().DinnerTime.Should().BeNull();
     }
     
     [Test]

@@ -1,6 +1,4 @@
 ﻿using WhoIsHome.Shared.Configurations;
-using WhoIsHome.Shared.Helper;
-using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Host.Authentication;
 
@@ -12,7 +10,7 @@ public class ApiKeyMiddleware(RequestDelegate next, ILogger<ApiKeyMiddleware> lo
     {
         if (!context.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
         {
-            logger.LogInformation("Unauthorized access with missing API Key");
+            logger.LogWarning("No API Key is configured");
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsync("API Key is missing.");
             return;
@@ -24,7 +22,7 @@ public class ApiKeyMiddleware(RequestDelegate next, ILogger<ApiKeyMiddleware> lo
         {
             logger.LogInformation("Unauthorized access with wrong API Key");
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsync("Unauthorized access.");
+            await context.Response.WriteAsync("Unauthorized access (invalid API Key)");
             return;
         }
 

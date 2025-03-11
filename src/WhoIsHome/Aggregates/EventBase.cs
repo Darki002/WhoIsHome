@@ -61,5 +61,5 @@ public abstract class EventBase(
 
     public abstract bool IsEventAt(DateOnly date);
 
-    public abstract DateOnly GetNextOccurrence(DateOnly date);
+    public abstract DateOnly GetNextOccurrence(DateOnly today);
 }

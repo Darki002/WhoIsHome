@@ -51,5 +51,5 @@ public class OneTimeEvent(
 
     public override bool IsEventAt(DateOnly date) => Date == date;
 
-    public override DateOnly GetNextOccurrence(DateOnly _) => Date;
+    public override DateOnly GetNextOccurrence(DateOnly today) => Date;
 }

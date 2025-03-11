@@ -2,9 +2,9 @@
 
 public class DateTimeProvider : IDateTimeProvider
 {
-    public DateTime Now { get; } = DateTime.UtcNow;
+    public DateTime Now => DateTime.UtcNow;
     
-    public TimeOnly CurrentTime { get; } = TimeOnly.FromDateTime(DateTime.UtcNow);
+    public TimeOnly CurrentTime => TimeOnly.FromDateTime(DateTime.UtcNow);
     
-    public DateOnly CurrentDate { get; } = DateOnly.FromDateTime(DateTime.UtcNow);
+    public DateOnly CurrentDate => DateOnly.FromDateTime(DateTime.UtcNow);
 }
