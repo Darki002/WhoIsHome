@@ -73,6 +73,13 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
             .HasConversion(
                 t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,
                 t => t.HasValue ? TimeOnly.FromTimeSpan(t.Value) : null);
+        
+        // userSettingsModel
+        modelBuilder.Entity<UserSettingsModel>()
+            .Property(e => e.DefaultDinnerTime)
+            .HasConversion(
+                t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,
+                t => t.HasValue ? TimeOnly.FromTimeSpan(t.Value) : null);
     }
 }
 
