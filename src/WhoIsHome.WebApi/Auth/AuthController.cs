@@ -24,7 +24,7 @@ public class AuthController(
         var user = await userAggregateService.GetUserByEmailAsync(loginDto.Email, cancellationToken);
         if (user == null)
         {
-            logger.LogInformation("Login Attempt failed, since no user was found");
+            logger.LogInformation("Login Attempt failed, since no user was found for {email}", loginDto.Email);
             return Unauthorized("Invalid email or password.");
         }
 
@@ -35,6 +35,8 @@ public class AuthController(
             return Unauthorized("Invalid email or password.");
         }
 
+        logger.LogInformation("New Login for {UserName}", user.UserName);
+        
         var token = await jwtTokenService.GenerateTokenAsync(user, cancellationToken);
         return Ok(new { token.JwtToken, token.RefreshToken });
     }
