@@ -11,7 +11,12 @@ builder.Services
     .AddJwtAuthentication(builder.Configuration);
 
 builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
+builder.Logging.AddSimpleConsole(options =>
+{
+    options.IncludeScopes = true;
+    options.SingleLine = true;
+    options.TimestampFormat = "HH:mm:ss ";
+});
 
 var app = builder.Build();
 app.UseCorsPolicy();

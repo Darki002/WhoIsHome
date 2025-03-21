@@ -50,6 +50,8 @@ public class AuthController(
                 registerDto.Password,
                 cancellationToken);
 
+            logger.LogInformation("New registration {UserName}", user.UserName);
+            
             return Ok(new { user.Id });
         }
         catch (EmailInUseException)

@@ -51,7 +51,7 @@ public class JwtTokenService(IConfiguration configuration, IRefreshTokenService 
             signingCredentials: creds
         );
         
-        logger.LogInformation("New Token for User {Id} was generated", user.Id);
+        logger.LogInformation("New Token for User {UserName} was generated", user.UserName);
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
