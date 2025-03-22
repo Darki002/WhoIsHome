@@ -16,7 +16,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <ProjectReference Include="..\WhoIsHome.DataAccess\WhoIsHome.DataAccess.csproj" />
+      <ProjectReference Include="..\WhoIsHome.External\WhoIsHome.External.csproj" />
     </ItemGroup>
 
 </Project>

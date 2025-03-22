@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
-using WhoIsHome.DataAccess.Models;
+using WhoIsHome.External.Models;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.Test.TestData;

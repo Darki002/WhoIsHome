@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using WhoIsHome.DataAccess.Models;
+using WhoIsHome.External.Models;
 
-namespace WhoIsHome.DataAccess;
+namespace WhoIsHome.External;
 
 public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbContext(options)
 {

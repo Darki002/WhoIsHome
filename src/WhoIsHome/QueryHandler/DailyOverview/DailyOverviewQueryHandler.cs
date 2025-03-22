@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
-using WhoIsHome.DataAccess;
+using WhoIsHome.External;
 using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
 

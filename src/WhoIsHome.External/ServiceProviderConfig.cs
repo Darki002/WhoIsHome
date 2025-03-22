@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WhoIsHome.Shared.Configurations;
 
-namespace WhoIsHome.DataAccess;
+namespace WhoIsHome.External;
 
 public static class ServiceProviderConfig
 {

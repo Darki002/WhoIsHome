@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using WhoIsHome.Shared.BaseTypes;
 using WhoIsHome.Shared.Types;
 
-namespace WhoIsHome.DataAccess.Models;
+namespace WhoIsHome.External.Models;
 
 [Table("RepeatedEvent")]
 public class RepeatedEventModel : DbModel
