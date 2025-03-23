@@ -1,6 +1,5 @@
 using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.QueryHandler.DailyOverview;
-using WhoIsHome.Shared.Types;
 using WhoIsHome.Test.TestData;
 
 namespace WhoIsHome.Test.Application.QueryHandler;
@@ -8,12 +7,13 @@ namespace WhoIsHome.Test.Application.QueryHandler;
 [TestFixture]
 public class DailyOverviewTest : InMemoryDbTest
 {
-    private readonly DateTimeProviderFake dateTimeProviderFake = new DateTimeProviderFake();
+    private readonly DateTimeProviderFake dateTimeProviderFake = new();
     
     [SetUp]
     public void SetUp()
     {
-        queryHandler = new DailyOverviewQueryHandler(DbFactory, dateTimeProviderFake);
+        var handler = new UserDayOverviewQueryHandler(DbFactory, dateTimeProviderFake);
+        queryHandler = new DailyOverviewQueryHandler(DbFactory, handler);
     }
 
     private DailyOverviewQueryHandler queryHandler;
