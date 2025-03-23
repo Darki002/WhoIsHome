@@ -1,6 +1,8 @@
-﻿namespace WhoIsHome.External.PushUp;
+﻿using WhoIsHome.External.PushUp.ApiClient;
 
-public class PushUpClient : IPushUpClient
+namespace WhoIsHome.External.PushUp;
+
+public class PushUpClient(PushApiClient client) : IPushUpClient
 {
     public Task Push(PushUpCommand command, CancellationToken cancellationToken)
     {

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WhoIsHome.External.PushUp.ApiClient;
 using WhoIsHome.Shared.Configurations;
 
 namespace WhoIsHome.External;
@@ -12,6 +13,9 @@ public static class ServiceProviderConfig
     {
         var connectionString = BuildConnectionString(configuration);
         services.AddDbContextFactory<WhoIsHomeContext>(o => o.UseMySQL(connectionString));
+
+        services.AddSingleton<PushApiClient>();
+        
         return services;
     }
 
