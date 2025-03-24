@@ -14,6 +14,8 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
     
     public DbSet<RefreshTokenModel> RefreshTokens { get; set; }
     
+    public DbSet<ExpoPushTokenModel> ExpoPushTokens { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // OneTimeEventModel

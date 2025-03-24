@@ -20,22 +20,25 @@ public class EventUpdateHandler(
         var events = await GetUserEventsFromTodayAsync(updatedEvent, cancellationToken);
 
         var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime);
-        if (dinnerTimeEvent?.Id == updatedEvent.Id)
+        if (dinnerTimeEvent?.Id != updatedEvent.Id)
         {
-            var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-
-            var user = await context.Users.SingleAsync(u => u.Id == updatedEvent.UserId, cancellationToken);
-            
-            var users = await context.Users
-                .Where(u => u.Id != updatedEvent.UserId)
-                .ToListAsync(cancellationToken);
-            
-            var command = new PushUpEventUpdateCommand(
-                Title: "Event Update",
-                Body: $"{user.UserName} has entered a new Event for Today.",
-                users.Select(u => u.Id).ToArray());
-            pushUpClient.PushEventUpdate(command, cancellationToken);
+            logger.LogDebug("Skip Push Up Notification, since there is no change in the DinnerTime for today.");
+            return;
         }
+
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+
+        var user = await context.Users.SingleAsync(u => u.Id == updatedEvent.UserId, cancellationToken);
+
+        var users = await context.Users
+            .Where(u => u.Id != updatedEvent.UserId)
+            .ToListAsync(cancellationToken);
+
+        var command = new PushUpEventUpdateCommand(
+            Title: "Event Update",
+            Body: $"{user.UserName} has entered a new Event for Today.",
+            users.Select(u => u.Id).ToArray());
+        pushUpClient.PushEventUpdate(command, cancellationToken);
     }
 
     private async Task<List<EventBase>> GetUserEventsFromTodayAsync(EventBase updatedEvent, CancellationToken cancellationToken)

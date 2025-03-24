@@ -1,0 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+using WhoIsHome.Shared.BaseTypes;
+
+namespace WhoIsHome.External.Models;
+
+public class ExpoPushTokenModel : DbModel
+{
+    [MaxLength(100)]
+    public string? Token { get; set; } // TODO: Generate DB
+}

@@ -1,9 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using WhoIsHome.External.PushUp.ApiClient;
 
 namespace WhoIsHome.External.PushUp;
 
-public class PushUpClient(PushApiClient client, ILogger<PushApiClient> logger) : IPushUpClient
+public class PushUpClient(
+    PushApiClient client, 
+    IDbContextFactory<WhoIsHomeContext> contextFactory,
+    ILogger<PushApiClient> logger) 
+    : IPushUpClient
 {
     public void PushEventUpdate(PushUpEventUpdateCommand command, CancellationToken cancellationToken)
     {
@@ -14,12 +19,13 @@ public class PushUpClient(PushApiClient client, ILogger<PushApiClient> logger) :
 
     private async Task SendAsync(PushUpEventUpdateCommand command)
     {
-        // TODO load Expo Push Tokens from Users
-        
         try
         {
+            var pushTokens = await GetExpoPushTokens(command.userIds);
+            
             var pushTicket = new PushTicketRequest
             {
+                PushTo = pushTokens,
                 PushTitle = command.Title,
                 PushBody = command.Body
             };
@@ -53,5 +59,18 @@ public class PushUpClient(PushApiClient client, ILogger<PushApiClient> logger) :
         {
             logger.LogError("Push Notification failed! Message: {Message}", e.Message);
         }
+    }
+
+    private async Task<List<string>> GetExpoPushTokens(int[] userIds)
+    {
+        var context = await contextFactory.CreateDbContextAsync();
+
+        return (await context.ExpoPushTokens
+                .Where(t => userIds.Contains(t.Id))
+                .Where(t => t.Token != null)
+                .ToListAsync())
+            .Select(t => t.Token)
+            .Cast<string>()
+            .ToList();
     }
 }
