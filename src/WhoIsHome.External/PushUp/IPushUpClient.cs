@@ -2,5 +2,5 @@
 
 public interface IPushUpClient
 {
-    Task Push(PushUpCommand command, CancellationToken cancellationToken);
+    void PushEventUpdate(PushUpEventUpdateCommand command, CancellationToken cancellationToken);
 }

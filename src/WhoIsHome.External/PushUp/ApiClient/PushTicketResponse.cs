@@ -12,8 +12,8 @@ public class PushTicketResponse
 
 }
 
-public class PushTicketStatus {
-
+public class PushTicketStatus 
+{
     /// <summary>
     /// "error" | "ok",
     /// </summary>

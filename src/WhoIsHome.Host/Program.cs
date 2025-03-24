@@ -15,7 +15,7 @@ builder.Logging.AddSimpleConsole(options =>
 {
     options.IncludeScopes = true;
     options.SingleLine = true;
-    options.TimestampFormat = "HH:mm:ss ";
+    options.TimestampFormat = "dd.MM.yyyy HH:mm:ss";
 });
 
 var app = builder.Build();
