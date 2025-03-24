@@ -1,11 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace WhoIsHome.External.PushUp.ApiClient;
 
-[JsonObject(MemberSerialization.OptIn)]
 public class PushReceiptRequest
 {
-
-    [JsonProperty(PropertyName = "ids")] 
+    [JsonPropertyName("ids")]
     public List<string> PushTicketIds { get; set; } = [];
 }

@@ -1,49 +1,48 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace WhoIsHome.External.PushUp.ApiClient;
 
-[JsonObject(MemberSerialization.OptIn)]
 public class PushTicketRequest
 {
-    [JsonProperty(PropertyName = "to")] 
+    [JsonPropertyName("to")]
     public List<string> PushTo { get; set; } = [];
 
-    [JsonProperty(PropertyName = "data")]
+    [JsonPropertyName("data")]
     public object? PushData { get; set; }
 
-    [JsonProperty(PropertyName = "title")]
+    [JsonPropertyName("title")]
     public string? PushTitle { get; set; }
 
-    [JsonProperty(PropertyName = "body")]
+    [JsonPropertyName("body")]
     public string? PushBody { get; set; }
 
-    [JsonProperty(PropertyName = "ttl")]
+    [JsonPropertyName("ttl")]
     public int? PushTtl { get; set; }
 
-    [JsonProperty(PropertyName = "expiration")]
+    [JsonPropertyName("expiration")]
     public int? PushExpiration { get; set; }
 
     /// <summary>
     /// 'default' | 'normal' | 'high'
     /// </summary>
-    [JsonProperty(PropertyName = "priority")] 
+    [JsonPropertyName("priority")]
     public string? PushPriority { get; set; }
 
-    [JsonProperty(PropertyName = "subtitle")]
+    [JsonPropertyName("subtitle")]
     public string? PushSubTitle { get; set; }
 
     /// <summary>
     /// 'default' | null
     /// </summary>
-    [JsonProperty(PropertyName = "sound")]	
+    [JsonPropertyName("sound")]
     public string? PushSound { get; set; }
 
-    [JsonProperty(PropertyName = "badge")]
+    [JsonPropertyName("badge")]
     public int? PushBadgeCount { get; set; }
 
-    [JsonProperty(PropertyName = "channelId")]
+    [JsonPropertyName("channelId")]
     public string? PushChannelId { get; set; }
 
-    [JsonProperty(PropertyName = "categoryId")]
+    [JsonPropertyName("categoryId")]
     public string? PushCategoryId { get; set; }
 }

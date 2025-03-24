@@ -1,43 +1,40 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace WhoIsHome.External.PushUp.ApiClient;
 
-[JsonObject (MemberSerialization.OptIn)]
 public class PushTicketResponse
 {
-    [JsonProperty (PropertyName = "data")]
+    [JsonPropertyName("data")]
     public List<PushTicketStatus> PushTicketStatuses { get; set; } = [];
 
-    [JsonProperty (PropertyName = "errors")]
+    [JsonPropertyName("errors")]
     public List<PushTicketErrors> PushTicketErrors { get; set; } = [];
 
 }
 
-[JsonObject (MemberSerialization.OptIn)]
 public class PushTicketStatus {
 
     /// <summary>
     /// "error" | "ok",
     /// </summary>
-    [JsonProperty (PropertyName = "status")] 
+    [JsonPropertyName("status")]
     public string? TicketStatus { get; set; }
 
-    [JsonProperty (PropertyName = "id")]
+    [JsonPropertyName("id")]
     public string? TicketId { get; set; }
 
-    [JsonProperty (PropertyName = "message")]
+    [JsonPropertyName("message")]
     public string? TicketMessage { get; set; }
 
-    [JsonProperty (PropertyName = "details")]
+    [JsonPropertyName("details")]
     public object? TicketDetails { get; set; }
 }
 
-[JsonObject (MemberSerialization.OptIn)]
 public class PushTicketErrors 
 {
-    [JsonProperty (PropertyName = "code")]
+    [JsonPropertyName("code")]
     public string? ErrorCode { get; set; }
 
-    [JsonProperty (PropertyName = "message")]
+    [JsonPropertyName("message")]
     public string? ErrorMessage { get; set; }
 }

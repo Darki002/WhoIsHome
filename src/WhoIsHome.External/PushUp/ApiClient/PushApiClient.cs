@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace WhoIsHome.External.PushUp.ApiClient;
 
@@ -42,16 +43,17 @@ public class PushApiClient
 
     private async Task<TResponse?> PostAsync<TRequest, TResponse>(TRequest requestObj, string path) where TRequest : new()
     {
-        var serializedRequestObj = JsonConvert.SerializeObject(requestObj, new JsonSerializerSettings
+        var serializedRequestObj = JsonSerializer.Serialize(requestObj, new JsonSerializerOptions
         {
-            NullValueHandling = NullValueHandling.Ignore
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         });
+    
         var requestBody = new StringContent(serializedRequestObj, System.Text.Encoding.UTF8, "application/json");
         var response = await httpClient.PostAsync(path, requestBody);
 
         if (!response.IsSuccessStatusCode) return default;
         
         var rawResponseBody = await response.Content.ReadAsStringAsync();
-        return JsonConvert.DeserializeObject<TResponse>(rawResponseBody);
+        return JsonSerializer.Deserialize<TResponse>(rawResponseBody);
     }
 }
