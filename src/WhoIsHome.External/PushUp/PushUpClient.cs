@@ -14,6 +14,8 @@ public class PushUpClient(PushApiClient client, ILogger<PushApiClient> logger) :
 
     private async Task SendAsync(PushUpEventUpdateCommand command)
     {
+        // TODO load Expo Push Tokens from Users
+        
         try
         {
             var pushTicket = new PushTicketRequest

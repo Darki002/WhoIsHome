@@ -1,3 +1,3 @@
 ﻿namespace WhoIsHome.External.PushUp;
 
-public sealed record PushUpEventUpdateCommand(string Title, string Body);
+public sealed record PushUpEventUpdateCommand(string Title, string Body, int[] userIds);
