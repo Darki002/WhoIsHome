@@ -6,15 +6,17 @@ namespace WhoIsHome.External;
 
 public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbContext(options)
 {
-    public DbSet<UserModel> Users { get; set; }
+    public WhoIsHomeContext() : this(new DbContextOptions<WhoIsHomeContext>()) { }
     
-    public DbSet<OneTimeEventModel> OneTimeEvents { get; set; }
+    public virtual DbSet<UserModel> Users { get; set; }
     
-    public DbSet<RepeatedEventModel> RepeatedEvents { get; set; }
+    public virtual DbSet<OneTimeEventModel> OneTimeEvents { get; set; }
     
-    public DbSet<RefreshTokenModel> RefreshTokens { get; set; }
+    public virtual DbSet<RepeatedEventModel> RepeatedEvents { get; set; }
     
-    public DbSet<ExpoPushTokenModel> ExpoPushTokens { get; set; }
+    public virtual DbSet<RefreshTokenModel> RefreshTokens { get; set; }
+    
+    public virtual DbSet<ExpoPushTokenModel> ExpoPushTokens { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserContext, UserContext>();
         
         services.AddWhoIsHomeServices()
-            .AddDataAccessServices(configuration)
+            .AddExternalServices(configuration)
             .AddWebApiServices()
             .AddWhoIsHomeShared();
         

@@ -15,8 +15,6 @@ public class EventUpdateHandlerTest : InMemoryDbTest
 {
     private readonly DateTimeProviderFake dateTimeProviderFake = new();
 
-    private readonly PushUpClientFake pushUpClientFake = new();
-
     private readonly ILogger<EventUpdateHandler> logger = NullLogger<EventUpdateHandler>.Instance;
 
     private readonly List<UserModel> userModels =
@@ -30,24 +28,52 @@ public class EventUpdateHandlerTest : InMemoryDbTest
     public async Task CallsPusUpClient_WithExpectedCommand()
     {
         // Arrange
-        var updatedEvent = OneTimeEventTestData.CreateDefault(id: 1, userId: 1);
+        var pushUpClientFake = new PushUpClientFake();
         
+        var updatedEvent = OneTimeEventTestData.CreateDefault(1, userId: 1, date: dateTimeProviderFake.CurrentDate);
+
         var factory = GetDbFactoryMock(context =>
         {
             context.Setup(c => c.RepeatedEvents).ReturnsDbSet([]);
             context.Setup(c => c.OneTimeEvents).ReturnsDbSet([updatedEvent.ToModel()]);
             context.Setup(c => c.Users).ReturnsDbSet(userModels);
         });
-        var handler = GetHandler(factory.Object);
-        
+        var handler = GetHandler(pushUpClientFake, factory.Object);
+
         // Act
         await handler.HandleAsync(updatedEvent, CancellationToken.None);
-        
+
         // Assert
         pushUpClientFake.Command.Should().NotBeNull();
         pushUpClientFake.Command!.Title.Should().Be("Event Update");
-        pushUpClientFake.Command!.Body.Should().Be("Darki has entered a new Event for Today.");
+        pushUpClientFake.Command.Body.Should().Be("Darki has entered a new Event for Today.");
         pushUpClientFake.Command.userIds.Should().BeEquivalentTo([2, 3]);
+    }
+
+    [Test]
+    public async Task DoesNotCallPushUpClient_WhenEventDidNotEffectDinnerTime()
+    {
+        // Arrange
+        var pushUpClientFake = new PushUpClientFake();
+        
+        var updatedEvent = OneTimeEventTestData.CreateDefault(1, userId: 1, date: dateTimeProviderFake.CurrentDate,
+            dinnerTime: new TimeOnly(18, 00, 00));
+        var effectiveEvent = OneTimeEventTestData.CreateDefault(2, userId: 1, date: dateTimeProviderFake.CurrentDate,
+            dinnerTime: new TimeOnly(19, 00, 00));
+
+        var factory = GetDbFactoryMock(context =>
+        {
+            context.Setup(c => c.RepeatedEvents).ReturnsDbSet([]);
+            context.Setup(c => c.OneTimeEvents).ReturnsDbSet([updatedEvent.ToModel(), effectiveEvent.ToModel()]);
+            context.Setup(c => c.Users).ReturnsDbSet(userModels);
+        });
+        var handler = GetHandler(pushUpClientFake, factory.Object);
+
+        // Act
+        await handler.HandleAsync(updatedEvent, CancellationToken.None);
+
+        // Assert
+        pushUpClientFake.Command.Should().BeNull();
     }
 
     private Mock<IDbContextFactory<WhoIsHomeContext>> GetDbFactoryMock(Action<Mock<WhoIsHomeContext>> setUp)
@@ -60,6 +86,9 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         return factory;
     }
 
-    private EventUpdateHandler GetHandler(IDbContextFactory<WhoIsHomeContext> factory) =>
-        new EventUpdateHandler(factory, dateTimeProviderFake, pushUpClientFake, logger);
+    private EventUpdateHandler GetHandler(PushUpClientFake pushUpClientFake,
+        IDbContextFactory<WhoIsHomeContext> factory)
+    {
+        return new EventUpdateHandler(factory, dateTimeProviderFake, pushUpClientFake, logger);
+    }
 }

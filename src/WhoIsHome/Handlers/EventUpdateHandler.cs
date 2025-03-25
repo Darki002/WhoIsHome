@@ -21,7 +21,7 @@ public class EventUpdateHandler(
     {
         var events = await GetUserEventsFromTodayAsync(updatedEvent, cancellationToken);
 
-        var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime);
+        var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime.Time);
         if (dinnerTimeEvent?.Id != updatedEvent.Id)
         {
             logger.LogDebug("Skip Push Up Notification, since there is no change in the DinnerTime for today.");

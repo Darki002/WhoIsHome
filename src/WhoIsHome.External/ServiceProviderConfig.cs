@@ -8,7 +8,7 @@ namespace WhoIsHome.External;
 
 public static class ServiceProviderConfig
 {
-    public static IServiceCollection AddDataAccessServices(this IServiceCollection services,
+    public static IServiceCollection AddExternalServices(this IServiceCollection services,
         IConfiguration configuration)
     {
         var connectionString = BuildConnectionString(configuration);
