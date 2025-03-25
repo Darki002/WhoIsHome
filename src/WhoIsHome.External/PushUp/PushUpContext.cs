@@ -4,11 +4,11 @@ using WhoIsHome.External.PushUp.ApiClient;
 
 namespace WhoIsHome.External.PushUp;
 
-public class PushUpClient(
+public class PushUpContext(
     PushApiClient client, 
     IDbContextFactory<WhoIsHomeContext> contextFactory,
     ILogger<PushApiClient> logger) 
-    : IPushUpClient
+    : IPushUpContext
 {
     public void PushEventUpdate(PushUpEventUpdateCommand command, CancellationToken cancellationToken)
     {
@@ -33,7 +33,7 @@ public class PushUpClient(
 
             if (result.PushTicketErrors.Count > 0)
             {
-                var error = string.Join(", ", result.PushTicketErrors
+                var error = string.Join(", \n", result.PushTicketErrors
                     .Select(e => $"Code: ${e.ErrorCode} - ${e.ErrorMessage}"));
                 
                 logger.LogError("Push Notification failed! Errors: {ErrorList}", error);

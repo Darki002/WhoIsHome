@@ -12,7 +12,7 @@ namespace WhoIsHome.Handlers;
 public class EventUpdateHandler(
     IDbContextFactory<WhoIsHomeContext> contextFactory, 
     IDateTimeProvider dateTimeProvider,
-    IPushUpClient pushUpClient,
+    IPushUpContext pushUpContext,
     ILogger<EventUpdateHandler> logger)
 {
     // TODO: Unit Test
@@ -40,7 +40,7 @@ public class EventUpdateHandler(
             Title: "Event Update",
             Body: $"{user.UserName} has entered a new Event for Today.",
             users.Select(u => u.Id).ToArray());
-        pushUpClient.PushEventUpdate(command, cancellationToken);
+        pushUpContext.PushEventUpdate(command, cancellationToken);
     }
 
     private async Task<List<EventBase>> GetUserEventsFromTodayAsync(EventBase updatedEvent, CancellationToken cancellationToken)

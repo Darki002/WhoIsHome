@@ -2,7 +2,7 @@ using WhoIsHome.External.PushUp;
 
 namespace WhoIsHome.Test.Application;
 
-public class PushUpClientFake : IPushUpClient
+public class PushUpContextFake : IPushUpContext
 {
     public PushUpEventUpdateCommand? Command { get; private set; }
     

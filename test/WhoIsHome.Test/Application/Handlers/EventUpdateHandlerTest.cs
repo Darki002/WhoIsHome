@@ -28,7 +28,7 @@ public class EventUpdateHandlerTest : InMemoryDbTest
     public async Task CallsPusUpClient_WithExpectedCommand()
     {
         // Arrange
-        var pushUpClientFake = new PushUpClientFake();
+        var pushUpClientFake = new PushUpContextFake();
         
         var updatedEvent = OneTimeEventTestData.CreateDefault(1, userId: 1, date: dateTimeProviderFake.CurrentDate);
 
@@ -54,7 +54,7 @@ public class EventUpdateHandlerTest : InMemoryDbTest
     public async Task DoesNotCallPushUpClient_WhenEventDidNotEffectDinnerTime()
     {
         // Arrange
-        var pushUpClientFake = new PushUpClientFake();
+        var pushUpClientFake = new PushUpContextFake();
         
         var updatedEvent = OneTimeEventTestData.CreateDefault(1, userId: 1, date: dateTimeProviderFake.CurrentDate,
             dinnerTime: new TimeOnly(18, 00, 00));
@@ -86,9 +86,9 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         return factory;
     }
 
-    private EventUpdateHandler GetHandler(PushUpClientFake pushUpClientFake,
+    private EventUpdateHandler GetHandler(PushUpContextFake pushUpContextFake,
         IDbContextFactory<WhoIsHomeContext> factory)
     {
-        return new EventUpdateHandler(factory, dateTimeProviderFake, pushUpClientFake, logger);
+        return new EventUpdateHandler(factory, dateTimeProviderFake, pushUpContextFake, logger);
     }
 }

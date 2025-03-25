@@ -1,6 +1,6 @@
 ﻿namespace WhoIsHome.External.PushUp;
 
-public interface IPushUpClient
+public interface IPushUpContext
 {
     void PushEventUpdate(PushUpEventUpdateCommand command, CancellationToken cancellationToken);
 }
