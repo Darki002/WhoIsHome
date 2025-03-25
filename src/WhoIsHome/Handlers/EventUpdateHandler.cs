@@ -15,6 +15,8 @@ public class EventUpdateHandler(
     IPushUpClient pushUpClient,
     ILogger<EventUpdateHandler> logger)
 {
+    // TODO: Unit Test
+    
     public async Task HandleAsync(EventBase updatedEvent, CancellationToken cancellationToken)
     {
         var events = await GetUserEventsFromTodayAsync(updatedEvent, cancellationToken);
