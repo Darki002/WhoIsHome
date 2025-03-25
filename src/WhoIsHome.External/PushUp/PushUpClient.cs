@@ -14,7 +14,7 @@ public class PushUpClient(
     {
         // We do not care about this Task. Fire and Forget, they will be sent in the background.
         // On Failure, we don't care, the user should not get an error on the Phone just because of this.
-        _ = Task.Run(() => SendAsync(command), cancellationToken);
+        _ = Task.Run(() => SendAsync(command), cancellationToken); // TODO: retry in failure?
     }
 
     private async Task SendAsync(PushUpEventUpdateCommand command)

@@ -11,6 +11,11 @@ public class PushApiClient
     private const string PushSendPath = "/--/api/v2/push/send";
     private const string PushGetReceiptsPath = "/--/api/v2/push/getReceipts";
 
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
+    
     private readonly HttpClientHandler httpHandler = new() { MaxConnectionsPerServer = 6 };
     private readonly HttpClient httpClient;
 
@@ -50,10 +55,7 @@ public class PushApiClient
 
     private async Task<TResponse> PostAsync<TRequest, TResponse>(TRequest requestObj, string path) where TRequest : new()
     {
-        var serializedRequestObj = JsonSerializer.Serialize(requestObj, new JsonSerializerOptions
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        });
+        var serializedRequestObj = JsonSerializer.Serialize(requestObj, JsonSerializerOptions);
     
         var requestBody = new StringContent(serializedRequestObj, System.Text.Encoding.UTF8, "application/json");
         var response = await httpClient.PostAsync(path, requestBody);
