@@ -7,4 +7,10 @@ public class ExpoPushTokenModel : DbModel
 {
     [MaxLength(100)]
     public string? Token { get; set; } // TODO: Generate DB
+    
+    [Required]
+    public int UserId { get; set; }
+    
+    [Required]
+    public UserModel User { get; set; } = null!;
 }

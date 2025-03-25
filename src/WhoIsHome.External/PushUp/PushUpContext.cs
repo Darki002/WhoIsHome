@@ -66,7 +66,7 @@ public class PushUpContext(
         var context = await contextFactory.CreateDbContextAsync();
 
         return (await context.ExpoPushTokens
-                .Where(t => userIds.Contains(t.Id))
+                .Where(t => userIds.Contains(t.UserId))
                 .Where(t => t.Token != null)
                 .ToListAsync())
             .Select(t => t.Token)
