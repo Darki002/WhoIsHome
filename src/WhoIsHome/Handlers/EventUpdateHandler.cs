@@ -4,6 +4,7 @@ using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.External;
 using WhoIsHome.External.PushUp;
+using WhoIsHome.Shared.BackgroundTasks;
 using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
 
@@ -11,34 +12,59 @@ namespace WhoIsHome.Handlers;
 
 public class EventUpdateHandler(
     IDbContextFactory<WhoIsHomeContext> contextFactory, 
-    IDateTimeProvider dateTimeProvider,
     IPushUpContext pushUpContext,
+    IDateTimeProvider dateTimeProvider,
+    IBackgroundTaskQueue backgroundTaskQueue,
     ILogger<EventUpdateHandler> logger)
 {
-    public async Task HandleAsync(EventBase updatedEvent, CancellationToken cancellationToken)
+    public async Task HandleAsync(EventBase updatedEvent, UpdateAction updateAction)
     {
-        var events = await GetUserEventsFromTodayAsync(updatedEvent, cancellationToken);
+        await backgroundTaskQueue.QueueBackgroundWorkItemAsync(RunAsync);
+        return;
 
-        var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime.Time);
-        if (dinnerTimeEvent?.Id != updatedEvent.Id)
+        async ValueTask RunAsync(CancellationToken cancellationToken)
         {
-            logger.LogDebug("Skip Push Up Notification, since there is no change in the DinnerTime for today.");
-            return;
+            var events = await GetUserEventsFromTodayAsync(updatedEvent, cancellationToken);
+
+            var shouldSend = updateAction switch
+            {
+                UpdateAction.Create => CheckUpdate(updatedEvent, events),
+                UpdateAction.Update => CheckUpdate(updatedEvent, events),
+                UpdateAction.Delete => CheckDelete(updatedEvent, events),
+                _ => throw new ArgumentOutOfRangeException(nameof(updateAction), "No command for this Action.")
+            };
+
+            if (shouldSend)
+            {
+                logger.LogDebug("Skip Push Up Notification, since there is no change in the DinnerTime for today.");
+                return;
+            }
+
+            var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+            
+            var user = await context.Users.SingleAsync(u => u.Id == updatedEvent.UserId, cancellationToken);
+            var users = await context.Users
+                .Where(u => u.Id != updatedEvent.UserId)
+                .ToListAsync(cancellationToken);
+            
+            var command = new PushUpEventUpdateCommand(
+                Title: "Event Update",
+                Body: $"{user.UserName} has an update for Today.",
+                users.Select(u => u.Id).ToArray());
+            pushUpContext.PushEventUpdate(command, cancellationToken);
         }
+    }
 
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+    private bool CheckDelete(EventBase updatedEvent, List<EventBase> events)
+    {
+        var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime.Time);
+        return dinnerTimeEvent is null || !(dinnerTimeEvent.DinnerTime.Time > updatedEvent.DinnerTime.Time);
+    }
 
-        var user = await context.Users.SingleAsync(u => u.Id == updatedEvent.UserId, cancellationToken);
-
-        var users = await context.Users
-            .Where(u => u.Id != updatedEvent.UserId)
-            .ToListAsync(cancellationToken);
-
-        var command = new PushUpEventUpdateCommand(
-            Title: "Event Update",
-            Body: $"{user.UserName} has entered a new Event for Today.",
-            users.Select(u => u.Id).ToArray());
-        pushUpContext.PushEventUpdate(command, cancellationToken);
+    private bool CheckUpdate(EventBase updatedEvent, List<EventBase> events)
+    {
+        var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime.Time);
+        return dinnerTimeEvent?.Id == updatedEvent.Id;
     }
 
     private async Task<List<EventBase>> GetUserEventsFromTodayAsync(EventBase updatedEvent, CancellationToken cancellationToken)
@@ -62,5 +88,12 @@ public class EventUpdateHandler(
             .Where(e => e.IsEventAt(dateTimeProvider.CurrentDate));
 
          return [..oneTimeEvents, ..repeatedEvents];
+    }
+    
+    public enum UpdateAction
+    {
+        Create,
+        Update,
+        Delete
     }
 }
