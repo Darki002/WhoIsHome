@@ -1,3 +1,4 @@
+using System.Threading.RateLimiting;
 using WhoIsHome.Host.Authentication;
 using WhoIsHome.Host.SetUp;
 
@@ -18,8 +19,35 @@ builder.Logging.AddSimpleConsole(options =>
     options.TimestampFormat = "dd.MM.yyyy HH:mm:ss";
 });
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 50,
+                QueueLimit = 0,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+});
+
 var app = builder.Build();
 app.UseCorsPolicy();
-app.ConfigureApplication();
+
+app.UseSwagger();
+app.UseSwaggerUI();
+        
+app.UseExceptionHandler();
+app.UseMiddleware<ApiKeyMiddleware>();
+
+app.UseRouting();
+app.UseRateLimiter();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+app.UseHttpsRedirection();
+
 app.ConfigureDatabase();
 app.Run();
