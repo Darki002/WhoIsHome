@@ -21,7 +21,9 @@ public class QueuedHostedService(
 
             try
             {
+                logger.LogInformation("Start background task {WorkItem}.", nameof(workItem));
                 await workItem(stoppingToken);
+                logger.LogInformation("Background task {WorkItem} finished successfully.", nameof(workItem));
             }
             catch (Exception ex)
             {
