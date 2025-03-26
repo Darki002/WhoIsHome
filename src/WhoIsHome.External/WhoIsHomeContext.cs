@@ -6,11 +6,6 @@ namespace WhoIsHome.External;
 
 public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbContext(options)
 {
-    /// <summary>
-    /// Only used for Unit Tests to Mock this class
-    /// </summary>
-    public WhoIsHomeContext() : this(new DbContextOptions<WhoIsHomeContext>()) { }
-    
     public virtual DbSet<UserModel> Users { get; set; }
     
     public virtual DbSet<OneTimeEventModel> OneTimeEvents { get; set; }

@@ -78,7 +78,7 @@ public class EventUpdateHandlerTest : InMemoryDbTest
 
     private Mock<IDbContextFactory<WhoIsHomeContext>> GetDbFactoryMock(Action<Mock<WhoIsHomeContext>> setUp)
     {
-        var context = new Mock<WhoIsHomeContext>();
+        var context = new Mock<WhoIsHomeContext>(new DbContextOptions<WhoIsHomeContext>());
         setUp(context);
         var factory = new Mock<IDbContextFactory<WhoIsHomeContext>>();
         factory.Setup(f => f.CreateDbContextAsync(CancellationToken.None))
