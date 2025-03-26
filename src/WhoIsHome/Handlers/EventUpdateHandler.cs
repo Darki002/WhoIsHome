@@ -48,20 +48,20 @@ public class EventUpdateHandler(
                 .ToListAsync(cancellationToken);
             
             var command = new PushUpEventUpdateCommand(
-                Title: "Event Update",
+                Title: "Dinner time change",
                 Body: $"{user.UserName} has an update for Today.",
                 users.Select(u => u.Id).ToArray());
             pushUpContext.PushEventUpdate(command, cancellationToken);
         }
     }
 
-    private bool CheckDelete(EventBase updatedEvent, List<EventBase> events)
+    private static bool CheckDelete(EventBase updatedEvent, List<EventBase> events)
     {
         var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime.Time);
         return dinnerTimeEvent is null || !(dinnerTimeEvent.DinnerTime.Time > updatedEvent.DinnerTime.Time);
     }
 
-    private bool CheckUpdate(EventBase updatedEvent, List<EventBase> events)
+    private static bool CheckUpdate(EventBase updatedEvent, List<EventBase> events)
     {
         var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime.Time);
         return dinnerTimeEvent?.Id == updatedEvent.Id;
