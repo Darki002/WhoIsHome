@@ -1,3 +1,5 @@
+using WhoIsHome.Shared.BackgroundTasks;
+
 namespace WhoIsHome.Host.BackgroundTasks;
 
 public class QueuedHostedService(

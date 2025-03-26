@@ -1,4 +1,4 @@
-namespace WhoIsHome.Host.BackgroundTasks;
+namespace WhoIsHome.Shared.BackgroundTasks;
 
 public interface IBackgroundTaskQueue
 {

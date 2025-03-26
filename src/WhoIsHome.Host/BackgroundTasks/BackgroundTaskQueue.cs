@@ -1,14 +1,17 @@
 using System.Threading.Channels;
+using WhoIsHome.Shared.BackgroundTasks;
 
 namespace WhoIsHome.Host.BackgroundTasks;
 
 public class BackgroundTaskQueue : IBackgroundTaskQueue
 {
+    private const int Capacity = 4;
+    
     private readonly Channel<Func<CancellationToken, ValueTask>> queue;
 
-    public BackgroundTaskQueue(int capacity)
+    public BackgroundTaskQueue()
     {
-        var options = new BoundedChannelOptions(capacity)
+        var options = new BoundedChannelOptions(Capacity)
         {
             FullMode = BoundedChannelFullMode.Wait
         };

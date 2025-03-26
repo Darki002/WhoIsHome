@@ -1,6 +1,8 @@
 using System.Threading.RateLimiting;
 using WhoIsHome.Host.Authentication;
+using WhoIsHome.Host.BackgroundTasks;
 using WhoIsHome.Host.SetUp;
+using WhoIsHome.Shared.BackgroundTasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,9 @@ builder.Services
     .AddCorsPolicy()
     .AddApplicationServices(builder.Configuration)
     .AddJwtAuthentication(builder.Configuration);
+
+builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+builder.Services.AddHostedService<QueuedHostedService>();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddSimpleConsole(options =>
