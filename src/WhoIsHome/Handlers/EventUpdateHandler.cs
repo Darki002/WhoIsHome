@@ -58,7 +58,7 @@ public class EventUpdateHandler(
     private static bool CheckDelete(EventBase updatedEvent, List<EventBase> events)
     {
         var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime.Time);
-        return dinnerTimeEvent is null || !(dinnerTimeEvent.DinnerTime.Time > updatedEvent.DinnerTime.Time);
+        return dinnerTimeEvent is null || dinnerTimeEvent.DinnerTime.Time < updatedEvent.DinnerTime.Time;
     }
 
     private static bool CheckUpdate(EventBase updatedEvent, List<EventBase> events)
