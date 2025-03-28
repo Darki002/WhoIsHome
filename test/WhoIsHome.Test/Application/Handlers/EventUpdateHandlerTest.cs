@@ -31,7 +31,7 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         // Arrange
         var pushUpClientFake = new PushUpContextFake();
         
-        var updatedEvent = OneTimeEventTestData.CreateDefault(1, userId: 1, date: dateTimeProviderFake.CurrentDate);
+        var updatedEvent = OneTimeEventTestData.CreateDefault(id: 1, userId: 1, date: dateTimeProviderFake.CurrentDate);
 
         var factory = GetDbFactoryMock(context =>
         {
@@ -57,9 +57,9 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         // Arrange
         var pushUpClientFake = new PushUpContextFake();
         
-        var updatedEvent = OneTimeEventTestData.CreateDefault(1, userId: 1, date: dateTimeProviderFake.CurrentDate,
+        var updatedEvent = OneTimeEventTestData.CreateDefault(id: 1, userId: 1, date: dateTimeProviderFake.CurrentDate,
             dinnerTime: new TimeOnly(18, 00, 00));
-        var effectiveEvent = OneTimeEventTestData.CreateDefault(2, userId: 1, date: dateTimeProviderFake.CurrentDate,
+        var effectiveEvent = OneTimeEventTestData.CreateDefault(id: 2, userId: 1, date: dateTimeProviderFake.CurrentDate,
             dinnerTime: new TimeOnly(19, 00, 00));
 
         var factory = GetDbFactoryMock(context =>
@@ -119,9 +119,7 @@ public class EventUpdateHandlerTest : InMemoryDbTest
     private EventUpdateHandler GetHandler(PushUpContextFake pushUpContextFake,
         IDbContextFactory<WhoIsHomeContext> factory)
     {
-        var backgroundTaskQueueMock = new Mock<IBackgroundTaskQueue>();
-
-        
+        var backgroundTaskQueueMock = new Mock<IBackgroundTaskQueue>(); // TODO: Don't Mock, fake it so we can test the Task it starts
         return new EventUpdateHandler(factory, pushUpContextFake, dateTimeProviderFake, backgroundTaskQueueMock.Object, logger);
     }
 }

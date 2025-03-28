@@ -34,7 +34,7 @@ public class EventUpdateHandler(
                 _ => throw new ArgumentOutOfRangeException(nameof(updateAction), "No command for this Action.")
             };
 
-            if (shouldSend)
+            if (!shouldSend)
             {
                 logger.LogDebug("Skip Push Up Notification, since there is no change in the DinnerTime for today.");
                 return;
