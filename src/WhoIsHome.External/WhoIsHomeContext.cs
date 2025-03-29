@@ -14,7 +14,7 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
     
     public virtual DbSet<RefreshTokenModel> RefreshTokens { get; set; }
     
-    public virtual DbSet<ExpoPushTokenModel> ExpoPushTokens { get; set; }
+    public virtual DbSet<PushUpSettingsModel> PushUpSettings { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

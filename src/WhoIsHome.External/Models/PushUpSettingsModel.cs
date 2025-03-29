@@ -3,7 +3,7 @@ using WhoIsHome.Shared.BaseTypes;
 
 namespace WhoIsHome.External.Models;
 
-public class ExpoPushTokenModel : DbModel
+public class PushUpSettingsModel : DbModel
 {
     [MaxLength(100)]
     public string? Token { get; set; } // TODO: Generate DB
