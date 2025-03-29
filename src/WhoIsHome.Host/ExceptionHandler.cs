@@ -6,7 +6,7 @@ namespace WhoIsHome.Host;
 
 internal static class ExceptionHandler
 {
-    public static void UseExceptionHandler(this WebApplication app)
+    public static void UseWihExceptionHandler(this WebApplication app)
     {
         var logger = app.Services.GetRequiredService<ILogger<Program>>();
         

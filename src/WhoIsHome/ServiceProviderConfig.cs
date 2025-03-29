@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 using WhoIsHome.AuthTokens;
 using WhoIsHome.QueryHandler.DailyOverview;
 using WhoIsHome.QueryHandler.UserOverview;
@@ -15,6 +14,7 @@ public static class ServiceProviderConfig
         services.AddScoped<IRepeatedEventAggregateService, RepeatedEventAggregateService>();
         services.AddScoped<IUserAggregateService, UserAggregateService>();
 
+        services.AddTransient<UserDayOverviewQueryHandler>();
         services.AddTransient<DailyOverviewQueryHandler>();
         services.AddTransient<UserOverviewQueryHandler>();
 

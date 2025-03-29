@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using WhoIsHome.Host;
 using WhoIsHome.Host.Authentication;
 using WhoIsHome.Host.BackgroundTasks;
 using WhoIsHome.Host.SetUp;
@@ -12,6 +13,11 @@ builder.Services
     .AddCorsPolicy()
     .AddApplicationServices(builder.Configuration)
     .AddJwtAuthentication(builder.Configuration);
+
+builder.Services.Configure<HostOptions>(options =>
+{
+    options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
+});
 
 builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 builder.Services.AddHostedService<QueuedHostedService>();
@@ -44,7 +50,7 @@ app.UseCorsPolicy();
 app.UseSwagger();
 app.UseSwaggerUI();
         
-app.UseExceptionHandler();
+app.UseWihExceptionHandler();
 app.UseMiddleware<ApiKeyMiddleware>();
 
 app.UseRouting();
