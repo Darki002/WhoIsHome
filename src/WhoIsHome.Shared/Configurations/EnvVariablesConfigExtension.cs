@@ -20,7 +20,13 @@ public static class EnvVariablesConfigExtension
     /// <summary>
     /// MySql Config Section
     /// </summary>
-    public static MySqlConfigSection GetMySql(this IConfiguration config) => new MySqlConfigSection(config.GetSection("MYSQL"));
+    public static MySqlConfigSection GetMySql(this IConfiguration config) => new(config.GetSection("MYSQL"));
+
+    /// <summary>
+    /// Key: PUSH_UP_ENABLED
+    /// Enable or Disable sending of Push Up Notifications
+    /// </summary>
+    public static bool GetPushNotificationEnabled(this IConfiguration config) => config.GetString("PUSH_UP_ENABLED").Equals("true", StringComparison.OrdinalIgnoreCase);
     
     internal static string GetString(this IConfiguration config, string name)
     {

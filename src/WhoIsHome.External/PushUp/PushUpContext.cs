@@ -1,17 +1,26 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using WhoIsHome.External.PushUp.ApiClient;
+using WhoIsHome.Shared.Configurations;
 
 namespace WhoIsHome.External.PushUp;
 
 public class PushUpContext(
     PushApiClient client, 
     IDbContextFactory<WhoIsHomeContext> contextFactory,
+    IConfiguration configuration,
     ILogger<PushApiClient> logger) 
     : IPushUpContext
 {
     public async Task PushEventUpdateAsync(PushUpEventUpdateCommand command)
     {
+        if (configuration.GetPushNotificationEnabled() is false)
+        {
+            logger.LogInformation("PushUp is disabled! Won't send any Push Notifications. To enable it, set 'PUSH_UP_ENABLED' to true in the environment Variables.");
+            return;
+        }
+        
         await SendAsync(command); // TODO: retry on failure?
     }
 
