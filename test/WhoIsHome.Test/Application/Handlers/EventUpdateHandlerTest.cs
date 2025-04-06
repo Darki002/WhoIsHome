@@ -44,7 +44,7 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         // Act
         await handler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Create);
         backgroundTaskQueueFake.Queue.Should().HaveCount(1);
-        await (await backgroundTaskQueueFake.DequeueAsync(CancellationToken.None)).Invoke(CancellationToken.None);
+        await backgroundTaskQueueFake.Queue.First().Invoke(CancellationToken.None);
 
         // Assert
         pushUpClientFake.Command.Should().NotBeNull();

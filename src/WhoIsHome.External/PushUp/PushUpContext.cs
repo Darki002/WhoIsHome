@@ -10,11 +10,9 @@ public class PushUpContext(
     ILogger<PushApiClient> logger) 
     : IPushUpContext
 {
-    public void PushEventUpdate(PushUpEventUpdateCommand command, CancellationToken cancellationToken)
+    public async Task PushEventUpdateAsync(PushUpEventUpdateCommand command)
     {
-        // We do not care about this Task. Fire and Forget, they will be sent in the background.
-        // On Failure, we don't care, the user should not get an error on the Phone just because of this.
-        _ = Task.Run(() => SendAsync(command), cancellationToken); // TODO: retry on failure?
+        await SendAsync(command); // TODO: retry on failure?
     }
 
     private async Task SendAsync(PushUpEventUpdateCommand command)
@@ -68,6 +66,7 @@ public class PushUpContext(
         return (await context.PushUpSettings
                 .Where(t => userIds.Contains(t.UserId))
                 .Where(t => t.Token != null)
+                .Where(t => t.Enabled)
                 .ToListAsync())
             .Select(t => t.Token)
             .Cast<string>()

@@ -2,5 +2,5 @@
 
 public interface IPushUpContext
 {
-    void PushEventUpdate(PushUpEventUpdateCommand command, CancellationToken cancellationToken);
+    Task PushEventUpdateAsync(PushUpEventUpdateCommand command);
 }

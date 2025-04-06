@@ -26,6 +26,7 @@ public class PushUpController(
         var model = new PushUpSettingsModel
         {
             Token = pushUpSettings.Token,
+            Enabled = pushUpSettings.Enable ?? false,
             UserId = userContext.UserId
         };
         

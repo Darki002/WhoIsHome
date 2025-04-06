@@ -51,7 +51,7 @@ public class EventUpdateHandler(
                 Title: "Dinner time change",
                 Body: $"{user.UserName} has an update for Today.",
                 users.Select(u => u.Id).ToArray());
-            pushUpContext.PushEventUpdate(command, cancellationToken);
+            await pushUpContext.PushEventUpdateAsync(command);
         }
     }
 

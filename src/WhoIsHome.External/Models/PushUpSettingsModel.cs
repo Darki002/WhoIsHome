@@ -9,6 +9,9 @@ public class PushUpSettingsModel : DbModel
     public string? Token { get; set; } // TODO: Generate DB
     
     [Required]
+    public bool Enabled { get; set; }
+    
+    [Required]
     public int UserId { get; set; }
     
     [Required]
