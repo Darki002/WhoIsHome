@@ -2,6 +2,7 @@
 using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.External;
+using WhoIsHome.Handlers;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.Shared.Types;
@@ -9,7 +10,10 @@ using WhoIsHome.Shared.Types;
 namespace WhoIsHome.Services;
 
 internal class RepeatedEventAggregateService(
-    IDbContextFactory<WhoIsHomeContext> contextFactory, IUserContext userContext) : IRepeatedEventAggregateService
+    IDbContextFactory<WhoIsHomeContext> contextFactory,
+    EventUpdateHandler eventUpdateHandler, 
+    IUserContext userContext) 
+    : IRepeatedEventAggregateService
 {
     public async Task<RepeatedEvent> GetAsync(int id, CancellationToken cancellationToken)
     {
@@ -39,6 +43,8 @@ internal class RepeatedEventAggregateService(
         
         context.RepeatedEvents.Remove(result);
         await context.SaveChangesAsync(cancellationToken);
+        
+        await eventUpdateHandler.HandleAsync(result.ToAggregate(), EventUpdateHandler.UpdateAction.Delete);
     }
 
     public async Task<RepeatedEvent> CreateAsync(string title, DateOnly firstOccurrence, DateOnly lastOccurrence,
@@ -52,7 +58,12 @@ internal class RepeatedEventAggregateService(
 
         var result = await context.RepeatedEvents.AddAsync(repeatedEvent, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
-        return result.Entity.ToAggregate();
+        
+        var createdEvent = result.Entity.ToAggregate();
+
+        await eventUpdateHandler.HandleAsync(createdEvent, EventUpdateHandler.UpdateAction.Create);
+        
+        return createdEvent;
     }
 
     public async Task<RepeatedEvent> UpdateAsync(int id, string title, DateOnly firstOccurrence,
@@ -73,6 +84,11 @@ internal class RepeatedEventAggregateService(
         
         var result = context.RepeatedEvents.Update(aggregate.ToModel());
         await context.SaveChangesAsync(cancellationToken);
-        return result.Entity.ToAggregate();
+                
+        var updatedEvent = result.Entity.ToAggregate();
+        
+        await eventUpdateHandler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Create);
+
+        return updatedEvent;
     }
 }
