@@ -87,7 +87,7 @@ internal class RepeatedEventAggregateService(
                 
         var updatedEvent = result.Entity.ToAggregate();
         
-        await eventUpdateHandler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Create);
+        await eventUpdateHandler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Update);
 
         return updatedEvent;
     }

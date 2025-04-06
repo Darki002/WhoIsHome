@@ -84,7 +84,7 @@ internal class OneTimeEventAggregateService(
         
         var updatedEvent = result.Entity.ToAggregate();
         
-        await eventUpdateHandler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Create);
+        await eventUpdateHandler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Update);
 
         return updatedEvent;
     }
