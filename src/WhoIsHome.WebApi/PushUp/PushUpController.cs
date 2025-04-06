@@ -22,15 +22,20 @@ public class PushUpController(
         {
             return BadRequest("ExpoPushToken is required.");
         }
-
-        var model = new PushUpSettingsModel
-        {
-            Token = pushUpSettings.Token,
-            Enabled = pushUpSettings.Enable ?? false,
-            UserId = userContext.UserId
-        };
         
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+
+        var model = await context.PushUpSettings.SingleOrDefaultAsync(s => s.UserId == userContext.UserId, cancellationToken);
+
+        model ??= new PushUpSettingsModel
+        {
+            Enabled = pushUpSettings.Enable ?? true,
+            UserId = userContext.UserId
+        };
+
+        model.Enabled = pushUpSettings.Enable ?? model.Enabled;
+        model.Token = pushUpSettings.Token;
+         
         await context.PushUpSettings.AddAsync(model, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
 
