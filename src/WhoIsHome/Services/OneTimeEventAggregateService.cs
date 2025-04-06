@@ -2,13 +2,17 @@
 using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.External;
+using WhoIsHome.Handlers;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Services;
 
-internal class OneTimeEventAggregateService(IDbContextFactory<WhoIsHomeContext> contextFactory, IUserContext userContext)
+internal class OneTimeEventAggregateService(
+    IDbContextFactory<WhoIsHomeContext> contextFactory, 
+    EventUpdateHandler eventUpdateHandler,
+    IUserContext userContext)
     : IOneTimeEventAggregateService
 {
     public async Task<OneTimeEvent> GetAsync(int id, CancellationToken cancellationToken)
@@ -40,6 +44,8 @@ internal class OneTimeEventAggregateService(IDbContextFactory<WhoIsHomeContext> 
 
         context.OneTimeEvents.Remove(result);
         await context.SaveChangesAsync(cancellationToken);
+
+        await eventUpdateHandler.HandleAsync(result.ToAggregate(), EventUpdateHandler.UpdateAction.Delete);
     }
 
     public async Task<OneTimeEvent> CreateAsync(string title, DateOnly date, TimeOnly startTime, TimeOnly endTime,
@@ -51,7 +57,12 @@ internal class OneTimeEventAggregateService(IDbContextFactory<WhoIsHomeContext> 
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var result = await context.OneTimeEvents.AddAsync(oneTimeEvent, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
-        return result.Entity.ToAggregate();
+        
+        var createdEvent = result.Entity.ToAggregate();
+
+        await eventUpdateHandler.HandleAsync(createdEvent, EventUpdateHandler.UpdateAction.Create);
+        
+        return createdEvent;
     }
 
     public async Task<OneTimeEvent> UpdateAsync(int id, string title, DateOnly date, TimeOnly startTime,
@@ -70,6 +81,11 @@ internal class OneTimeEventAggregateService(IDbContextFactory<WhoIsHomeContext> 
         
         var result = context.OneTimeEvents.Update(aggregate.ToModel());
         await context.SaveChangesAsync(cancellationToken);
-        return result.Entity.ToAggregate();
+        
+        var updatedEvent = result.Entity.ToAggregate();
+        
+        await eventUpdateHandler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Update);
+
+        return updatedEvent;
     }
 }

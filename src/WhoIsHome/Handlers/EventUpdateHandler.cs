@@ -17,7 +17,7 @@ public class EventUpdateHandler(
     IBackgroundTaskQueue backgroundTaskQueue,
     ILogger<EventUpdateHandler> logger)
 {
-    public async Task HandleAsync(EventBase updatedEvent, UpdateAction updateAction)
+    public virtual async Task HandleAsync(EventBase updatedEvent, UpdateAction updateAction)
     {
         await backgroundTaskQueue.QueueBackgroundWorkItemAsync(RunAsync);
         return;

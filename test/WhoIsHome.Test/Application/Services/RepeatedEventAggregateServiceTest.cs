@@ -1,5 +1,7 @@
+using Moq;
 using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
+using WhoIsHome.Handlers;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.Test.TestData;
@@ -16,9 +18,11 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
     [SetUp]
     public void SetUp()
     {
+        var eventUpdateHandlerMock = Mock.Of<EventUpdateHandler>();
+        
         userContextFake = new UserContextFake();
         userContextFake.SetUser(user, 1);
-        service = new RepeatedEventAggregateService(DbFactory, userContextFake);
+        service = new RepeatedEventAggregateService(DbFactory, eventUpdateHandlerMock, userContextFake);
     }
 
     protected override async Task DbSetUpAsync()
