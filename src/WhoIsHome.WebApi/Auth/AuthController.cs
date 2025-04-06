@@ -21,21 +21,24 @@ public class AuthController(
     [HttpPost]
     public async Task<IActionResult> Login(LoginDto loginDto, CancellationToken cancellationToken)
     {
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+        var userAgent = Request.Headers.UserAgent.ToString();
+        
         var user = await userAggregateService.GetUserByEmailAsync(loginDto.Email, cancellationToken);
         if (user == null)
         {
-            logger.LogInformation("Login Attempt failed, since no user was found for {email}", loginDto.Email);
+            logger.LogInformation("Login Attempt failed, since no user was found for {email} from IP {IP} | UserAgent: {UserAgent}", loginDto.Email, ip, userAgent);
             return Unauthorized("Invalid email or password.");
         }
 
         var result = passwordHasher.VerifyHashedPassword(user, user.Password, loginDto.Password);
         if (result == PasswordVerificationResult.Failed)
         {
-            logger.LogInformation("Login Attempt failed because the email or password was incorrect");
+            logger.LogInformation("Login Attempt failed because the email or password was incorrect from IP {IP} | UserAgent: {UserAgent}", ip, userAgent);
             return Unauthorized("Invalid email or password.");
         }
 
-        logger.LogInformation("New Login for {UserName}", user.UserName);
+        logger.LogInformation("New Login for {UserName} with ID {Id} from IP {IP} | UserAgent: {UserAgent}", user.UserName, user.Id, ip, userAgent);
         
         var token = await jwtTokenService.GenerateTokenAsync(user, cancellationToken);
         return Ok(new { token.JwtToken, token.RefreshToken });
@@ -44,6 +47,9 @@ public class AuthController(
     [HttpPost]
     public async Task<IActionResult> Register(RegisterDto registerDto, CancellationToken cancellationToken)
     {
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+        var userAgent = Request.Headers.UserAgent.ToString();
+        
         try
         {
             var user = await userAggregateService.CreateUserAsync(
@@ -52,7 +58,8 @@ public class AuthController(
                 registerDto.Password,
                 cancellationToken);
 
-            logger.LogInformation("New registration {UserName}", user.UserName);
+            logger.LogInformation("New registration {UserName} with ID {Id} from IP {IP} | UserAgent: {UserAgent}", user.UserName, user.Id, ip, userAgent);
+
             
             return Ok(new { user.Id });
         }

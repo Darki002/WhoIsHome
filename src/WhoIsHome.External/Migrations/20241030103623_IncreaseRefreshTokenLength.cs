@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace WhoIsHome.DataAccess.Migrations
+namespace WhoIsHome.External.Migrations
 {
     /// <inheritdoc />
     public partial class IncreaseRefreshTokenLength : Migration

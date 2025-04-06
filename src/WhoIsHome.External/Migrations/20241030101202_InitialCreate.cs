@@ -4,7 +4,7 @@ using MySql.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace WhoIsHome.DataAccess.Migrations
+namespace WhoIsHome.External.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

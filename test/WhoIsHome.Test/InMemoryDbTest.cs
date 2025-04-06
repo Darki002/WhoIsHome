@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Internal;
 using Moq;
-using WhoIsHome.DataAccess;
+using WhoIsHome.External;
 
 namespace WhoIsHome.Test;
 

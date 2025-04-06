@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WhoIsHome.DataAccess;
-using WhoIsHome.DataAccess.Models;
+using WhoIsHome.External;
+using WhoIsHome.External.Models;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace WhoIsHome.Host.Authentication;

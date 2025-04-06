@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Shared.BaseTypes;
 
-namespace WhoIsHome.DataAccess.Models;
+namespace WhoIsHome.External.Models;
 
 [Table("RefreshToken")]
 [Index(nameof(Token), IsUnique = true)]

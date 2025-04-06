@@ -6,6 +6,7 @@ namespace WhoIsHome.Test.TestData;
 public static class OneTimeEventTestData
 {
     public static OneTimeEvent CreateDefault(
+        int? id = null,
         string title = "Test",
         DateOnly? date = null,
         TimeOnly? startTime = null,
@@ -20,7 +21,7 @@ public static class OneTimeEventTestData
         dinnerTime ??= new TimeOnly(18, 00, 00);
 
         return new OneTimeEvent(
-            id: null, 
+            id: id, 
             title: title, 
             date: date.Value, 
             startTime: startTime.Value, 

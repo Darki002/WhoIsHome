@@ -1,18 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using WhoIsHome.DataAccess.Models;
+using WhoIsHome.External.Models;
 
-namespace WhoIsHome.DataAccess;
+namespace WhoIsHome.External;
 
 public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbContext(options)
 {
-    public DbSet<UserModel> Users { get; set; }
+    public virtual DbSet<UserModel> Users { get; set; }
     
-    public DbSet<OneTimeEventModel> OneTimeEvents { get; set; }
+    public virtual DbSet<OneTimeEventModel> OneTimeEvents { get; set; }
     
-    public DbSet<RepeatedEventModel> RepeatedEvents { get; set; }
+    public virtual DbSet<RepeatedEventModel> RepeatedEvents { get; set; }
     
-    public DbSet<RefreshTokenModel> RefreshTokens { get; set; }
+    public virtual DbSet<RefreshTokenModel> RefreshTokens { get; set; }
+    
+    public virtual DbSet<PushUpSettingsModel> PushUpSettings { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

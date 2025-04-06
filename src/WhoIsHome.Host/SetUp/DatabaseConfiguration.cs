@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WhoIsHome.DataAccess;
+using WhoIsHome.External;
 
 namespace WhoIsHome.Host.SetUp;
 

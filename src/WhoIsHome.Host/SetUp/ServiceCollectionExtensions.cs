@@ -1,4 +1,4 @@
-﻿using WhoIsHome.DataAccess;
+﻿using WhoIsHome.External;
 using WhoIsHome.Host.Authentication;
 using WhoIsHome.Shared;
 using WhoIsHome.Shared.Authentication;
@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserContext, UserContext>();
         
         services.AddWhoIsHomeServices()
-            .AddDataAccessServices(configuration)
+            .AddExternalServices(configuration)
             .AddWebApiServices()
             .AddWhoIsHomeShared();
         

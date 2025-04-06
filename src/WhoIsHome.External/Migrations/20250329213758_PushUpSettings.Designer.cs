@@ -2,24 +2,27 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WhoIsHome.DataAccess;
+using WhoIsHome.External;
 
 #nullable disable
 
-namespace WhoIsHome.DataAccess.Migrations
+namespace WhoIsHome.External.Migrations
 {
     [DbContext(typeof(WhoIsHomeContext))]
-    partial class WhoIsHomeContextModelSnapshot : ModelSnapshot
+    [Migration("20250329213758_PushUpSettings")]
+    partial class PushUpSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("WhoIsHome.DataAccess.Models.OneTimeEventModel", b =>
+            modelBuilder.Entity("WhoIsHome.External.Models.OneTimeEventModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -55,7 +58,27 @@ namespace WhoIsHome.DataAccess.Migrations
                     b.ToTable("Event");
                 });
 
-            modelBuilder.Entity("WhoIsHome.DataAccess.Models.RefreshTokenModel", b =>
+            modelBuilder.Entity("WhoIsHome.External.Models.PushUpSettingsModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Token")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PushUpSettings");
+                });
+
+            modelBuilder.Entity("WhoIsHome.External.Models.RefreshTokenModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -85,7 +108,7 @@ namespace WhoIsHome.DataAccess.Migrations
                     b.ToTable("RefreshToken");
                 });
 
-            modelBuilder.Entity("WhoIsHome.DataAccess.Models.RepeatedEventModel", b =>
+            modelBuilder.Entity("WhoIsHome.External.Models.RepeatedEventModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -124,7 +147,7 @@ namespace WhoIsHome.DataAccess.Migrations
                     b.ToTable("RepeatedEvent");
                 });
 
-            modelBuilder.Entity("WhoIsHome.DataAccess.Models.UserModel", b =>
+            modelBuilder.Entity("WhoIsHome.External.Models.UserModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -153,9 +176,9 @@ namespace WhoIsHome.DataAccess.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("WhoIsHome.DataAccess.Models.OneTimeEventModel", b =>
+            modelBuilder.Entity("WhoIsHome.External.Models.OneTimeEventModel", b =>
                 {
-                    b.HasOne("WhoIsHome.DataAccess.Models.UserModel", "User")
+                    b.HasOne("WhoIsHome.External.Models.UserModel", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -164,9 +187,9 @@ namespace WhoIsHome.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WhoIsHome.DataAccess.Models.RefreshTokenModel", b =>
+            modelBuilder.Entity("WhoIsHome.External.Models.PushUpSettingsModel", b =>
                 {
-                    b.HasOne("WhoIsHome.DataAccess.Models.UserModel", "User")
+                    b.HasOne("WhoIsHome.External.Models.UserModel", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -175,9 +198,20 @@ namespace WhoIsHome.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WhoIsHome.DataAccess.Models.RepeatedEventModel", b =>
+            modelBuilder.Entity("WhoIsHome.External.Models.RefreshTokenModel", b =>
                 {
-                    b.HasOne("WhoIsHome.DataAccess.Models.UserModel", "User")
+                    b.HasOne("WhoIsHome.External.Models.UserModel", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WhoIsHome.External.Models.RepeatedEventModel", b =>
+                {
+                    b.HasOne("WhoIsHome.External.Models.UserModel", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

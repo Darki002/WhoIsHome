@@ -1,4 +1,4 @@
-﻿using WhoIsHome.DataAccess.Models;
+﻿using WhoIsHome.External.Models;
 using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.AuthTokens;
