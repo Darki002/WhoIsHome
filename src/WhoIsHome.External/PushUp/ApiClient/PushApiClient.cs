@@ -28,11 +28,6 @@ public class PushApiClient
         httpClient.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
     }
-    
-    public void SetAccessToken(string value)
-    {
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", value);
-    }
 
     public async Task<PushTicketResponse> SendPushAsync(PushTicketRequest pushTicketRequest)
     {
