@@ -14,6 +14,7 @@ public static class InitLogger
         
         if (!builder.Environment.IsDevelopment())
         {
+            builder.WebHost.UseSentry();
             builder.Logging.AddSentry();
         }
 
