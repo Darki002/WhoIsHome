@@ -35,7 +35,7 @@ public class QueuedHostedService(
     public override async Task StopAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation("Queued Hosted Service is stopping.");
-
+        
         await base.StopAsync(stoppingToken);
     }
 }
