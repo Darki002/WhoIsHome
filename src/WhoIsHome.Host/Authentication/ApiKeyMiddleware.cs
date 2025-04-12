@@ -8,6 +8,12 @@ public class ApiKeyMiddleware(RequestDelegate next, ILogger<ApiKeyMiddleware> lo
 
     public async Task InvokeAsync(HttpContext context, IConfiguration configuration)
     {
+        if (context.Request.Path.StartsWithSegments("/health"))
+        {
+            await next(context);
+            return;
+        }
+        
         if (!context.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
         {
             logger.LogWarning("No API Key  in request header!");

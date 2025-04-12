@@ -11,6 +11,8 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.AddLoggers();
 
+builder.Services.AddHealthChecks();
+
 builder.Services
     .AddCorsPolicy()
     .AddApplicationServices(builder.Configuration)
@@ -53,6 +55,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.UseHttpsRedirection();
+
+app.MapHealthChecks("/health").AllowAnonymous();
 
 app.ConfigureDatabase();
 app.Run();
