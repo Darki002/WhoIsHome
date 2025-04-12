@@ -9,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
 
+builder.AddLoggers();
+
 builder.Services
     .AddCorsPolicy()
     .AddApplicationServices(builder.Configuration)
@@ -21,14 +23,6 @@ builder.Services.Configure<HostOptions>(options =>
 
 builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 builder.Services.AddHostedService<QueuedHostedService>();
-
-builder.Logging.ClearProviders();
-builder.Logging.AddSimpleConsole(options =>
-{
-    options.IncludeScopes = true;
-    options.SingleLine = true;
-    options.TimestampFormat = "dd.MM.yyyy HH:mm:ss";
-});
 
 builder.Services.AddRateLimiter(options =>
 {
