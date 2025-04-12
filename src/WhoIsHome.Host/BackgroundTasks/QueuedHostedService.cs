@@ -28,6 +28,7 @@ public class QueuedHostedService(
             catch (Exception ex)
             {
                 logger.LogError(ex,"Error occurred executing {WorkItem}.", nameof(workItem));
+                // TODO: retry or "dead letter" feature 
             }
         }
     }
