@@ -27,8 +27,8 @@ public class QueuedHostedService(
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "Background task {WorkItem} failed on first attempt. Retrying once.", nameof(workItem));
-                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+                logger.LogWarning(ex, "Background task {WorkItem} failed on first attempt. Retrying once in 10sec.", nameof(workItem));
+                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
 
                 try
                 {
