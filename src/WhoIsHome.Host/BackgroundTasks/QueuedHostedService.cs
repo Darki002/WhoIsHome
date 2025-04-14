@@ -27,8 +27,19 @@ public class QueuedHostedService(
             }
             catch (Exception ex)
             {
-                logger.LogError(ex,"Error occurred executing {WorkItem}.", nameof(workItem));
-                // TODO: retry or "dead letter" feature 
+                logger.LogWarning(ex, "Background task {WorkItem} failed on first attempt. Retrying once.", nameof(workItem));
+                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+
+                try
+                {
+                    logger.LogInformation("Start background task {WorkItem} retry.", nameof(workItem));
+                    await workItem(stoppingToken);
+                    logger.LogInformation("Background task {WorkItem} succeeded on retry.", nameof(workItem));
+                }
+                catch (Exception retryEx)
+                {
+                    logger.LogError(retryEx, "Background task {WorkItem} failed on retry. Task will not be retried again.", nameof(workItem));
+                }
             }
         }
     }
