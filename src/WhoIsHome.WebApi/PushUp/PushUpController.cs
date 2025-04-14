@@ -24,21 +24,39 @@ public class PushUpController(
         }
         
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-
         var model = await context.PushUpSettings.SingleOrDefaultAsync(s => s.UserId == userContext.UserId, cancellationToken);
 
-        model ??= new PushUpSettingsModel
+        if (model is null)
+        {
+            await CreateSettingAsync(pushUpSettings, cancellationToken);
+            return Ok("ExpoPushToken is saved.");
+        }
+
+        await UpdateSettingAsync(pushUpSettings, model, cancellationToken);
+        return Ok("ExpoPushToken is saved.");
+    }
+
+    private async Task CreateSettingAsync(PushUpSettings pushUpSettings, CancellationToken cancellationToken)
+    {
+        var model = new PushUpSettingsModel
         {
             Enabled = pushUpSettings.Enable ?? true,
-            UserId = userContext.UserId
+            UserId = userContext.UserId,
+            Token = pushUpSettings.Token
         };
-
-        model.Enabled = pushUpSettings.Enable ?? model.Enabled;
-        model.Token = pushUpSettings.Token;
-         
+        
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         await context.PushUpSettings.AddAsync(model, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
+    }
 
-        return Ok("ExpoPushToken is saved.");
+    private async Task UpdateSettingAsync(PushUpSettings pushUpSettings, PushUpSettingsModel model, CancellationToken cancellationToken)
+    {
+        model.Enabled = pushUpSettings.Enable ?? model.Enabled;
+        model.Token = pushUpSettings.Token;
+        
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        context.PushUpSettings.Update(model);
+        await context.SaveChangesAsync(cancellationToken);
     }
 }
