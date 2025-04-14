@@ -1,4 +1,6 @@
-﻿namespace WhoIsHome.Host.SetUp;
+﻿using Microsoft.Extensions.Logging.Console;
+
+namespace WhoIsHome.Host.SetUp;
 
 public static class InitLogger
 {
@@ -10,6 +12,7 @@ public static class InitLogger
             options.IncludeScopes = true;
             options.SingleLine = true;
             options.TimestampFormat = "dd.MM.yyyy HH:mm:ss";
+            options.ColorBehavior = LoggerColorBehavior.Enabled;
         });
         
         if (!builder.Environment.IsDevelopment())
