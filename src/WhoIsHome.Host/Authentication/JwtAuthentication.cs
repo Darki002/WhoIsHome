@@ -45,7 +45,7 @@ public static class JwtAuthentication
                     OnAuthenticationFailed = context =>
                     {
                         var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
-                        logger.LogError("Authentication failed: {Message}", context.Exception.Message);
+                        logger.LogInformation("Authentication failed: {Message}", context.Exception.Message);
                         return Task.CompletedTask;
                     }
                 };
