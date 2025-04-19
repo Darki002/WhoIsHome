@@ -3,14 +3,13 @@ using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.External;
 using WhoIsHome.Shared.Exceptions;
-using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.QueryHandler.DailyOverview;
 
-public class UserDayOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contextFactory, IDateTimeProvider dateTimeProvider)
+public class UserDayOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contextFactory)
 {
-    public async Task<DailyOverview> HandleAsync(int id, CancellationToken cancellationToken)
+    public async Task<DailyOverview> HandleAsync(int id, DateOnly today, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
 
@@ -21,8 +20,6 @@ public class UserDayOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> con
         {
             throw new NotFoundException($"User with ID {id} was not found for UserDayOverview");
         }
-
-        var today = dateTimeProvider.CurrentDate;
 
         var oneTimeEvents = (await context.OneTimeEvents
                 .Where(e => e.UserId == id)
