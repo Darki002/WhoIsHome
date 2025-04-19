@@ -1,10 +1,11 @@
 using WhoIsHome.QueryHandler.DailyOverview;
+using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi.QueryServices.DailyOverviews;
 
 public record DailyOverviewModel
 {
-    public required DailyOverviewUser User { get; set; }
+    public required SimpleUserModel UserModel { get; set; }
 
     public required bool IsAtHome { get; set; }
 
@@ -14,11 +15,9 @@ public record DailyOverviewModel
     {
         return new DailyOverviewModel
         {
-            User = new DailyOverviewUser(dailyOverview.User.Id!.Value, dailyOverview.User.UserName),
+            UserModel = new SimpleUserModel(dailyOverview.User.Id!.Value, dailyOverview.User.UserName),
             IsAtHome = dailyOverview.IsAtHome,
             DinnerTime = dailyOverview.DinnerTime
         };
     }
 }
-
-public record DailyOverviewUser(int id, string Username);

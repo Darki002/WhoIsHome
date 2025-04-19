@@ -2,6 +2,7 @@
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.BaseTypes;
 using WhoIsHome.Shared.Exceptions;
+using ZstdSharp.Unsafe;
 
 namespace WhoIsHome.Aggregates;
 
@@ -52,6 +53,26 @@ public class User : AggregateBase
     private static bool IsValidUserName(string userName)
     {
         return userName.Length is <= UserNameMaxLength and >= UserNameMinLength;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is User user)
+        {
+            return Equals(user);
+        }
+
+        return false;
+    }
+
+    private bool Equals(User other)
+    {
+        return Id == other.Id;
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }
 
