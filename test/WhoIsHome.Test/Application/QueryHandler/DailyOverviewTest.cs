@@ -12,7 +12,7 @@ public class DailyOverviewTest : InMemoryDbTest
     [SetUp]
     public void SetUp()
     {
-        var handler = new UserDayOverviewQueryHandler(DbFactory, dateTimeProviderFake);
+        var handler = new UserDayOverviewQueryHandler(DbFactory);
         queryHandler = new DailyOverviewQueryHandler(DbFactory, handler);
     }
 
@@ -29,7 +29,7 @@ public class DailyOverviewTest : InMemoryDbTest
         await Db.SaveChangesAsync();
 
         // Act
-        var result = await queryHandler.HandleAsync(CancellationToken.None);
+        var result = await queryHandler.HandleAsync(dateTimeProviderFake.CurrentDate, CancellationToken.None);
 
         // Assert
         result.Should().HaveCount(2);
@@ -56,7 +56,7 @@ public class DailyOverviewTest : InMemoryDbTest
         await Db.SaveChangesAsync();
 
         // Act
-        var result = await queryHandler.HandleAsync(CancellationToken.None);
+        var result = await queryHandler.HandleAsync(dateTimeProviderFake.CurrentDate, CancellationToken.None);
 
         // Assert
         result.Should().HaveCount(1);
@@ -91,7 +91,7 @@ public class DailyOverviewTest : InMemoryDbTest
         await Db.SaveChangesAsync();
 
         // Act
-        var result = await queryHandler.HandleAsync(CancellationToken.None);
+        var result = await queryHandler.HandleAsync(dateTimeProviderFake.CurrentDate, CancellationToken.None);
 
         // Assert
         result.Should().HaveCount(1);
@@ -123,7 +123,7 @@ public class DailyOverviewTest : InMemoryDbTest
         await Db.SaveChangesAsync();
 
         // Act
-        var result = await queryHandler.HandleAsync(CancellationToken.None);
+        var result = await queryHandler.HandleAsync(dateTimeProviderFake.CurrentDate, CancellationToken.None);
 
         // Assert
         result.Should().HaveCount(1);
@@ -149,7 +149,7 @@ public class DailyOverviewTest : InMemoryDbTest
         await Db.SaveChangesAsync();
 
         // Act
-        var result = await queryHandler.HandleAsync(CancellationToken.None);
+        var result = await queryHandler.HandleAsync(dateTimeProviderFake.CurrentDate, CancellationToken.None);
 
         // Assert
         result.Should().HaveCount(1);
@@ -172,7 +172,7 @@ public class DailyOverviewTest : InMemoryDbTest
         await Db.SaveChangesAsync();
 
         // Act
-        var result = await queryHandler.HandleAsync(CancellationToken.None);
+        var result = await queryHandler.HandleAsync(dateTimeProviderFake.CurrentDate, CancellationToken.None);
 
         // Assert
         result.Should().HaveCount(1);
@@ -200,7 +200,7 @@ public class DailyOverviewTest : InMemoryDbTest
         await Db.SaveChangesAsync();
 
         // Act
-        var result = await queryHandler.HandleAsync(CancellationToken.None);
+        var result = await queryHandler.HandleAsync(dateTimeProviderFake.CurrentDate, CancellationToken.None);
 
         // Assert
         result.Should().HaveCount(1);
