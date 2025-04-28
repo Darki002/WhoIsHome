@@ -18,7 +18,7 @@ public class OneTimeEventAggregateServiceTest : InMemoryDbTest
     [SetUp]
     public void SetUp()
     {
-        var eventUpdateHandlerMock = Mock.Of<EventUpdateHandler>();
+        var eventUpdateHandlerMock = Mock.Of<IEventUpdateHandler>();
         
         userContextFake = new UserContextFake();
         userContextFake.SetUser(user, 1);

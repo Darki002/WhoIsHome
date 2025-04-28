@@ -19,7 +19,7 @@ public static class ServiceProviderConfig
         services.AddTransient<DailyOverviewQueryHandler>();
         services.AddTransient<UserOverviewQueryHandler>();
 
-        services.AddTransient<EventUpdateHandler>();
+        services.AddTransient<IEventUpdateHandler, EventUpdateHandler>();
 
         services.AddTransient<JwtTokenService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();

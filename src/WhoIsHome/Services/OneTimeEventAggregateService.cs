@@ -11,7 +11,7 @@ namespace WhoIsHome.Services;
 
 internal class OneTimeEventAggregateService(
     IDbContextFactory<WhoIsHomeContext> contextFactory, 
-    EventUpdateHandler eventUpdateHandler,
+    IEventUpdateHandler eventUpdateHandler,
     IUserContext userContext)
     : IOneTimeEventAggregateService
 {

@@ -45,20 +45,36 @@ public class WeeklyReportTest : InMemoryDbTest
     {
         // Arrange
         var expectedDinnerTime = new TimeOnly(20, 00, 00);
-        var expectedDate = DateOnly.FromDateTime(dateTimeProviderFake.Now.StartOfWeek());
 
         var user1 = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
         await Db.Users.AddAsync(user1);
 
-        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(date: dateTimeProviderFake.CurrentDate).ToModel();
-        await Db.OneTimeEvents.AddAsync(oneTimeEvent1);
-
-        var oneTimeEvent2 = OneTimeEventTestData.CreateDefault(date: dateTimeProviderFake.CurrentDate,
+        var oneTimeEvent = OneTimeEventTestData.CreateDefault(date: dateTimeProviderFake.CurrentDate,
                 startTime: new TimeOnly(18, 00, 00),
                 endTime: new TimeOnly(19, 00, 00), dinnerTime: expectedDinnerTime)
             .ToModel();
-        await Db.OneTimeEvents.AddAsync(oneTimeEvent2);
+        await Db.OneTimeEvents.AddAsync(oneTimeEvent);
 
+        await Db.SaveChangesAsync();
+        
+        // Act
+        var result = await queryHandler.HandleAsync(CancellationToken.None);
+        
+        // Assert
+        var (isAtHome, dinnerTime) = result.Single().DailyOverviews[dateTimeProviderFake.CurrentDate];
+        dinnerTime.Should().Be(expectedDinnerTime);
+        isAtHome.Should().BeTrue();
+    }
+    
+    [Test]
+    public async Task ReturnsListOfAllDaysInCurrentWeek()
+    {
+        // Arrange
+        var expectedFirstDate = new DateOnly(2024, 11, 25);
+        var expectedLastDate = new DateOnly(2024, 12, 1);
+        
+        var user1 = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
+        await Db.Users.AddAsync(user1);
         await Db.SaveChangesAsync();
         
         // Act
@@ -67,8 +83,7 @@ public class WeeklyReportTest : InMemoryDbTest
         // Assert
         result.Should().HaveCount(1);
         result.Single().DailyOverviews.Should().HaveCount(7);
-        result.Single().DailyOverviews.First().Key.Should().Be(expectedDate);
-        result.Single().DailyOverviews.First().Value.DinnerTime.Should().Be(expectedDinnerTime);
-        result.Single().DailyOverviews.First().Value.IsAtHome.Should().BeTrue();
+        result.Single().DailyOverviews.First().Key.Should().Be(expectedFirstDate);
+        result.Single().DailyOverviews.Last().Key.Should().Be(expectedLastDate);
     }
 }

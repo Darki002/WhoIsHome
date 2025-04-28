@@ -15,9 +15,9 @@ public class EventUpdateHandler(
     IPushUpContext pushUpContext,
     IDateTimeProvider dateTimeProvider,
     IBackgroundTaskQueue backgroundTaskQueue,
-    ILogger<EventUpdateHandler> logger)
+    ILogger<EventUpdateHandler> logger) : IEventUpdateHandler
 {
-    public virtual async Task HandleAsync(EventBase updatedEvent, UpdateAction updateAction)
+    public async Task HandleAsync(EventBase updatedEvent, UpdateAction updateAction)
     {
         await backgroundTaskQueue.QueueBackgroundWorkItemAsync(RunAsync);
         return;
@@ -96,4 +96,9 @@ public class EventUpdateHandler(
         Update,
         Delete
     }
+}
+
+public interface IEventUpdateHandler
+{
+    Task HandleAsync(EventBase updatedEvent, EventUpdateHandler.UpdateAction updateAction);
 }
