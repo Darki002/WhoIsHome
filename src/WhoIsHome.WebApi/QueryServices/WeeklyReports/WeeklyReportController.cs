@@ -7,8 +7,7 @@ public class WeeklyReportController(WeeklyReportQueryHandler queryHandler)
     : WhoIsHomeControllerBase<IReadOnlyCollection<WeeklyReport>, IReadOnlyCollection<WeeklyReportModel>>
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyCollection<WeeklyReportModel>>> GetAsync(
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyCollection<WeeklyReportModel>>> GetAsync(CancellationToken cancellationToken)
     {
         var result = await queryHandler.HandleAsync(cancellationToken);
         return await BuildResponseAsync(result);
