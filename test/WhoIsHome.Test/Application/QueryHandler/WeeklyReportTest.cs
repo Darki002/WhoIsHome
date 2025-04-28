@@ -1,7 +1,6 @@
 ﻿using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.QueryHandler.DailyOverview;
 using WhoIsHome.QueryHandler.WeeklyReports;
-using WhoIsHome.Shared.Helper;
 using WhoIsHome.Test.TestData;
 
 namespace WhoIsHome.Test.Application.QueryHandler;
