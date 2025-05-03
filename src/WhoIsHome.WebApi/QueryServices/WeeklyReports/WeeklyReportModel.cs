@@ -7,14 +7,18 @@ public record WeeklyReportModel
 {
     public required SimpleUserModel User { get; set; }
     
-    public required Dictionary<DateOnly, (bool IsAtHome, TimeOnly? DinnerTime)> DailyOverviews { get; init; }
+    public required List<DailyOverviewReport> DailyOverviews { get; init; }
     
     public static WeeklyReportModel From(WeeklyReport dailyOverview)
     {
         return new WeeklyReportModel
         {
             User = new SimpleUserModel(dailyOverview.User.Id!.Value, dailyOverview.User.UserName),
-            DailyOverviews = dailyOverview.DailyOverviews,
+            DailyOverviews = dailyOverview.DailyOverviews
+                .Select(o => new DailyOverviewReport(o.Key, o.Value.IsAtHome, o.Value.DinnerTime))
+                .ToList(),
         };
     }
 }
+
+public record DailyOverviewReport(DateOnly Date, bool IsAtHome, TimeOnly? DinnerTime);

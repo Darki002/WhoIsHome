@@ -3,6 +3,7 @@ using WhoIsHome.AuthTokens;
 using WhoIsHome.Handlers;
 using WhoIsHome.QueryHandler.DailyOverview;
 using WhoIsHome.QueryHandler.UserOverview;
+using WhoIsHome.QueryHandler.WeeklyReports;
 using WhoIsHome.Services;
 
 namespace WhoIsHome;
@@ -18,6 +19,7 @@ public static class ServiceProviderConfig
         services.AddTransient<UserDayOverviewQueryHandler>();
         services.AddTransient<DailyOverviewQueryHandler>();
         services.AddTransient<UserOverviewQueryHandler>();
+        services.AddTransient<WeeklyReportQueryHandler>();
 
         services.AddTransient<IEventUpdateHandler, EventUpdateHandler>();
 
