@@ -1,7 +1,7 @@
 using System.Threading.Channels;
 using WhoIsHome.Shared.BackgroundTasks;
 
-namespace WhoIsHome.Host.BackgroundTasks;
+namespace WhoIsHome.Host.BackgroundTasks.QueuedTasks;
 
 public class BackgroundTaskQueue : IBackgroundTaskQueue
 {
