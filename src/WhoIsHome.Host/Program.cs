@@ -2,9 +2,7 @@ using System.Threading.RateLimiting;
 using WhoIsHome.Host;
 using WhoIsHome.Host.Authentication;
 using WhoIsHome.Host.BackgroundTasks;
-using WhoIsHome.Host.BackgroundTasks.QueuedTasks;
 using WhoIsHome.Host.SetUp;
-using WhoIsHome.Shared.BackgroundTasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
