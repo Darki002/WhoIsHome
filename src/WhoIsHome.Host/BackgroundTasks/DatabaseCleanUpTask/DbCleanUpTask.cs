@@ -1,11 +1,14 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using WhoIsHome.External;
 using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.Host.BackgroundTasks.DatabaseCleanUpTask;
 
-public class DbCleanUpTask(DbCleanUpTaskOptions options, IServiceScopeFactory scopeFactory, ILogger<DbCleanUpTask> logger) : BackgroundService
+public class DbCleanUpTask(IOptions<DbCleanUpTaskOptions> options, IServiceScopeFactory scopeFactory, ILogger<DbCleanUpTask> logger) : BackgroundService
 {
+    private readonly DbCleanUpTaskOptions options = options.Value;
+    
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
