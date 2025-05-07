@@ -3,7 +3,6 @@ using WhoIsHome.Host;
 using WhoIsHome.Host.Authentication;
 using WhoIsHome.Host.BackgroundTasks;
 using WhoIsHome.Host.SetUp;
-using WhoIsHome.Shared.BackgroundTasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,13 +17,11 @@ builder.Services
     .AddApplicationServices(builder.Configuration)
     .AddJwtAuthentication(builder.Configuration);
 
+builder.Services.AddBackgroundTasks(builder.Configuration);
 builder.Services.Configure<HostOptions>(options =>
 {
     options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
 });
-
-builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
-builder.Services.AddHostedService<QueuedHostedService>();
 
 builder.Services.AddRateLimiter(options =>
 {
