@@ -10,7 +10,7 @@ public static class InitLogger
         builder.Logging.AddSimpleConsole(options =>
         {
             options.IncludeScopes = true;
-            options.SingleLine = true;
+            options.SingleLine = false;
             options.TimestampFormat = "dd.MM.yyyy HH:mm:ss";
             options.ColorBehavior = LoggerColorBehavior.Enabled;
         });
