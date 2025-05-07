@@ -11,4 +11,9 @@ public sealed record DbCleanUpTaskOptions
     /// Time of day (HH:mm:ss) on that day to run the job
     /// </summary>
     public TimeSpan Time { get; set; } = TimeSpan.FromHours(2);
+    
+    /// <summary>
+    /// How many days of data to keep (older records will be deleted)
+    /// </summary>
+    public int DaysToKeep { get; set; } = 90;
 }

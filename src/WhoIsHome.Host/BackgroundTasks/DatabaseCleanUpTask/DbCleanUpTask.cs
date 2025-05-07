@@ -44,17 +44,20 @@ public class DbCleanUpTask(DbCleanUpTaskOptions options, IServiceScopeFactory sc
     private async Task RunDatabaseCleanupAsync(CancellationToken ct)
     {
         using var scope = scopeFactory.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<WhoIsHomeContext>();
+        var dbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<WhoIsHomeContext>>();
+        var db = await dbFactory.CreateDbContextAsync(ct);
         var dateTimeProvider = scope.ServiceProvider.GetRequiredService<IDateTimeProvider>();
 
-        var cutoff = dateTimeProvider.CurrentDate.AddMonths(-1);
+        var cutoff = dateTimeProvider.CurrentDate.AddDays(-options.DaysToKeep);
         
-        await db.OneTimeEvents
+        var deletedOneTimeEvents = await db.OneTimeEvents
             .Where(e => e.Date < cutoff)
             .ExecuteDeleteAsync(ct);
+        logger.LogInformation("Deleted {Count} one-time events older than {Cutoff}.", deletedOneTimeEvents, cutoff);
         
-        await db.RepeatedEvents
+        var deletedRepeatedEvents = await db.RepeatedEvents
             .Where(e => e.LastOccurrence < cutoff)
             .ExecuteDeleteAsync(ct);
+        logger.LogInformation("Deleted {Count} repeated events with last occurrence before {Cutoff}.", deletedRepeatedEvents, cutoff);
     }
 }
