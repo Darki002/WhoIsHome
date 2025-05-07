@@ -14,8 +14,4 @@
       <ProjectReference Include="..\WhoIsHome\WhoIsHome.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="QueryServices\" />
-    </ItemGroup>
-
 </Project>

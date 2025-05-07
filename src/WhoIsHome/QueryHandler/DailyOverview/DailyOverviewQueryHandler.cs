@@ -1,9 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WhoIsHome.Aggregates;
-using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.External;
-using WhoIsHome.Shared.Helper;
-using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.QueryHandler.DailyOverview;
 
@@ -11,7 +7,7 @@ public class DailyOverviewQueryHandler(
     IDbContextFactory<WhoIsHomeContext> contextFactory, 
     UserDayOverviewQueryHandler userDayOverviewQueryHandler)
 {
-    public async Task<IReadOnlyCollection<DailyOverview>> HandleAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<DailyOverview>> HandleAsync(DateOnly today, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var userIds = await context.Users.Select(u => u.Id).ToListAsync(cancellationToken);
@@ -20,7 +16,7 @@ public class DailyOverviewQueryHandler(
         
         foreach (var userId in userIds)
         {
-            var overview = await userDayOverviewQueryHandler.HandleAsync(userId, cancellationToken);
+            var overview = await userDayOverviewQueryHandler.HandleAsync(userId, today, cancellationToken);
             result.Add(overview);
         }
 

@@ -11,7 +11,7 @@ namespace WhoIsHome.Services;
 
 internal class RepeatedEventAggregateService(
     IDbContextFactory<WhoIsHomeContext> contextFactory,
-    EventUpdateHandler eventUpdateHandler, 
+    IEventUpdateHandler eventUpdateHandler, 
     IUserContext userContext) 
     : IRepeatedEventAggregateService
 {
