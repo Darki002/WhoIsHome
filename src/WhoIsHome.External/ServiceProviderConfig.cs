@@ -13,7 +13,6 @@ public static class ServiceProviderConfig
         IConfiguration configuration)
     {
         var connectionString = BuildConnectionString(configuration);
-        services.AddDbContext<WhoIsHomeContext>(o => o.UseMySQL(connectionString));
         services.AddDbContextFactory<WhoIsHomeContext>(o => o.UseMySQL(connectionString));
 
         services.AddScoped<IPushUpContext, PushUpContext>();
