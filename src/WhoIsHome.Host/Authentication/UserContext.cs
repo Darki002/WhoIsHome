@@ -4,6 +4,7 @@ using WhoIsHome.External.Models;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
 using System.Security.Claims;
+using WhoIsHome.Host.DataProtectionKeys;
 
 namespace WhoIsHome.Host.Authentication;
 

@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="8.0.16" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.6"/>
         <PackageReference Include="Sentry.AspNetCore" Version="5.5.1" />
         <PackageReference Include="Sentry.Extensions.Logging" Version="5.5.1" />

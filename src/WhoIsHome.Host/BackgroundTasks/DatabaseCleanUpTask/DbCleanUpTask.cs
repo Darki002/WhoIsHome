@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using WhoIsHome.External;
+using WhoIsHome.Host.DataProtectionKeys;
 using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.Host.BackgroundTasks.DatabaseCleanUpTask;

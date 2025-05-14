@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WhoIsHome.External;
+using WhoIsHome.Host.DataProtectionKeys;
 
 namespace WhoIsHome.Host.SetUp;
 
