@@ -2,6 +2,7 @@ using System.Threading.RateLimiting;
 using WhoIsHome.Host;
 using WhoIsHome.Host.Authentication;
 using WhoIsHome.Host.BackgroundTasks;
+using WhoIsHome.Host.DataProtectionKeys;
 using WhoIsHome.Host.SetUp;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,7 @@ builder.Services.AddHealthChecks();
 builder.Services
     .AddCorsPolicy()
     .AddApplicationServices(builder.Configuration)
+    .AddDataProtectionKey(builder.Configuration)
     .AddJwtAuthentication(builder.Configuration);
 
 builder.Services.AddBackgroundTasks(builder.Configuration);
