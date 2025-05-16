@@ -5,7 +5,7 @@ namespace WhoIsHome.WebApi.QueryServices.DailyOverviews;
 
 public record DailyOverviewModel
 {
-    public required SimpleUserModel UserModel { get; set; }
+    public required SimpleUserModel User { get; set; }
 
     public required bool IsAtHome { get; set; }
 
@@ -15,7 +15,7 @@ public record DailyOverviewModel
     {
         return new DailyOverviewModel
         {
-            UserModel = new SimpleUserModel(dailyOverview.User.Id!.Value, dailyOverview.User.UserName),
+            User = new SimpleUserModel(dailyOverview.User.Id!.Value, dailyOverview.User.UserName),
             IsAtHome = dailyOverview.IsAtHome,
             DinnerTime = dailyOverview.DinnerTime
         };
