@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.External;
@@ -42,7 +43,8 @@ public class PushUpController(
         {
             Enabled = pushUpSettings.Enable ?? true,
             UserId = userContext.UserId,
-            Token = pushUpSettings.Token
+            Token = pushUpSettings.Token,
+            LanguageCode = pushUpSettings.LanguageCode ?? CultureInfo.GetCultureInfo("en")
         };
         
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
@@ -52,8 +54,9 @@ public class PushUpController(
 
     private async Task UpdateSettingAsync(PushUpSettings pushUpSettings, PushUpSettingsModel model, CancellationToken cancellationToken)
     {
-        model.Enabled = pushUpSettings.Enable ?? model.Enabled;
         model.Token = pushUpSettings.Token;
+        model.Enabled = pushUpSettings.Enable ?? model.Enabled;
+        model.LanguageCode = pushUpSettings.LanguageCode ?? model.LanguageCode;
         
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         context.PushUpSettings.Update(model);
