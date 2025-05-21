@@ -4,9 +4,9 @@ namespace WhoIsHome.Test.Application;
 
 public class PushUpContextFake : IPushUpContext
 {
-    public PushUpEventUpdateCommand? Command { get; private set; }
+    public PushUpCommand? Command { get; private set; }
 
-    public async Task PushEventUpdateAsync(PushUpEventUpdateCommand command)
+    public async Task PushEventUpdateAsync(PushUpCommand command)
     {
         Command = command;
     }

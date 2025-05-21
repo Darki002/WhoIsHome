@@ -13,7 +13,7 @@ public class PushUpContext(
     ILogger<PushApiClient> logger) 
     : IPushUpContext
 {
-    public async Task PushEventUpdateAsync(PushUpEventUpdateCommand command)
+    public async Task PushEventUpdateAsync(PushUpCommand command)
     {
         if (configuration.GetPushNotificationEnabled() is false)
         {
@@ -21,19 +21,19 @@ public class PushUpContext(
             return;
         }
         
-        await SendAsync(command); // TODO: retry on failure?
+        await SendAsync(command);
     }
 
-    private async Task SendAsync(PushUpEventUpdateCommand command)
+    private async Task SendAsync(PushUpCommand command)
     {
         try
         {
-            var pushTokens = await GetExpoPushTokens(command.userIds);
+            var pushTokens = await GetExpoPushTokens(command.UserIds);
             
             var pushTicket = new PushTicketRequest
             {
                 PushTo = pushTokens,
-                PushTitle = command.Title,
+                PushTitle = command.Title, // TODO: translate foreach user
                 PushBody = command.Body
             };
             var result = await client.SendPushAsync(pushTicket);

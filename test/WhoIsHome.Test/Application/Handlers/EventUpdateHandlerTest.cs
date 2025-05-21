@@ -50,7 +50,7 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         pushUpClientFake.Command.Should().NotBeNull();
         pushUpClientFake.Command!.Title.Should().Be("Dinner time change");
         pushUpClientFake.Command.Body.Should().Be("Darki has an update for Today.");
-        pushUpClientFake.Command.userIds.Should().BeEquivalentTo([2, 3]);
+        pushUpClientFake.Command.UserIds.Should().BeEquivalentTo([2, 3]);
     }
 
     [Test]
@@ -112,7 +112,7 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         pushUpClientFake.Command.Should().NotBeNull();
         pushUpClientFake.Command!.Title.Should().Be("Dinner time change");
         pushUpClientFake.Command.Body.Should().Be("Darki has an update for Today.");
-        pushUpClientFake.Command.userIds.Should().BeEquivalentTo([2, 3]);
+        pushUpClientFake.Command.UserIds.Should().BeEquivalentTo([2, 3]);
     }
 
     private Mock<IDbContextFactory<WhoIsHomeContext>> GetDbFactoryMock(Action<Mock<WhoIsHomeContext>> setUp)

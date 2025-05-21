@@ -2,5 +2,5 @@
 
 public interface IPushUpContext
 {
-    Task PushEventUpdateAsync(PushUpEventUpdateCommand command);
+    Task PushEventUpdateAsync(PushUpCommand command);
 }

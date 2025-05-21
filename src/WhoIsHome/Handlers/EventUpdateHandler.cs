@@ -47,9 +47,9 @@ public class EventUpdateHandler(
                 .Where(u => u.Id != updatedEvent.UserId)
                 .ToListAsync(cancellationToken);
             
-            var command = new PushUpEventUpdateCommand(
+            var command = new PushUpCommand(
                 Title: "Dinner time change",
-                Body: $"{user.UserName} has an update for Today.",
+                Body: $"{user.UserName} has an update for Today.", // TODO: use resource key
                 users.Select(u => u.Id).ToArray());
             await pushUpContext.PushEventUpdateAsync(command);
         }

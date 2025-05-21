@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WhoIsHome.External.PushUp;
 using WhoIsHome.External.PushUp.ApiClient;
+using WhoIsHome.External.Translation;
 using WhoIsHome.Shared.Configurations;
 
 namespace WhoIsHome.External;
@@ -15,6 +16,8 @@ public static class ServiceProviderConfig
         var connectionString = BuildConnectionString(configuration);
         services.AddDbContextFactory<WhoIsHomeContext>(o => o.UseMySQL(connectionString));
 
+        services.AddSingleton<ITranslationService, TranslationService>();
+        
         services.AddScoped<IPushUpContext, PushUpContext>();
         services.AddSingleton<PushApiClient>();
         
