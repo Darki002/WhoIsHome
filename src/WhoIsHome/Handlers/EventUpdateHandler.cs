@@ -4,6 +4,7 @@ using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.External;
 using WhoIsHome.External.PushUp;
+using WhoIsHome.External.Translation;
 using WhoIsHome.Shared.BackgroundTasks;
 using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
@@ -48,8 +49,8 @@ public class EventUpdateHandler(
                 .ToListAsync(cancellationToken);
             
             var command = new PushUpCommand(
-                Title: "Dinner time change",
-                Body: $"{user.UserName} has an update for Today.", // TODO: use resource key
+                Title: TranslationKeys.DinnerTimeChange,
+                Body: new TranslatableString(TranslationKeys.UserHasUpdated, user.UserName),
                 users.Select(u => u.Id).ToArray());
             await pushUpContext.PushEventUpdateAsync(command);
         }
