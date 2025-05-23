@@ -48,8 +48,9 @@ public class EventUpdateHandlerTest : InMemoryDbTest
 
         // Assert
         pushUpClientFake.Command.Should().NotBeNull();
-        pushUpClientFake.Command!.Title.Should().Be("Dinner time change");
-        pushUpClientFake.Command.Body.Should().Be("Darki has an update for Today.");
+        pushUpClientFake.Command!.Title.Value.Should().Be("DinnerTimeChange");
+        pushUpClientFake.Command.Body.Value.Should().Be("UserHasUpdated");
+        pushUpClientFake.Command.Body.Args.Should().BeEquivalentTo(["Darki"]);
         pushUpClientFake.Command.UserIds.Should().BeEquivalentTo([2, 3]);
     }
 
@@ -110,8 +111,9 @@ public class EventUpdateHandlerTest : InMemoryDbTest
 
         // Assert
         pushUpClientFake.Command.Should().NotBeNull();
-        pushUpClientFake.Command!.Title.Should().Be("Dinner time change");
-        pushUpClientFake.Command.Body.Should().Be("Darki has an update for Today.");
+        pushUpClientFake.Command!.Title.Value.Should().Be("DinnerTimeChange");
+        pushUpClientFake.Command.Body.Value.Should().Be("UserHasUpdated");
+        pushUpClientFake.Command.Body.Args.Should().BeEquivalentTo(["Darki"]);
         pushUpClientFake.Command.UserIds.Should().BeEquivalentTo([2, 3]);
     }
 

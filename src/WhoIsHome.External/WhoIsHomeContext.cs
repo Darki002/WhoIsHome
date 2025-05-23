@@ -55,11 +55,11 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
         // RepeatedEventModel
         modelBuilder.Entity<RepeatedEventModel>()
             .Property(e => e.FirstOccurrence)
-            .HasConversion(timeOnlyConverter);
+            .HasConversion(dateOnlyConverter);
         
         modelBuilder.Entity<RepeatedEventModel>()
             .Property(e => e.LastOccurrence)
-            .HasConversion(timeOnlyConverter);
+            .HasConversion(dateOnlyConverter);
     
         modelBuilder.Entity<RepeatedEventModel>()
             .Property(e => e.StartTime)
