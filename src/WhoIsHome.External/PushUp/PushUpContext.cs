@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using WhoIsHome.External.PushUp.ApiClient;
+using WhoIsHome.External.Translation;
 using WhoIsHome.Shared.Configurations;
 
 namespace WhoIsHome.External.PushUp;
@@ -10,6 +12,7 @@ public class PushUpContext(
     PushApiClient client, 
     IDbContextFactory<WhoIsHomeContext> contextFactory,
     IConfiguration configuration,
+    ITranslationService translation,
     ILogger<PushApiClient> logger) 
     : IPushUpContext
 {
@@ -26,49 +29,69 @@ public class PushUpContext(
 
     private async Task SendAsync(PushUpCommand command)
     {
-        try
-        {
-            var pushTokens = await GetExpoPushTokens(command.UserIds);
+        var translationGroups = await GetExpoPushTokens(command.UserIds);
+        var pushTickets = new List<PushTicketRequest>();
             
+        foreach (var translationGroup in translationGroups)
+        {
             var pushTicket = new PushTicketRequest
             {
-                PushTo = pushTokens,
-                PushTitle = command.Title, // TODO: translate foreach user
-                PushBody = command.Body
+                PushTo = translationGroup.PushTokens,
+                PushTitle = command.Title.Translate(translation, translationGroup.Culture),
+                PushBody = command.Body.Translate(translation, translationGroup.Culture)
             };
-            var result = await client.SendPushAsync(pushTicket);
+            pushTickets.Add(pushTicket);
+        }
 
-            if (result.PushTicketErrors.Count > 0)
+        var responses = new List<PushTicketResponse>();
+        
+        try
+        {
+            foreach (var pushTicket in pushTickets)
             {
-                var error = string.Join(", \n", result.PushTicketErrors
-                    .Select(e => $"Code: ${e.ErrorCode} - ${e.ErrorMessage}"));
-                
-                logger.LogError("Push Notification failed! Errors: {ErrorList}", error);
-                return;
+                var result = await client.SendPushAsync(pushTicket);
+                responses.Add(result);
             }
-
-            var failedTickets = result.PushTicketStatuses
-                .Where(t => t.TicketStatus != "ok")
-                .ToList();
-            
-            if (failedTickets.Count > 0)
-            {
-                foreach (var ticket in failedTickets)
-                {
-                    logger.LogError("A push had failed! Message {Message}", ticket.TicketMessage);
-                }
-                return;
-            }
-            
-            logger.LogInformation("All push notifications where send successfully");
         }
         catch (Exception e)
         {
             logger.LogError("Push Notification failed! Message: {Message}", e.Message);
         }
+        
+        var ticketsWithErrors = responses
+            .Where(r => r.PushTicketErrors.Count > 0)
+            .ToList();
+        
+        if (ticketsWithErrors.Count > 0)
+        {
+            foreach (var errorTicket in ticketsWithErrors)
+            {
+                var error = string.Join(", \n", errorTicket.PushTicketErrors
+                    .Select(e => $"Code: ${e.ErrorCode} - ${e.ErrorMessage}"));
+                
+                logger.LogError("Push Notification failed! Errors: {ErrorList}", error);
+            }
+            return;
+        }
+
+        var failedTickets = responses.SelectMany(r => r.PushTicketStatuses
+                .Where(t => t.TicketStatus != "ok")
+                .ToList())
+            .ToList();
+            
+        if (failedTickets.Count > 0)
+        {
+            foreach (var ticket in failedTickets)
+            {
+                logger.LogError("A push had failed! Message {Message}", ticket.TicketMessage);
+            }
+            return;
+        }
+            
+        logger.LogInformation("All push notifications where send successfully");
     }
 
-    private async Task<List<string>> GetExpoPushTokens(int[] userIds)
+    private async Task<List<TranslationGroup>> GetExpoPushTokens(int[] userIds)
     {
         var context = await contextFactory.CreateDbContextAsync();
 
@@ -76,9 +99,12 @@ public class PushUpContext(
                 .Where(t => userIds.Contains(t.UserId))
                 .Where(t => t.Token != null)
                 .Where(t => t.Enabled)
+                .GroupBy(t => t.LanguageCode)
                 .ToListAsync())
-            .Select(t => t.Token)
-            .Cast<string>()
+            .Select(s => new TranslationGroup(
+                s.Select(t => t.Token).ToList()!, s.Key))
             .ToList();
     }
+
+    private record TranslationGroup(List<string> PushTokens, CultureInfo Culture);
 }
