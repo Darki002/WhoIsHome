@@ -6,7 +6,7 @@ public readonly record struct TranslatableString(string Value, params object?[] 
 {
     public static implicit operator TranslatableString(string str) => new(str);
 
-    public string Translate(ITranslationService translation, CultureInfo culture)
+    public string Translate(ITranslationService translation, CultureInfo? culture)
     {
         return translation.Translate(this, culture);
     }

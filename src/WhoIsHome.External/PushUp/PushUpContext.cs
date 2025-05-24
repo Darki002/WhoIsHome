@@ -106,5 +106,5 @@ public class PushUpContext(
             .ToList();
     }
 
-    private record TranslationGroup(List<string> PushTokens, CultureInfo Culture);
+    private record TranslationGroup(List<string> PushTokens, CultureInfo? Culture);
 }

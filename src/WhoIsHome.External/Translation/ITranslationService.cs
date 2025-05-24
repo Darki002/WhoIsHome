@@ -8,7 +8,7 @@ public interface ITranslationService
     
     string this[TranslatableString str, CultureInfo culture] { get; }
     
-    string Translate(string key, CultureInfo culture, params object?[] args);
+    string Translate(string key, CultureInfo? culture, params object?[] args);
 
-    string Translate(TranslatableString str, CultureInfo culture);
+    string Translate(TranslatableString str, CultureInfo? culture);
 }
