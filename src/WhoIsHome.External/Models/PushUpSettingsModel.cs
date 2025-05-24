@@ -12,9 +12,8 @@ public class PushUpSettingsModel : DbModel
     [Required]
     public bool Enabled { get; set; }
     
-    [Required]
     [MaxLength(10)]
-    public required CultureInfo LanguageCode { get; set; }
+    public CultureInfo? LanguageCode { get; set; }
     
     [Required]
     public int UserId { get; set; }
