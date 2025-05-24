@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace WhoIsHome.WebApi.PushUp;
+﻿namespace WhoIsHome.WebApi.PushUp;
 
 public class PushUpSettings
 {
@@ -8,5 +6,5 @@ public class PushUpSettings
     
     public bool? Enable { get; set; }
 
-    public CultureInfo? LanguageCode { get; set; }
+    public string? LanguageCode { get; set; }
 }

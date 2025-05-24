@@ -44,7 +44,7 @@ public class PushUpController(
             Enabled = pushUpSettings.Enable ?? true,
             UserId = userContext.UserId,
             Token = pushUpSettings.Token,
-            LanguageCode = pushUpSettings.LanguageCode ?? CultureInfo.GetCultureInfo("en")
+            LanguageCode = Convert(pushUpSettings.LanguageCode, CultureInfo.GetCultureInfo("en"))
         };
         
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
@@ -56,10 +56,17 @@ public class PushUpController(
     {
         model.Token = pushUpSettings.Token;
         model.Enabled = pushUpSettings.Enable ?? model.Enabled;
-        model.LanguageCode = pushUpSettings.LanguageCode ?? model.LanguageCode;
+        model.LanguageCode = Convert(pushUpSettings.LanguageCode, model.LanguageCode);
         
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         context.PushUpSettings.Update(model);
         await context.SaveChangesAsync(cancellationToken);
+    }
+
+    private static CultureInfo Convert(string? languageCode, CultureInfo fallback)
+    {
+        return languageCode is not null
+            ? CultureInfo.GetCultureInfo(languageCode)
+            : fallback;
     }
 }
