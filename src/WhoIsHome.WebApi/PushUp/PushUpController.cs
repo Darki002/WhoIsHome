@@ -19,11 +19,6 @@ public class PushUpController(
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] PushUpSettings pushUpSettings, CancellationToken cancellationToken)
     {
-        if (pushUpSettings.Token is null)
-        {
-            return BadRequest("ExpoPushToken is required.");
-        }
-        
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var model = await context.PushUpSettings.SingleOrDefaultAsync(s => s.UserId == userContext.UserId, cancellationToken);
 
