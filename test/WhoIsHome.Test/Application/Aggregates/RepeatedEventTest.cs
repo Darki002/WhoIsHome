@@ -280,6 +280,21 @@ public class RepeatedEventTest
             // Assert
             result.Should().BeFalse();
         }
+        
+        [Test]
+        public void ReturnsTrue_WhenEventIsInfinitelyLong()
+        {
+            // Arrange
+            var firstOccurrence = new DateOnly(2024, 11, 1);
+            var dinnerTime = new DinnerTime(PresenceType, time);
+            var repeatedEvent = new RepeatedEvent(null, Title, firstOccurrence, null, startTime, endTime, dinnerTime, UserId);
+            
+            // Act
+            var result = repeatedEvent.IsEventAt(firstOccurrence);
+            
+            // Assert
+            result.Should().BeTrue();
+        }
     }
     
     [TestFixture]

@@ -20,7 +20,7 @@ public class UserOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contex
             .Select(m => m.ToAggregate());
 
         var repeatedEvents = (await context.RepeatedEvents
-                .Where(e => e.LastOccurrence >= today)
+                .Where(e => e.LastOccurrence == null || e.LastOccurrence >= today)
                 .Where(e => e.UserId == userId)
                 .ToListAsync(cancellationToken))
             .Select(m => m.ToAggregate());

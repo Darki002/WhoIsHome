@@ -62,7 +62,7 @@ public class RepeatedEvent(
     {
         return date.DayOfWeek == FirstOccurrence.DayOfWeek &&
                date >= FirstOccurrence &&
-               date <= LastOccurrence;
+               (LastOccurrence == null || date <= LastOccurrence);
     }
 
     public override DateOnly GetNextOccurrence(DateOnly today)

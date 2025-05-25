@@ -9,7 +9,7 @@ namespace WhoIsHome.QueryHandler.DailyOverview;
 
 public class UserDayOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contextFactory)
 {
-    public async Task<DailyOverview> HandleAsync(int id, DateOnly today, CancellationToken cancellationToken)
+    public async Task<DailyOverview> HandleAsync(int id, DateOnly date, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
 
@@ -24,18 +24,18 @@ public class UserDayOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> con
         var oneTimeEvents = (await context.OneTimeEvents
                 .Where(e => e.UserId == id)
                 .Where(e => e.PresenceType != PresenceType.Unknown)
-                .Where(e => e.Date == today)
+                .Where(e => e.Date == date)
                 .ToListAsync(cancellationToken))
             .Select(e => e.ToAggregate());
 
         var repeatedEvents = (await context.RepeatedEvents
                 .Where(e => e.UserId == id)
                 .Where(e => e.PresenceType != PresenceType.Unknown)
-                .Where(e => e.FirstOccurrence <= today)
-                .Where(e => e.LastOccurrence >= today)
+                .Where(e => e.FirstOccurrence <= date)
+                .Where(e => e.LastOccurrence == null || e.LastOccurrence >= date)
                 .ToListAsync(cancellationToken))
             .Select(e => e.ToAggregate())
-            .Where(e => e.IsEventAt(today));
+            .Where(e => e.IsEventAt(date));
 
         List<EventBase> events = [..oneTimeEvents, ..repeatedEvents];
         

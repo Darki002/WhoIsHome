@@ -40,7 +40,7 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
         public async Task ReturnsEvent_WithTheExpectedId()
         {
             // Arrange
-            var repeatedEvent = RepeatedEventTestData.CreateDefault();
+            var repeatedEvent = RepeatedEventTestData.CreateDefaultWithDefaultDateTimes();
             await SaveToDb(repeatedEvent);
             
             // Act
@@ -69,7 +69,7 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
         public async Task DeletesEvent_WithTheGivenId()
         {
             // Arrange
-            var repeatedEvent = RepeatedEventTestData.CreateDefault();
+            var repeatedEvent = RepeatedEventTestData.CreateDefaultWithDefaultDateTimes();
             await SaveToDb(repeatedEvent);
             
             // Act
@@ -97,7 +97,7 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
             await Db.Users.AddAsync(newUser);
             await Db.SaveChangesAsync();
             
-            var repeatedEvent = RepeatedEventTestData.CreateDefault(userId: 2);
+            var repeatedEvent = RepeatedEventTestData.CreateDefaultWithDefaultDateTimes(userId: 2);
             await SaveToDb(repeatedEvent);
             
             // Act
@@ -115,7 +115,7 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
         public async Task SaveGivenEventToDb()
         {
             // Arrange
-            var repeatedEvent = RepeatedEventTestData.CreateDefault(title: "SaveGivenEventToDb");
+            var repeatedEvent = RepeatedEventTestData.CreateDefaultWithDefaultDateTimes(title: "SaveGivenEventToDb");
             
             // Act
             var result = await service.CreateAsync(repeatedEvent.Title, repeatedEvent.FirstOccurrence, repeatedEvent.LastOccurrence, repeatedEvent.StartTime,
@@ -137,7 +137,7 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
         public async Task SaveGivenEventToDb()
         {
             // Arrange
-            var repeatedEvent = RepeatedEventTestData.CreateDefault(title: "SaveGivenEventToDb");
+            var repeatedEvent = RepeatedEventTestData.CreateDefaultWithDefaultDateTimes(title: "SaveGivenEventToDb");
             await SaveToDb(repeatedEvent);
             
             // Act

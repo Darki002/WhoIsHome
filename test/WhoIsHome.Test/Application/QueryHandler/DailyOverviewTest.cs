@@ -74,13 +74,13 @@ public class DailyOverviewTest : InMemoryDbTest
         await Db.Users.AddAsync(user1);
 
         var repeatedEvent1 = RepeatedEventTestData
-            .CreateDefault(firstOccurrence: dateTimeProviderFake.CurrentDate, 
+            .CreateDefaultWithDefaultDateTimes(firstOccurrence: dateTimeProviderFake.CurrentDate, 
                 lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7), 
                 userId: 1)
             .ToModel();
         await Db.RepeatedEvents.AddAsync(repeatedEvent1);
 
-        var repeatedEvent2 = RepeatedEventTestData.CreateDefault(firstOccurrence: dateTimeProviderFake.CurrentDate,
+        var repeatedEvent2 = RepeatedEventTestData.CreateDefaultWithDefaultDateTimes(firstOccurrence: dateTimeProviderFake.CurrentDate,
                 lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7), startTime: new TimeOnly(18, 00, 00),
                 endTime: new TimeOnly(19, 00, 00), 
                 dinnerTime: expectedDinnerTime,
@@ -114,7 +114,7 @@ public class DailyOverviewTest : InMemoryDbTest
             .ToModel();
         await Db.OneTimeEvents.AddAsync(oneTimeEvent);
 
-        var repeatedEvent = RepeatedEventTestData.CreateDefault(firstOccurrence: dateTimeProviderFake.CurrentDate,
+        var repeatedEvent = RepeatedEventTestData.CreateDefaultWithDefaultDateTimes(firstOccurrence: dateTimeProviderFake.CurrentDate,
                 lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7), startTime: new TimeOnly(18, 00, 00),
                 endTime: new TimeOnly(19, 00, 00), dinnerTime: expectedDinnerTime)
             .ToModel();
@@ -138,7 +138,7 @@ public class DailyOverviewTest : InMemoryDbTest
         var user = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
         await Db.Users.AddAsync(user);
 
-        var repeatedEvent = RepeatedEventTestData.NotPresent(
+        var repeatedEvent = RepeatedEventTestData.NotPresentWithDefaultDateTimes(
                 firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-2),
                 lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(5), 
                 startTime: new TimeOnly(18, 00, 00),
@@ -196,6 +196,31 @@ public class DailyOverviewTest : InMemoryDbTest
             .CreateDefault(date: dateTimeProviderFake.CurrentDate)
             .ToModel();
         await Db.OneTimeEvents.AddAsync(oneTimeEvent2);
+
+        await Db.SaveChangesAsync();
+
+        // Act
+        var result = await queryHandler.HandleAsync(dateTimeProviderFake.CurrentDate, CancellationToken.None);
+
+        // Assert
+        result.Should().HaveCount(1);
+        result.Single().IsAtHome.Should().BeFalse();
+        result.Single().DinnerTime.Should().BeNull();
+    }
+    
+    [Test]
+    public async Task ReturnsExpectedDailyOverview_WithNotPresentRepeatingInfinitely()
+    {
+        // Arrange
+        var user = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
+        await Db.Users.AddAsync(user);
+
+        var repeatedEvent = RepeatedEventTestData.NotPresent(
+                firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-7),
+                startTime: new TimeOnly(18, 00, 00),
+                endTime: new TimeOnly(19, 00, 00))
+            .ToModel();
+        await Db.RepeatedEvents.AddAsync(repeatedEvent);
 
         await Db.SaveChangesAsync();
 

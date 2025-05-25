@@ -45,13 +45,13 @@ public class UserOverviewTest : InMemoryDbTest
         var oneTimeEvent3 = OneTimeEventTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(1)).ToModel();
         
         var repeatedEvent1 = RepeatedEventTestData
-            .CreateDefault(title: "4", firstOccurrence: dateTimeProviderFake.CurrentDate, lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7))
+            .CreateDefaultWithDefaultDateTimes(title: "4", firstOccurrence: dateTimeProviderFake.CurrentDate, lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7))
             .ToModel();
         var repeatedEvent2 = RepeatedEventTestData
-            .CreateDefault(title: "5", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7), lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(14))
+            .CreateDefaultWithDefaultDateTimes(title: "5", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7), lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(14))
             .ToModel();
         var repeatedEvent3 = RepeatedEventTestData
-            .CreateDefault(title: "6", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-14), lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-7))
+            .CreateDefaultWithDefaultDateTimes(title: "6", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-14), lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-7))
             .ToModel();
 
         await Db.AddRangeAsync(oneTimeEvent1, oneTimeEvent2, oneTimeEvent3, repeatedEvent1, repeatedEvent2, repeatedEvent3);
@@ -71,6 +71,29 @@ public class UserOverviewTest : InMemoryDbTest
     }
     
     [Test]
+    public async Task ReturnsOverview_WithExpectedEvents_ForToday_WithInfinitelyEvent()
+    {
+        // Arrange
+        var user = UserTestData.CreateDefaultUser().ToModel();
+        await Db.Users.AddAsync(user);
+        
+        
+        var repeatedEvent = RepeatedEventTestData
+            .CreateDefault(title: "6", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-14))
+            .ToModel();
+
+        await Db.AddRangeAsync(repeatedEvent);
+        await Db.SaveChangesAsync();
+        
+        // Act
+        var result = await queryHandler.HandleAsync(1, CancellationToken.None);
+        
+        // Assert
+        result.Today.Should().HaveCount(1);
+        result.Today.Should().ContainSingle(e => e.Title == "6");
+    }
+    
+    [Test]
     public async Task ReturnsOverview_WithExpectedEvents_ForThisWeek()
     {
         // Arrange
@@ -82,13 +105,13 @@ public class UserOverviewTest : InMemoryDbTest
         var oneTimeEvent3 = OneTimeEventTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(-1)).ToModel();
         
         var repeatedEvent1 = RepeatedEventTestData
-            .CreateDefault(title: "4", firstOccurrence: dateTimeProviderFake.CurrentDate, lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7))
+            .CreateDefaultWithDefaultDateTimes(title: "4", firstOccurrence: dateTimeProviderFake.CurrentDate, lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7))
             .ToModel();
         var repeatedEvent2 = RepeatedEventTestData
-            .CreateDefault(title: "5", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(2), lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(14))
+            .CreateDefaultWithDefaultDateTimes(title: "5", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(2), lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(14))
             .ToModel();
         var repeatedEvent3 = RepeatedEventTestData
-            .CreateDefault(title: "6", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-14), lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-7))
+            .CreateDefaultWithDefaultDateTimes(title: "6", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-14), lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-7))
             .ToModel();
 
         await Db.AddRangeAsync(oneTimeEvent1, oneTimeEvent2, oneTimeEvent3, repeatedEvent1, repeatedEvent2, repeatedEvent3);
@@ -119,16 +142,16 @@ public class UserOverviewTest : InMemoryDbTest
         var oneTimeEvent3 = OneTimeEventTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(8)).ToModel();
         
         var repeatedEvent1 = RepeatedEventTestData
-            .CreateDefault(title: "4", firstOccurrence: dateTimeProviderFake.CurrentDate, lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7))
+            .CreateDefaultWithDefaultDateTimes(title: "4", firstOccurrence: dateTimeProviderFake.CurrentDate, lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7))
             .ToModel();
         var repeatedEvent2 = RepeatedEventTestData
-            .CreateDefault(title: "5", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(2), lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(14))
+            .CreateDefaultWithDefaultDateTimes(title: "5", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(2), lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(14))
             .ToModel();
         var repeatedEvent3 = RepeatedEventTestData
-            .CreateDefault(title: "6", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(8), lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(15))
+            .CreateDefaultWithDefaultDateTimes(title: "6", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(8), lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(15))
             .ToModel();
         var repeatedEvent4 = RepeatedEventTestData
-            .CreateDefault(title: "7", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-8), lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-15))
+            .CreateDefaultWithDefaultDateTimes(title: "7", firstOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-8), lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(-15))
             .ToModel();
 
         await Db.AddRangeAsync(oneTimeEvent1, oneTimeEvent2, oneTimeEvent3, repeatedEvent1, repeatedEvent2, repeatedEvent3, repeatedEvent4);
