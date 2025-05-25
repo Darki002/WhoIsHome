@@ -172,6 +172,20 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
             result.Id.Should().Be(1);
             result.LastOccurrence.Should().Be(dateTimeProviderFake.CurrentDate);
         }
+        
+        [Test]
+        public async Task ThrowIfLastOccurrenceIsAlreadySet()
+        {
+            // Arrange
+            var repeatedEvent = RepeatedEventTestData.CreateDefault(title: "SetEndTimeOnAggregate", lastOccurrence: dateTimeProviderFake.CurrentDate);
+            await SaveToDb(repeatedEvent);
+            
+            // Act
+            var action = async () => await service.EndAsync(1, CancellationToken.None);
+            
+            // Assert
+            await action.Should().ThrowAsync<InvalidModelException>();
+        }
     }
     
     private async Task SaveToDb(RepeatedEvent oneTimeEvent)

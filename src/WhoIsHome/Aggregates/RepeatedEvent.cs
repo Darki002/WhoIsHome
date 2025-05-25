@@ -96,6 +96,11 @@ public class RepeatedEvent(
 
     public void End(DateOnly currentDate)
     {
+        if (LastOccurrence is not null)
+        {
+            throw new InvalidModelException("Can not end a RepeatedEvent that already has a LastOccurrence date.");
+        }
+        
         LastOccurrence = currentDate;
     }
 }
