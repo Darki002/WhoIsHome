@@ -6,7 +6,7 @@ public class RepeatedEventModelDto
     
     public required DateOnly FirstOccurrence { get; set; }
     
-    public required DateOnly LastOccurrence { get; set; }
+    public DateOnly? LastOccurrence { get; set; }
 
     public required TimeOnly StartTime { get; set; }
 

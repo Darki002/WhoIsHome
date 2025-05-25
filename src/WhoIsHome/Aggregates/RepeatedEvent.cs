@@ -8,7 +8,7 @@ public class RepeatedEvent(
     int? id,
     string title,
     DateOnly firstOccurrence,
-    DateOnly lastOccurrence,
+    DateOnly? lastOccurrence,
     TimeOnly startTime,
     TimeOnly? endTime,
     DinnerTime dinnerTime,
@@ -17,12 +17,12 @@ public class RepeatedEvent(
 {
     public DateOnly FirstOccurrence { get; set; } = firstOccurrence;
 
-    public DateOnly LastOccurrence { get; set; } = lastOccurrence;
+    public DateOnly? LastOccurrence { get; set; } = lastOccurrence;
 
     public static RepeatedEvent Create(
         string title, 
         DateOnly firstOccurrence, 
-        DateOnly lastOccurrence, 
+        DateOnly? lastOccurrence, 
         TimeOnly startTime, 
         TimeOnly? endTime, 
         PresenceType presenceType, 
@@ -44,7 +44,7 @@ public class RepeatedEvent(
             userId);
     }
     
-    public void Update(string title, DateOnly firstOccurrence, DateOnly lastOccurrence, TimeOnly startTime, TimeOnly? endTime, PresenceType presenceType, TimeOnly? time)
+    public void Update(string title, DateOnly firstOccurrence, DateOnly? lastOccurrence, TimeOnly startTime, TimeOnly? endTime, PresenceType presenceType, TimeOnly? time)
     {
         var dinnerTime = DinnerTime.Update(presenceType, time);
         ValidateBase(title, startTime, endTime, dinnerTime);
@@ -86,7 +86,7 @@ public class RepeatedEvent(
         return today.AddDays(daysUntilNextOccurence);
     }
 
-    private static void ValidateOccurrence(DateOnly firstOccurrence,  DateOnly lastOccurrence)
+    private static void ValidateOccurrence(DateOnly firstOccurrence,  DateOnly? lastOccurrence)
     {
         if (firstOccurrence > lastOccurrence)
         {

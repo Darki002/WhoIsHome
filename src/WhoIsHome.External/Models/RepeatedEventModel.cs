@@ -16,8 +16,7 @@ public class RepeatedEventModel : DbModel
     [Required]
     public DateOnly FirstOccurrence { get; set; }
     
-    [Required]
-    public DateOnly LastOccurrence { get; set; }
+    public DateOnly? LastOccurrence { get; set; }
     
     [Required]
     public TimeOnly StartTime { get; set; }

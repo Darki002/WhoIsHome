@@ -47,8 +47,9 @@ internal class RepeatedEventAggregateService(
         await eventUpdateHandler.HandleAsync(result.ToAggregate(), EventUpdateHandler.UpdateAction.Delete);
     }
 
-    public async Task<RepeatedEvent> CreateAsync(string title, DateOnly firstOccurrence, DateOnly lastOccurrence,
-        TimeOnly startTime, TimeOnly? endTime, PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
+    public async Task<RepeatedEvent> CreateAsync(string title, DateOnly firstOccurrence, DateOnly? lastOccurrence,
+        TimeOnly startTime, TimeOnly? endTime, PresenceType presenceType, TimeOnly? time,
+        CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var user = await context.Users.SingleAsync(u => u.Id == userContext.UserId, cancellationToken: cancellationToken);
@@ -67,7 +68,7 @@ internal class RepeatedEventAggregateService(
     }
 
     public async Task<RepeatedEvent> UpdateAsync(int id, string title, DateOnly firstOccurrence,
-        DateOnly lastOccurrence, TimeOnly startTime, TimeOnly? endTime, PresenceType presenceType, TimeOnly? time,
+        DateOnly? lastOccurrence, TimeOnly startTime, TimeOnly? endTime, PresenceType presenceType, TimeOnly? time,
         CancellationToken cancellationToken)
     {
         var aggregate = await GetAsync(id, cancellationToken);

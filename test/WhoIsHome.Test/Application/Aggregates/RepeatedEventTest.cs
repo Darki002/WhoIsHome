@@ -42,13 +42,13 @@ public class RepeatedEventTest
         public void ReturnsNewOneTimeEvent_WithoutEndTime()
         {
             // Act
-            var result = RepeatedEvent.Create(Title, firstOccurrence, lastOccurrence, startTime, null, PresenceType, null, UserId);
+            var result = RepeatedEvent.Create(Title, firstOccurrence, null, startTime, null, PresenceType, null, UserId);
             
             // Assert
             result.Id.Should().BeNull();
             result.Title.Should().Be(Title);
             result.FirstOccurrence.Should().Be(firstOccurrence);
-            result.LastOccurrence.Should().Be(lastOccurrence);
+            result.LastOccurrence.Should().BeNull();
             result.StartTime.Should().Be(startTime);
             result.EndTime.Should().BeNull();
             result.DinnerTime.PresenceType.Should().Be(PresenceType);
