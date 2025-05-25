@@ -93,4 +93,9 @@ public class RepeatedEvent(
             throw new InvalidModelException("First occurrence must be before the last occurrence.");
         }
     }
+
+    public void End(DateOnly currentDate)
+    {
+        LastOccurrence = currentDate;
+    }
 }

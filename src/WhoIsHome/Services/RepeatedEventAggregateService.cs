@@ -5,6 +5,7 @@ using WhoIsHome.External;
 using WhoIsHome.Handlers;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
+using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Services;
@@ -12,6 +13,7 @@ namespace WhoIsHome.Services;
 internal class RepeatedEventAggregateService(
     IDbContextFactory<WhoIsHomeContext> contextFactory,
     IEventUpdateHandler eventUpdateHandler, 
+    IDateTimeProvider dateTimeProvider,
     IUserContext userContext) 
     : IRepeatedEventAggregateService
 {
@@ -89,6 +91,29 @@ internal class RepeatedEventAggregateService(
         var updatedEvent = result.Entity.ToAggregate();
         
         await eventUpdateHandler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Update);
+
+        return updatedEvent;
+    }
+
+    public async Task<RepeatedEvent> EndAsync(int id, CancellationToken cancellationToken)
+    {
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+
+        var aggregate = await GetAsync(id, cancellationToken);
+        
+        var user = await context.Users.SingleAsync(u => u.Id == aggregate.UserId, cancellationToken: cancellationToken);
+        
+        if (!userContext.IsUserPermitted(user.Id))
+        {
+            throw new ActionNotAllowedException($"User with ID {user.Id} is not allowed to delete or modify the content of {id}");
+        }
+
+        aggregate.End(dateTimeProvider.CurrentDate);
+        
+        var result = context.RepeatedEvents.Update(aggregate.ToModel());
+        await context.SaveChangesAsync(cancellationToken);
+                
+        var updatedEvent = result.Entity.ToAggregate();
 
         return updatedEvent;
     }

@@ -11,8 +11,10 @@ namespace WhoIsHome.Test.Application.Services;
 [TestFixture]
 public class RepeatedEventAggregateServiceTest : InMemoryDbTest
 {
+    private readonly UserContextFake userContextFake = new();
+    private readonly DateTimeProviderFake dateTimeProviderFake = new();
+    
     private User user = null!;
-    private UserContextFake userContextFake;
     private RepeatedEventAggregateService service;
 
     [SetUp]
@@ -20,9 +22,8 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
     {
         var eventUpdateHandlerMock = Mock.Of<IEventUpdateHandler>();
         
-        userContextFake = new UserContextFake();
         userContextFake.SetUser(user, 1);
-        service = new RepeatedEventAggregateService(DbFactory, eventUpdateHandlerMock, userContextFake);
+        service = new RepeatedEventAggregateService(DbFactory, eventUpdateHandlerMock, dateTimeProviderFake, userContextFake);
     }
 
     protected override async Task DbSetUpAsync()
@@ -151,6 +152,25 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
             result.Id.Should().Be(1);
             Db.RepeatedEvents.Single().Title.Should().Be("This is a new title");
             result.Title.Should().Be("This is a new title");
+        }
+    }
+    
+    [TestFixture]
+    private class EndAsync : RepeatedEventAggregateServiceTest
+    {
+        [Test]
+        public async Task SetEndTimeOnAggregate()
+        {
+            // Arrange
+            var repeatedEvent = RepeatedEventTestData.CreateDefault(title: "SetEndTimeOnAggregate");
+            await SaveToDb(repeatedEvent);
+            
+            // Act
+            var result = await service.EndAsync(1, CancellationToken.None);
+            
+            // Assert
+            result.Id.Should().Be(1);
+            result.LastOccurrence.Should().Be(dateTimeProviderFake.CurrentDate);
         }
     }
     

@@ -47,6 +47,14 @@ public class RepeatedEventController(IRepeatedEventAggregateService repeatedEven
 
         return await BuildResponseAsync(result);
     }
+
+    [HttpPost("end/{id:int}")]
+    public async Task<ActionResult<RepeatedEventModel>> EndAsync(int id, CancellationToken cancellationToken)
+    {
+        var result = await repeatedEventAggregateService.EndAsync(id: id, cancellationToken: cancellationToken);
+
+        return await BuildResponseAsync(result);
+    }
     
     protected override Task<RepeatedEventModel> ConvertToModelAsync(RepeatedEvent data) => Task.FromResult(RepeatedEventModel.From(data));
 }
