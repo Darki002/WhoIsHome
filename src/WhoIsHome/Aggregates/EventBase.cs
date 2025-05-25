@@ -7,7 +7,7 @@ public abstract class EventBase(
     int? id,
     string title,
     TimeOnly startTime,
-    TimeOnly endTime,
+    TimeOnly? endTime,
     DinnerTime dinnerTime,
     int userId)
     : AggregateBase
@@ -18,7 +18,7 @@ public abstract class EventBase(
 
     public TimeOnly StartTime { get; protected set; } = startTime;
 
-    public TimeOnly EndTime { get; protected set; } = endTime;
+    public TimeOnly? EndTime { get; protected set; } = endTime;
 
     public DinnerTime DinnerTime { get; protected set; } = dinnerTime;
 
@@ -27,7 +27,7 @@ public abstract class EventBase(
     protected static void ValidateBase(
         string title,
         TimeOnly startTime,
-        TimeOnly endTime,
+        TimeOnly? endTime,
         DinnerTime dinnerTime)
     {
         ValidateTitle(title);
@@ -43,7 +43,7 @@ public abstract class EventBase(
         }
     }
 
-    private static void ValidateTime(TimeOnly startTime, TimeOnly endTime)
+    private static void ValidateTime(TimeOnly startTime, TimeOnly? endTime)
     {
         if (startTime > endTime)
         {
@@ -51,7 +51,7 @@ public abstract class EventBase(
         }
     }
 
-    private static void ValidateDinnerTime(TimeOnly endTime, DinnerTime dinnerTime)
+    private static void ValidateDinnerTime(TimeOnly? endTime, DinnerTime dinnerTime)
     {
         if (endTime > dinnerTime.Time)
         {

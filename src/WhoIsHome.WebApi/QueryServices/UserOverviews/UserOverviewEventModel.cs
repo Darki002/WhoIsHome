@@ -12,7 +12,7 @@ public record UserOverviewEventModel
 
     public required TimeOnly StartTime { get; init; }
 
-    public required TimeOnly EndTime { get; init; }
+    public TimeOnly? EndTime { get; init; }
 
     public required string EventType { get; init; }
 

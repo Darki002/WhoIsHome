@@ -22,8 +22,7 @@ public class RepeatedEventModel : DbModel
     [Required]
     public TimeOnly StartTime { get; set; }
     
-    [Required]
-    public TimeOnly EndTime { get; set; }
+    public TimeOnly? EndTime { get; set; }
     
     [Required]
     [DefaultValue(PresenceType.Unknown)]

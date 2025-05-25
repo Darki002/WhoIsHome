@@ -10,7 +10,7 @@ public class RepeatedEvent(
     DateOnly firstOccurrence,
     DateOnly lastOccurrence,
     TimeOnly startTime,
-    TimeOnly endTime,
+    TimeOnly? endTime,
     DinnerTime dinnerTime,
     int userId)
     : EventBase(id, title, startTime, endTime, dinnerTime, userId)
@@ -24,7 +24,7 @@ public class RepeatedEvent(
         DateOnly firstOccurrence, 
         DateOnly lastOccurrence, 
         TimeOnly startTime, 
-        TimeOnly endTime, 
+        TimeOnly? endTime, 
         PresenceType presenceType, 
         TimeOnly? time,
         int userId)
@@ -44,7 +44,7 @@ public class RepeatedEvent(
             userId);
     }
     
-    public void Update(string title, DateOnly firstOccurrence, DateOnly lastOccurrence, TimeOnly startTime, TimeOnly endTime, PresenceType presenceType, TimeOnly? time)
+    public void Update(string title, DateOnly firstOccurrence, DateOnly lastOccurrence, TimeOnly startTime, TimeOnly? endTime, PresenceType presenceType, TimeOnly? time)
     {
         var dinnerTime = DinnerTime.Update(presenceType, time);
         ValidateBase(title, startTime, endTime, dinnerTime);

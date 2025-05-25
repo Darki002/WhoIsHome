@@ -8,7 +8,7 @@ public class OneTimeEventModelDto
 
     public required TimeOnly StartTime { get; set; }
 
-    public required TimeOnly EndTime { get; set; }
+    public TimeOnly? EndTime { get; set; }
 
     public required string PresenceType { get; set; }
 

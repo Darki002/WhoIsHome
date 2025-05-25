@@ -39,6 +39,24 @@ public class RepeatedEventTest
         }
         
         [Test]
+        public void ReturnsNewOneTimeEvent_WithoutEndTime()
+        {
+            // Act
+            var result = RepeatedEvent.Create(Title, firstOccurrence, lastOccurrence, startTime, null, PresenceType, null, UserId);
+            
+            // Assert
+            result.Id.Should().BeNull();
+            result.Title.Should().Be(Title);
+            result.FirstOccurrence.Should().Be(firstOccurrence);
+            result.LastOccurrence.Should().Be(lastOccurrence);
+            result.StartTime.Should().Be(startTime);
+            result.EndTime.Should().BeNull();
+            result.DinnerTime.PresenceType.Should().Be(PresenceType);
+            result.DinnerTime.Time.Should().BeNull();
+            result.UserId.Should().Be(UserId);
+        }
+        
+        [Test]
         public void ThrowsInvalidModelException_WhenTitleIsTooLong()
         {
             // Arrange

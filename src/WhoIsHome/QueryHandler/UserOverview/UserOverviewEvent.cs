@@ -10,7 +10,7 @@ public class UserOverviewEvent
     
     public required TimeOnly StartTime { get; init; }
     
-    public required TimeOnly EndTime { get; init; }
+    public required TimeOnly? EndTime { get; init; }
     
     public required EventType EventType { get; init; }
 }

@@ -37,6 +37,23 @@ public class OneTimeEventTest
             result.DinnerTime.Time.Should().BeNull();
             result.UserId.Should().Be(UserId);
         }
+        
+        [Test]
+        public void ReturnsNewOneTimeEvent_WithoutEndTime()
+        {
+            // Act
+            var result = OneTimeEvent.Create(Title, date, startTime, null, PresenceType, null, UserId);
+
+            // Assert
+            result.Id.Should().BeNull();
+            result.Title.Should().Be(Title);
+            result.Date.Should().Be(date);
+            result.StartTime.Should().Be(startTime);
+            result.EndTime.Should().BeNull();
+            result.DinnerTime.PresenceType.Should().Be(PresenceType);
+            result.DinnerTime.Time.Should().BeNull();
+            result.UserId.Should().Be(UserId);
+        }
 
         [Test]
         public void ThrowsInvalidModelException_WhenTitleIsTooLong()

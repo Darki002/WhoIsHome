@@ -8,7 +8,7 @@ public class OneTimeEvent(
     string title,
     DateOnly date,
     TimeOnly startTime,
-    TimeOnly endTime,
+    TimeOnly? endTime,
     DinnerTime dinnerTime,
     int userId)
     : EventBase(id, title, startTime, endTime, dinnerTime, userId)
@@ -19,7 +19,7 @@ public class OneTimeEvent(
         string title, 
         DateOnly date, 
         TimeOnly startTime, 
-        TimeOnly endTime, 
+        TimeOnly? endTime, 
         PresenceType presenceType, 
         TimeOnly? time,
         int userId)
@@ -37,7 +37,7 @@ public class OneTimeEvent(
             userId);
     }
     
-    public void Update(string title, DateOnly date, TimeOnly startTime, TimeOnly endTime, PresenceType presenceType, TimeOnly? time)
+    public void Update(string title, DateOnly date, TimeOnly startTime, TimeOnly? endTime, PresenceType presenceType, TimeOnly? time)
     {
         var dinnerTime = DinnerTime.Update(presenceType, time);
         ValidateBase(title, startTime, endTime, dinnerTime);

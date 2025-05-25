@@ -48,7 +48,7 @@ internal class OneTimeEventAggregateService(
         await eventUpdateHandler.HandleAsync(result.ToAggregate(), EventUpdateHandler.UpdateAction.Delete);
     }
 
-    public async Task<OneTimeEvent> CreateAsync(string title, DateOnly date, TimeOnly startTime, TimeOnly endTime,
+    public async Task<OneTimeEvent> CreateAsync(string title, DateOnly date, TimeOnly startTime, TimeOnly? endTime,
         PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
     {
         var oneTimeEvent = OneTimeEvent.Create(title, date, startTime, endTime, presenceType, time, userContext.UserId)
@@ -66,7 +66,7 @@ internal class OneTimeEventAggregateService(
     }
 
     public async Task<OneTimeEvent> UpdateAsync(int id, string title, DateOnly date, TimeOnly startTime,
-        TimeOnly endTime, PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
+        TimeOnly? endTime, PresenceType presenceType, TimeOnly? time, CancellationToken cancellationToken)
     {
         var aggregate = await GetAsync(id, cancellationToken);
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
