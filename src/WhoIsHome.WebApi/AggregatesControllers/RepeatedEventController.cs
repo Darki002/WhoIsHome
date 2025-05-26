@@ -49,9 +49,9 @@ public class RepeatedEventController(IRepeatedEventAggregateService repeatedEven
     }
 
     [HttpPost("end/{id:int}")]
-    public async Task<ActionResult<RepeatedEventModel>> EndAsync(int id, CancellationToken cancellationToken)
+    public async Task<ActionResult<RepeatedEventModel>> EndAsync(int id, [FromBody] EndRepeatedEventDto dto, CancellationToken cancellationToken)
     {
-        var result = await repeatedEventAggregateService.EndAsync(id: id, cancellationToken: cancellationToken);
+        var result = await repeatedEventAggregateService.EndAsync(id: id, dto.EndDate, cancellationToken: cancellationToken);
 
         return await BuildResponseAsync(result);
     }

@@ -13,5 +13,5 @@ public interface IRepeatedEventAggregateService : IAggregateService<RepeatedEven
         DateOnly? lastOccurrence, TimeOnly startTime, TimeOnly? endTime, PresenceType presenceType, TimeOnly? time,
         CancellationToken cancellationToken);
 
-    Task<RepeatedEvent> EndAsync(int id, CancellationToken cancellationToken);
+    Task<RepeatedEvent> EndAsync(int id, DateOnly endTime, CancellationToken cancellationToken);
 }

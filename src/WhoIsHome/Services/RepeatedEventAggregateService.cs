@@ -13,7 +13,6 @@ namespace WhoIsHome.Services;
 internal class RepeatedEventAggregateService(
     IDbContextFactory<WhoIsHomeContext> contextFactory,
     IEventUpdateHandler eventUpdateHandler, 
-    IDateTimeProvider dateTimeProvider,
     IUserContext userContext) 
     : IRepeatedEventAggregateService
 {
@@ -95,7 +94,7 @@ internal class RepeatedEventAggregateService(
         return updatedEvent;
     }
 
-    public async Task<RepeatedEvent> EndAsync(int id, CancellationToken cancellationToken)
+    public async Task<RepeatedEvent> EndAsync(int id, DateOnly endTime, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
 
@@ -108,7 +107,7 @@ internal class RepeatedEventAggregateService(
             throw new ActionNotAllowedException($"User with ID {user.Id} is not allowed to delete or modify the content of {id}");
         }
 
-        aggregate.End(dateTimeProvider.CurrentDate);
+        aggregate.End(endTime);
         
         var result = context.RepeatedEvents.Update(aggregate.ToModel());
         await context.SaveChangesAsync(cancellationToken);
