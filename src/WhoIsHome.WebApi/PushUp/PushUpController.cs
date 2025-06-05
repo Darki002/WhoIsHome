@@ -51,7 +51,7 @@ public class PushUpController(
     {
         model.Token = pushUpSettings.Token;
         model.Enabled = pushUpSettings.Enable ?? model.Enabled;
-        model.LanguageCode = Convert(pushUpSettings.LanguageCode, model.LanguageCode);
+        model.LanguageCode = Convert(pushUpSettings.LanguageCode, model.LanguageCode!);
         
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         context.PushUpSettings.Update(model);
