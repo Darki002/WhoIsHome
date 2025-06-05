@@ -12,7 +12,6 @@ namespace WhoIsHome.Test.Application.Services;
 public class RepeatedEventAggregateServiceTest : InMemoryDbTest
 {
     private readonly UserContextFake userContextFake = new();
-    private readonly DateTimeProviderFake dateTimeProviderFake = new();
     
     private User user = null!;
     private RepeatedEventAggregateService service;
@@ -23,7 +22,7 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
         var eventUpdateHandlerMock = Mock.Of<IEventUpdateHandler>();
         
         userContextFake.SetUser(user, 1);
-        service = new RepeatedEventAggregateService(DbFactory, eventUpdateHandlerMock, dateTimeProviderFake, userContextFake);
+        service = new RepeatedEventAggregateService(DbFactory, eventUpdateHandlerMock, userContextFake);
     }
 
     protected override async Task DbSetUpAsync()
@@ -162,26 +161,44 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
         public async Task SetEndTimeOnAggregate()
         {
             // Arrange
+            var expected = new DateOnly(2025, 1, 1);
+            
             var repeatedEvent = RepeatedEventTestData.CreateDefault(title: "SetEndTimeOnAggregate");
             await SaveToDb(repeatedEvent);
             
             // Act
-            var result = await service.EndAsync(1, CancellationToken.None);
+            var result = await service.EndAsync(1, expected, CancellationToken.None);
             
             // Assert
             result.Id.Should().Be(1);
-            result.LastOccurrence.Should().Be(dateTimeProviderFake.CurrentDate);
+            result.LastOccurrence.Should().Be(expected);
         }
         
         [Test]
         public async Task ThrowIfLastOccurrenceIsAlreadySet()
         {
             // Arrange
-            var repeatedEvent = RepeatedEventTestData.CreateDefault(title: "SetEndTimeOnAggregate", lastOccurrence: dateTimeProviderFake.CurrentDate);
+            var expected = new DateOnly(2025, 1, 1);
+            var repeatedEvent = RepeatedEventTestData.CreateDefault(title: "SetEndTimeOnAggregate", lastOccurrence: expected);
             await SaveToDb(repeatedEvent);
             
             // Act
-            var action = async () => await service.EndAsync(1, CancellationToken.None);
+            var action = async () => await service.EndAsync(1, expected, CancellationToken.None);
+            
+            // Assert
+            await action.Should().ThrowAsync<InvalidModelException>();
+        }
+        
+        [Test]
+        public async Task ThrowIfLastOccurrenceIsBeforeFirstOccurrence()
+        {
+            // Arrange
+            var expected = new DateOnly(2025, 1, 1);
+            var repeatedEvent = RepeatedEventTestData.CreateDefault(title: "SetEndTimeOnAggregate", firstOccurrence: expected.AddDays(7), lastOccurrence: expected);
+            await SaveToDb(repeatedEvent);
+            
+            // Act
+            var action = async () => await service.EndAsync(1, expected, CancellationToken.None);
             
             // Assert
             await action.Should().ThrowAsync<InvalidModelException>();
