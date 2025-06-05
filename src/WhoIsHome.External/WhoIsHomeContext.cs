@@ -33,8 +33,6 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        
-        
         // OneTimeEventModel
         modelBuilder.Entity<OneTimeEventModel>()
             .Property(e => e.Date)
