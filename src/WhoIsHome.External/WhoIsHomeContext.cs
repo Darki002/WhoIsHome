@@ -18,33 +18,37 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
     
     public virtual DbSet<PushUpSettingsModel> PushUpSettings { get; set; }
     
+    private static readonly ValueConverter<TimeOnly, TimeSpan> TimeOnlyConverter = new(
+        only => only.ToTimeSpan(),
+        span => TimeOnly.FromTimeSpan(span));
+
+    private static readonly ValueConverter<DateOnly, DateTime> DateOnlyConverter = new(
+        only => only.ToDateTime(TimeOnly.MinValue),
+        dt => DateOnly.FromDateTime(dt));
+
+    private static readonly ValueConverter<CultureInfo?, string?> CultureConverter = new(
+        ci => ci != null ? ci.Name : null,
+        s  => string.IsNullOrEmpty(s) ? null : new CultureInfo(s)
+    );
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var timeOnlyConverter = new ValueConverter<TimeOnly, TimeSpan>(
-            only => only.ToTimeSpan(),
-            span => TimeOnly.FromTimeSpan(span));
         
-        var dateOnlyConverter = new ValueConverter<DateOnly, DateTime>(
-            only => only.ToDateTime(TimeOnly.MinValue),
-            dt => DateOnly.FromDateTime(dt));
-        
-        var cultureConverter = new ValueConverter<CultureInfo,string>(
-            ci => ci.Name,
-            s  => new CultureInfo(s)
-        );
         
         // OneTimeEventModel
         modelBuilder.Entity<OneTimeEventModel>()
             .Property(e => e.Date)
-            .HasConversion(dateOnlyConverter);
+            .HasConversion(DateOnlyConverter);
     
         modelBuilder.Entity<OneTimeEventModel>()
             .Property(e => e.StartTime)
-            .HasConversion(timeOnlyConverter);
+            .HasConversion(TimeOnlyConverter);
     
         modelBuilder.Entity<OneTimeEventModel>()
             .Property(e => e.EndTime)
-            .HasConversion(timeOnlyConverter);
+            .HasConversion(
+                t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,
+                t => t.HasValue ? TimeOnly.FromTimeSpan(t.Value) : null);
     
         modelBuilder.Entity<OneTimeEventModel>()
             .Property(e => e.DinnerTime)
@@ -55,19 +59,23 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
         // RepeatedEventModel
         modelBuilder.Entity<RepeatedEventModel>()
             .Property(e => e.FirstOccurrence)
-            .HasConversion(dateOnlyConverter);
+            .HasConversion(DateOnlyConverter);
         
         modelBuilder.Entity<RepeatedEventModel>()
             .Property(e => e.LastOccurrence)
-            .HasConversion(dateOnlyConverter);
+            .HasConversion(
+                d => d.HasValue ? d.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
+                d => d.HasValue ? DateOnly.FromDateTime(d.Value) : null);
     
         modelBuilder.Entity<RepeatedEventModel>()
             .Property(e => e.StartTime)
-            .HasConversion(timeOnlyConverter);
+            .HasConversion(TimeOnlyConverter);
     
         modelBuilder.Entity<RepeatedEventModel>()
             .Property(e => e.EndTime)
-            .HasConversion(timeOnlyConverter);
+            .HasConversion(
+                t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,
+                t => t.HasValue ? TimeOnly.FromTimeSpan(t.Value) : null);
     
         modelBuilder.Entity<RepeatedEventModel>()
             .Property(e => e.DinnerTime)
@@ -78,7 +86,7 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
         // PushUpSettings
         modelBuilder.Entity<PushUpSettingsModel>()
             .Property(e => e.LanguageCode)
-            .HasConversion(cultureConverter);
+            .HasConversion(CultureConverter);
     }
 }
 
