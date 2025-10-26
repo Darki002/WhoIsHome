@@ -18,6 +18,8 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
     
     public virtual DbSet<PushUpSettingsModel> PushUpSettings { get; set; }
     
+    public virtual DbSet<ChoreModel> Chores { get; set; }
+    
     private static readonly ValueConverter<TimeOnly, TimeSpan> TimeOnlyConverter = new(
         only => only.ToTimeSpan(),
         span => TimeOnly.FromTimeSpan(span));

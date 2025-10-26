@@ -5,6 +5,7 @@ using WhoIsHome.QueryHandler.DailyOverview;
 using WhoIsHome.QueryHandler.UserOverview;
 using WhoIsHome.QueryHandler.WeeklyReports;
 using WhoIsHome.Services;
+using WhoIsHome.Services.ChoreServices;
 
 namespace WhoIsHome;
 
@@ -15,6 +16,7 @@ public static class ServiceProviderConfig
         services.AddScoped<IOneTimeEventAggregateService, OneTimeEventAggregateService>();
         services.AddScoped<IRepeatedEventAggregateService, RepeatedEventAggregateService>();
         services.AddScoped<IUserAggregateService, UserAggregateService>();
+        services.AddScoped<IChoreService, ChoreService>();
 
         services.AddTransient<UserDayOverviewQueryHandler>();
         services.AddTransient<DailyOverviewQueryHandler>();
