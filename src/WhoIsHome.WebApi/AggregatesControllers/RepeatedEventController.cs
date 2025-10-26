@@ -8,8 +8,8 @@ using WhoIsHome.WebApi.Models.Response;
 
 namespace WhoIsHome.WebApi.AggregatesControllers;
 
-public class RepeatedEventController(IRepeatedEventAggregateService repeatedEventAggregateService, IUserContext userContext)
-    : AggregateControllerBase<RepeatedEvent, RepeatedEventModel>(repeatedEventAggregateService, userContext)
+public class RepeatedEventController(IRepeatedEventAggregateService repeatedEventAggregateService)
+    : AggregateControllerBase<RepeatedEvent, RepeatedEventModel>(repeatedEventAggregateService)
 {
     [HttpPost]
     public async Task<ActionResult<RepeatedEventModel>> CreateEvent([FromBody] RepeatedEventModelDto eventModelDto,

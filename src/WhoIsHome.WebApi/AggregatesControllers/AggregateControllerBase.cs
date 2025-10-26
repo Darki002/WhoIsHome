@@ -5,7 +5,7 @@ using WhoIsHome.Shared.Authentication;
 
 namespace WhoIsHome.WebApi.AggregatesControllers;
 
-public abstract class AggregateControllerBase<T, TModel>(IAggregateService<T> aggregateService, IUserContext userContext) 
+public abstract class AggregateControllerBase<T, TModel>(IAggregateService<T> aggregateService) 
     : WhoIsHomeControllerBase<T, TModel>
 {
     [HttpGet("{id:int}")]

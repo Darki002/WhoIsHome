@@ -9,8 +9,8 @@ using WhoIsHome.WebApi.Models.Response;
 namespace WhoIsHome.WebApi.AggregatesControllers;
 
 public class OneTimeEventController(
-    IOneTimeEventAggregateService oneTimeEventAggregateService, IUserContext userContext)
-    : AggregateControllerBase<OneTimeEvent, OneTimeEventModel>(oneTimeEventAggregateService, userContext)
+    IOneTimeEventAggregateService oneTimeEventAggregateService)
+    : AggregateControllerBase<OneTimeEvent, OneTimeEventModel>(oneTimeEventAggregateService)
 {
     [HttpPost]
     public async Task<ActionResult<OneTimeEventModel>> CreateEvent(
