@@ -1,4 +1,5 @@
 using WhoIsHome.Aggregates;
+using WhoIsHome.Entities;
 
 namespace WhoIsHome.Services;
 

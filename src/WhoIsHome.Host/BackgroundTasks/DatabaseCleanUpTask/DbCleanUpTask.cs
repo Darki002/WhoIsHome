@@ -53,14 +53,14 @@ public class DbCleanUpTask(IOptions<DbCleanUpTaskOptions> options, IServiceScope
 
         var cutoff = dateTimeProvider.CurrentDate.AddDays(-options.DaysToKeep);
         
-        var deletedOneTimeEvents = await db.OneTimeEvents
+        var deletedEventTemplates = await db.EventTemplates
+            .Where(e => e.EndDate < cutoff)
+            .ExecuteDeleteAsync(ct);
+        logger.LogInformation("Deleted {Count} Event Templates events older than {Cutoff}.", deletedEventTemplates, cutoff);
+        
+        var deletedEvents = await db.Events
             .Where(e => e.Date < cutoff)
             .ExecuteDeleteAsync(ct);
-        logger.LogInformation("Deleted {Count} one-time events older than {Cutoff}.", deletedOneTimeEvents, cutoff);
-        
-        var deletedRepeatedEvents = await db.RepeatedEvents
-            .Where(e => e.LastOccurrence < cutoff)
-            .ExecuteDeleteAsync(ct);
-        logger.LogInformation("Deleted {Count} repeated events with last occurrence before {Cutoff}.", deletedRepeatedEvents, cutoff);
+        logger.LogInformation("Deleted {Count} events older than {Cutoff}.", deletedEvents, cutoff);
     }
 }

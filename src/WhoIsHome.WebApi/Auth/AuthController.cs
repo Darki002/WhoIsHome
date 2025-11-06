@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WhoIsHome.Aggregates;
 using WhoIsHome.AuthTokens;
+using WhoIsHome.Entities;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;

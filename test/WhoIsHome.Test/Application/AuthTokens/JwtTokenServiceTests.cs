@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using WhoIsHome.Aggregates;
 using WhoIsHome.AuthTokens;
+using WhoIsHome.Entities;
 using WhoIsHome.Services;
 
 namespace WhoIsHome.Test.Application.AuthTokens;

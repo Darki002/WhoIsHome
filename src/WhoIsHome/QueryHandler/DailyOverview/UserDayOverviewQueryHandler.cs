@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
+using WhoIsHome.Entities;
 using WhoIsHome.External;
 using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.Shared.Types;

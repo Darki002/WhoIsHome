@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using WhoIsHome.Aggregates;
-using WhoIsHome.Aggregates.Mappers;
+using WhoIsHome.Entities;
 using WhoIsHome.External;
+using WhoIsHome.External.Models;
 using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Services;
 
-internal class UserAggregateService(IDbContextFactory<WhoIsHomeContext> contextFactory, IPasswordHasher<User> passwordHasher) : IUserAggregateService
+internal class UserService(IDbContextFactory<WhoIsHomeContext> contextFactory, IPasswordHasher<User> passwordHasher) : IUserAggregateService
 {
     public async Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
     {
@@ -15,7 +15,7 @@ internal class UserAggregateService(IDbContextFactory<WhoIsHomeContext> contextF
         var user = await context.Users
             .Where(u => u.Email == email)
             .SingleOrDefaultAsync(cancellationToken);
-        return user?.ToAggregate();
+        return new User(user);
     }
 
     public async Task<User> CreateUserAsync(string userName, string email, string password, CancellationToken cancellationToken)
@@ -30,13 +30,18 @@ internal class UserAggregateService(IDbContextFactory<WhoIsHomeContext> contextF
 
         var passwordHash = passwordHasher.HashPassword(null!, password);
         
-        var user = User.Create(userName, email, passwordHash);
-        var model = user.ToModel();
-        context.Users.Add(model);
+        var user = new User(userName, email, passwordHash);
+        var model = new UserModel
+        {
+            Id = user.Id!.Value,
+            UserName = user.UserName,
+            Email = user.Email,
+            Password = user.Password
+        };
+        
+        var newUser = context.Users.Add(model);
         await context.SaveChangesAsync(cancellationToken);
-
-        var createdUser = await context.Users.SingleAsync(u => u.Email == email, cancellationToken);
-        return createdUser.ToAggregate();
+        return new User(newUser.Entity);
     }
 
     public async Task<User> GetAsync(int id, CancellationToken cancellationToken)
@@ -49,7 +54,7 @@ internal class UserAggregateService(IDbContextFactory<WhoIsHomeContext> contextF
             throw new NotFoundException($"User with Id {id} does not exist");
         }
         
-        return userModel.ToAggregate();
+        return new User(userModel);
     }
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken)

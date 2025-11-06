@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
+using WhoIsHome.Entities;
 using WhoIsHome.External.Models;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Exceptions;
@@ -9,18 +10,18 @@ using WhoIsHome.Test.TestData;
 namespace WhoIsHome.Test.Application.Services;
 
 [TestFixture]
-public class UserAggregateServiceTest : InMemoryDbTest
+public class UserServiceTest : InMemoryDbTest
 {
-    private UserAggregateService service;
+    private UserService service;
 
     [SetUp]
     public void SetUp()
     {
-        service = new UserAggregateService(DbFactory, new PasswordHasher<User>());
+        service = new UserService(DbFactory, new PasswordHasher<User>());
     }
     
     [TestFixture]
-    private class GetUserByEmailAsync : UserAggregateServiceTest
+    private class GetUserByEmailAsync : UserServiceTest
     {
         [Test]
         public async Task ReturnsExpectedUser_ByItsEmail()
@@ -47,7 +48,7 @@ public class UserAggregateServiceTest : InMemoryDbTest
     }
 
     [TestFixture]
-    private class CreateUserAsync : UserAggregateServiceTest
+    private class CreateUserAsync : UserServiceTest
     {
         [Test]
         public async Task ThrowsEmailInUseException_WhenEmailIsAlreadyInUse()

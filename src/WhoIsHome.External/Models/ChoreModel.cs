@@ -1,12 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using WhoIsHome.Shared.BaseTypes;
 
 namespace WhoIsHome.External.Models;
 
 [Table("Chore")]
-public class ChoreModel : DbModel
+public class ChoreModel
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+    
     [Required]
     [MaxLength(50)]
     public required string Title { get; set; }

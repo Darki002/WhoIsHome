@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WhoIsHome.External;
-using WhoIsHome.External.Models;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Exceptions;
 using System.Security.Claims;
-using WhoIsHome.Host.DataProtectionKeys;
 
 namespace WhoIsHome.Host.Authentication;
 
@@ -13,20 +11,20 @@ public class UserContext(
     IDbContextFactory<WhoIsHomeContext> contextFactory,
     ILogger<UserContext> logger) : IUserContext
 {
-    private AuthenticatedUser? authenticatedUserCache = null;
+    private AuthenticatedUser? authenticatedUserCache;
 
-    private int? idCache = null;
+    private int? idCache;
 
-    public int UserId => GetId() ?? throw new InvalidClaimsException("No User is present in the Request.");
+    public int UserId => GetUserId() ?? throw new InvalidClaimsException("No User is present in the Request.");
 
     public async Task<AuthenticatedUser> GetCurrentUserAsync()
     {
-        return await GetCurrentUserAsync(default);
+        return await GetCurrentUserAsync(CancellationToken.None);
     }
 
     public async Task<AuthenticatedUser> GetCurrentUserAsync(CancellationToken cancellationToken)
     {
-        if (GetId() is null)
+        if (GetUserId() is null)
         {
             logger.LogInformation("(Invalid Claims) | No User ID found in request");
             throw new InvalidClaimsException("No User is present in the Request.");
@@ -40,35 +38,25 @@ public class UserContext(
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var user = await context.Users.AsNoTracking().SingleAsync(u => u.Id == UserId, cancellationToken);
 
-        authenticatedUserCache = user.MapFromDb();
+        authenticatedUserCache = new AuthenticatedUser
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+            PasswordHash = user.Password
+        };
+        
         return authenticatedUserCache;
     }
 
-    public bool IsUserPermitted(int permittedUserId)
-    {
-        return GetId() == permittedUserId;
-    }
+    public bool IsUserPermitted(int permittedUserId) => GetUserId() == permittedUserId;
 
-    private int? GetId() => idCache ?? GetIdFromClaims();
+    private int? GetUserId() => idCache ?? GetIdFromClaims();
 
     private int? GetIdFromClaims()
     {
         var idString = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         idCache = idString is not null ? int.Parse(idString) : null;
         return idCache;
-    }
-}
-
-public static class Mapper
-{
-    public static AuthenticatedUser MapFromDb(this UserModel dbModel)
-    {
-        return new AuthenticatedUser
-        {
-            Id = dbModel.Id,
-            UserName = dbModel.UserName,
-            Email = dbModel.Email,
-            PasswordHash = dbModel.Password
-        };
     }
 }

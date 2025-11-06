@@ -1,28 +1,29 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using WhoIsHome.Shared.BaseTypes;
 using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.External.Models;
 
-[Table("RepeatedEvent")]
-public class RepeatedEventModel : DbModel
+[Table("Event")]
+public class EventModel
 {
-    [Required] 
-    [MaxLength(50)] 
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+    
+    [Required]
+    [MaxLength(50)]
     public string Title { get; set; } = null!;
     
     [Required]
-    public DateOnly FirstOccurrence { get; set; }
-    
-    public DateOnly? LastOccurrence { get; set; }
+    public DateOnly Date { get; set; }
     
     [Required]
     public TimeOnly StartTime { get; set; }
     
     public TimeOnly? EndTime { get; set; }
-    
+
     [Required]
     [DefaultValue(PresenceType.Unknown)]
     public PresenceType PresenceType { get; set; }

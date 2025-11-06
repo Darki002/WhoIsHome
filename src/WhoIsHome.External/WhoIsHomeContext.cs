@@ -10,9 +10,9 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
 {
     public virtual DbSet<UserModel> Users { get; set; }
     
-    public virtual DbSet<OneTimeEventModel> OneTimeEvents { get; set; }
+    public virtual DbSet<EventTemplateModel> EventTemplates { get; set; }
     
-    public virtual DbSet<RepeatedEventModel> RepeatedEvents { get; set; }
+    public virtual DbSet<EventModel> Events { get; set; }
     
     public virtual DbSet<RefreshTokenModel> RefreshTokens { get; set; }
     
@@ -35,49 +35,50 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // OneTimeEventModel
-        modelBuilder.Entity<OneTimeEventModel>()
-            .Property(e => e.Date)
+        // EventTemplateModel
+        modelBuilder.Entity<EventTemplateModel>()
+            .Property(e => e.StartDate)
             .HasConversion(DateOnlyConverter);
+        modelBuilder.Entity<EventTemplateModel>()
+            .Property(e => e.EndDate)
+            .HasConversion(
+                d => d.HasValue ? d.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
+                d => d.HasValue ? DateOnly.FromDateTime(d.Value) : null);
     
-        modelBuilder.Entity<OneTimeEventModel>()
+        modelBuilder.Entity<EventTemplateModel>()
             .Property(e => e.StartTime)
             .HasConversion(TimeOnlyConverter);
     
-        modelBuilder.Entity<OneTimeEventModel>()
+        modelBuilder.Entity<EventTemplateModel>()
             .Property(e => e.EndTime)
             .HasConversion(
                 t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,
                 t => t.HasValue ? TimeOnly.FromTimeSpan(t.Value) : null);
     
-        modelBuilder.Entity<OneTimeEventModel>()
+        modelBuilder.Entity<EventTemplateModel>()
             .Property(e => e.DinnerTime)
             .HasConversion(
                 t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,
                 t => t.HasValue ? TimeOnly.FromTimeSpan(t.Value) : null);
         
-        // RepeatedEventModel
-        modelBuilder.Entity<RepeatedEventModel>()
-            .Property(e => e.FirstOccurrence)
+        // EventModel
+        modelBuilder.Entity<EventModel>()
+            .Property(e => e.Date)
             .HasConversion(DateOnlyConverter);
         
-        modelBuilder.Entity<RepeatedEventModel>()
-            .Property(e => e.LastOccurrence)
-            .HasConversion(
-                d => d.HasValue ? d.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
-                d => d.HasValue ? DateOnly.FromDateTime(d.Value) : null);
+      
     
-        modelBuilder.Entity<RepeatedEventModel>()
+        modelBuilder.Entity<EventModel>()
             .Property(e => e.StartTime)
             .HasConversion(TimeOnlyConverter);
     
-        modelBuilder.Entity<RepeatedEventModel>()
+        modelBuilder.Entity<EventModel>()
             .Property(e => e.EndTime)
             .HasConversion(
                 t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,
                 t => t.HasValue ? TimeOnly.FromTimeSpan(t.Value) : null);
     
-        modelBuilder.Entity<RepeatedEventModel>()
+        modelBuilder.Entity<EventModel>()
             .Property(e => e.DinnerTime)
             .HasConversion(
                 t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,

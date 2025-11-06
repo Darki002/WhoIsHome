@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Aggregates;
+using WhoIsHome.Entities;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.WebApi.Models;

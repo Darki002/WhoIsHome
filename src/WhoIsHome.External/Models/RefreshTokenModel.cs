@@ -1,14 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
-using WhoIsHome.Shared.BaseTypes;
 
 namespace WhoIsHome.External.Models;
 
 [Table("RefreshToken")]
 [Index(nameof(Token), IsUnique = true)]
-public class RefreshTokenModel : DbModel
+public class RefreshTokenModel
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+    
     [Required] 
     [MaxLength(100)]
     public string Token { get; set; } = null!;

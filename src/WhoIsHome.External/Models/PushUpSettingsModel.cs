@@ -1,11 +1,15 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
-using WhoIsHome.Shared.BaseTypes;
 
 namespace WhoIsHome.External.Models;
 
-public class PushUpSettingsModel : DbModel
+public class PushUpSettingsModel
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+    
     [MaxLength(100)]
     public string? Token { get; set; }
     

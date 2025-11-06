@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using WhoIsHome.Aggregates;
+using WhoIsHome.Entities;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Configurations;
 

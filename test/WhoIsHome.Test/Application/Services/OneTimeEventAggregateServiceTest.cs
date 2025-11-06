@@ -1,6 +1,7 @@
 using Moq;
 using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
+using WhoIsHome.Entities;
 using WhoIsHome.Handlers;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Exceptions;
