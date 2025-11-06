@@ -1,4 +1,3 @@
-using WhoIsHome.Aggregates;
 using WhoIsHome.Entities;
 using WhoIsHome.Shared.Authentication;
 

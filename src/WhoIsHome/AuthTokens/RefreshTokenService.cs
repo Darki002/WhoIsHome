@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WhoIsHome.External;
-using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.AuthTokens;

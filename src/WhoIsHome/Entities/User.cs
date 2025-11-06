@@ -1,6 +1,6 @@
 ﻿using System.Net.Mail;
 using WhoIsHome.External.Models;
-using WhoIsHome.Shared.Exceptions;
+using WhoIsHome.Validations;
 
 namespace WhoIsHome.Entities;
 
@@ -21,12 +21,20 @@ public class User(int? id, string userName, string email, string password)
     
     public User(UserModel user) : this(user.Id, user.UserName, user.Email, user.Password) { }
 
-    public void Validate()
+    public List<ValidationError> Validate()
     {
-        _ = new MailAddress(Email);
-        
+        List<ValidationError> validationErrors = [];
+        if (!MailAddress.TryCreate(Email, out _))
+        {
+            validationErrors.Add(new ValidationError("Email is not in a valid format."));
+        }
+
         if (IsValidUserName(UserName) is false)
-            throw new InvalidModelException($"UserName is to long or to short. Must be between {UserNameMinLength} and {UserNameMaxLength} Characters.");
+        {
+            validationErrors.Add(new ValidationError($"UserName is to long or to short. Must be between {UserNameMinLength} and {UserNameMaxLength} Characters."));
+        }
+
+        return validationErrors;
     }
 
     private static bool IsValidUserName(string userName)

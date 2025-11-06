@@ -45,7 +45,6 @@ app.UseCorsPolicy();
 app.UseSwagger();
 app.UseSwaggerUI();
         
-app.UseWihExceptionHandler();
 app.UseMiddleware<ApiKeyMiddleware>();
 
 app.UseRouting();

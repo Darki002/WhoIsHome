@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WhoIsHome.Aggregates.Mappers;
+using WhoIsHome.Entities;
 using WhoIsHome.External;
 using WhoIsHome.QueryHandler.DailyOverview;
 using WhoIsHome.Shared.Helper;
@@ -20,7 +20,7 @@ public class WeeklyReportQueryHandler(
 
         var result =
             userIds.ToDictionary(
-                keySelector: k => k.ToAggregate(), 
+                keySelector: k => new User(k), 
                 elementSelector: _ => new Dictionary<DateOnly, (bool IsAtHome, TimeOnly? DinnerTime)>());
         
         for (var i = 0; i < 7; i++)

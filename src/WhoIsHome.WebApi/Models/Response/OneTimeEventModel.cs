@@ -1,6 +1,4 @@
-﻿using WhoIsHome.Aggregates;
-
-namespace WhoIsHome.WebApi.Models.Response;
+﻿namespace WhoIsHome.WebApi.Models.Response;
 
 public class OneTimeEventModel
 {

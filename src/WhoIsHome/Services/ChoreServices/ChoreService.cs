@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WhoIsHome.External;
 using WhoIsHome.External.Models;
-using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Services.ChoreServices;
 

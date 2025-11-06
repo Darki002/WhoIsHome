@@ -1,19 +1,17 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using WhoIsHome.Aggregates;
 using WhoIsHome.AuthTokens;
 using WhoIsHome.Entities;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Authentication;
-using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.WebApi.Auth;
 
 [ApiController]
 [Route("api/v1/[controller]/[action]")]
 public class AuthController(
-    IUserAggregateService userAggregateService, 
+    IUserService userService, 
     JwtTokenService jwtTokenService,
     IPasswordHasher<User> passwordHasher,
     IUserContext userContext,
@@ -25,7 +23,7 @@ public class AuthController(
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
         var userAgent = Request.Headers.UserAgent.ToString();
         
-        var user = await userAggregateService.GetUserByEmailAsync(loginDto.Email, cancellationToken);
+        var user = await userService.GetUserByEmailAsync(loginDto.Email, cancellationToken);
         if (user == null)
         {
             logger.LogInformation("Login Attempt failed, since no user was found for {email} from IP {IP} | UserAgent: {UserAgent}", loginDto.Email, ip, userAgent);
@@ -51,23 +49,21 @@ public class AuthController(
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
         var userAgent = Request.Headers.UserAgent.ToString();
         
-        try
-        {
-            var user = await userAggregateService.CreateUserAsync(
-                registerDto.UserName,
-                registerDto.Email,
-                registerDto.Password,
-                cancellationToken);
+        var result = await userService.CreateUserAsync(
+            registerDto.UserName,
+            registerDto.Email,
+            registerDto.Password,
+            cancellationToken);
 
-            logger.LogInformation("New registration {UserName} with ID {Id} from IP {IP} | UserAgent: {UserAgent}", user.UserName, user.Id, ip, userAgent);
+        if (result.HasErrors)
+        {
+            return BadRequest(result.ValidationErrors);
+        }
+        
+        logger.LogInformation("New registration {UserName} with ID {Id} from IP {IP} | UserAgent: {UserAgent}", result.Value.UserName, result.Value.Id, ip, userAgent);
 
             
-            return Ok(new { user.Id });
-        }
-        catch (EmailInUseException)
-        {
-            return BadRequest("Email is already in use.");
-        }
+        return Ok(new { result.Value.Id });
     }
 
     [HttpPost]

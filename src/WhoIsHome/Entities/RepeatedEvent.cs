@@ -1,8 +1,7 @@
-﻿using WhoIsHome.Shared.Exceptions;
-using WhoIsHome.Shared.Helper;
+﻿using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
 
-namespace WhoIsHome.Aggregates;
+namespace WhoIsHome.Entities;
 
 public class RepeatedEvent(
     int? id,

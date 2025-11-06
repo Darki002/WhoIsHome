@@ -1,7 +1,6 @@
-﻿using WhoIsHome.Shared.Exceptions;
-using WhoIsHome.Shared.Types;
+﻿using WhoIsHome.Shared.Types;
 
-namespace WhoIsHome.Aggregates;
+namespace WhoIsHome.Entities;
 
 public class DinnerTime(PresenceType presenceType, TimeOnly? time = null)
 {

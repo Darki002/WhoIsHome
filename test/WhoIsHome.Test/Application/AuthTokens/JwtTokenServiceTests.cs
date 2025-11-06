@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
-using WhoIsHome.Aggregates;
 using WhoIsHome.AuthTokens;
 using WhoIsHome.Entities;
 using WhoIsHome.Services;
@@ -15,12 +14,12 @@ public class JwtTokenServiceTests
     
     private IConfiguration configMock;
     private ILogger<JwtTokenService> loggerMock;
-    private IUserAggregateService userAggregateService;
+    private IUserService userService;
     
     [SetUp]
     public void SetUp()
     {
-        var mockUserService = new Mock<IUserAggregateService>();
+        var mockUserService = new Mock<IUserService>();
 
         mockUserService.Setup(u => u.GetAsync(1, CancellationToken.None))
             .ReturnsAsync(() => new User(1, "Test", "test@whoishome.dev", "test"));
@@ -37,7 +36,7 @@ public class JwtTokenServiceTests
             .Returns("hakjlshdfkljashdfkljahsdfkjhalksdhfkljashdfkljhaskljdfhakjlsdhfkjh");
         
         configMock = mockConfiguration.Object;
-        userAggregateService = mockUserService.Object;
+        userService = mockUserService.Object;
         loggerMock = Mock.Of<ILogger<JwtTokenService>>();
     }
     
@@ -94,6 +93,6 @@ public class JwtTokenServiceTests
 
     private JwtTokenService CreateService(IRefreshTokenService refreshTokenService)
     {
-        return new JwtTokenService(configMock, refreshTokenService, userAggregateService, loggerMock);
+        return new JwtTokenService(configMock, refreshTokenService, userService, loggerMock);
     }
 }

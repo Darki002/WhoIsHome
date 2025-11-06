@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using WhoIsHome.Aggregates;
 using WhoIsHome.Entities;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Authentication;
@@ -7,7 +6,7 @@ using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi;
 
-public class UserController(IUserContext context, IUserAggregateService service) 
+public class UserController(IUserContext context, IUserService service) 
     : WhoIsHomeControllerBase<User, UserModel>
 {
     [HttpGet("Me")]

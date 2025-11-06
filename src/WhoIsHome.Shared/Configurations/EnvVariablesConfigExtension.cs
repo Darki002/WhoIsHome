@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Configuration;
-using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.Shared.Configurations;
 
@@ -40,7 +39,7 @@ public static class EnvVariablesConfigExtension
 
     internal static string GetString(this IConfiguration config, string name)
     {
-        return config[name] ?? throw new EnvironmentHelperException($"Missing Config for key {name}", name);
+        return config[name] ?? throw new ArgumentException($"Missing Config for key {name}", name);
     }
 
     internal static string GetStringOrDefault(this IConfiguration config, string name, string defaultValue)

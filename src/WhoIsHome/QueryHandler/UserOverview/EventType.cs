@@ -1,4 +1,4 @@
-﻿using WhoIsHome.Aggregates;
+﻿using WhoIsHome.Entities;
 
 namespace WhoIsHome.QueryHandler.UserOverview;
 

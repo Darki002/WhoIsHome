@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WhoIsHome.Aggregates;
 using WhoIsHome.Aggregates.Mappers;
+using WhoIsHome.Entities;
 using WhoIsHome.External;
 using WhoIsHome.Handlers;
 using WhoIsHome.Shared.Authentication;

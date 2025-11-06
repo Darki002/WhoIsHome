@@ -4,14 +4,13 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using WhoIsHome.Aggregates;
 using WhoIsHome.Entities;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Configurations;
 
 namespace WhoIsHome.AuthTokens;
 
-public class JwtTokenService(IConfiguration configuration, IRefreshTokenService refreshTokenService, IUserAggregateService userAggregateService, ILogger<JwtTokenService> logger)
+public class JwtTokenService(IConfiguration configuration, IRefreshTokenService refreshTokenService, IUserService userService, ILogger<JwtTokenService> logger)
 {
     public async Task<AuthToken> GenerateTokenAsync(User user, CancellationToken cancellationToken)
     {
@@ -23,7 +22,7 @@ public class JwtTokenService(IConfiguration configuration, IRefreshTokenService 
     public async Task<AuthToken> RefreshTokenAsync(string token, CancellationToken cancellationToken)
     {
         var newRefreshToken = await refreshTokenService.RefreshAsync(token, cancellationToken);
-        var user = await userAggregateService.GetAsync(newRefreshToken.UserId, cancellationToken);
+        var user = await userService.GetAsync(newRefreshToken.UserId, cancellationToken);
         var jwtToken = GenerateJwtToken(user);
         
         return new AuthToken(jwtToken, newRefreshToken.Token);

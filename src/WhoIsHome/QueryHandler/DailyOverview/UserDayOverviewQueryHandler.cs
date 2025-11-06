@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WhoIsHome.Aggregates;
-using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.Entities;
 using WhoIsHome.External;
-using WhoIsHome.Shared.Exceptions;
 using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.QueryHandler.DailyOverview;
@@ -14,8 +11,7 @@ public class UserDayOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> con
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
 
-        var user = (await context.Users.SingleOrDefaultAsync(u => u.Id == id, cancellationToken))
-            ?.ToAggregate();
+        var user = (await context.Users.SingleOrDefaultAsync(u => u.Id == id, cancellationToken));
         
         if (user is null)
         {
@@ -42,16 +38,16 @@ public class UserDayOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> con
         
         if (events.Count == 0)
         {
-            return DailyOverview.Empty(user);
+            return DailyOverview.Empty(new User(user));
         }
 
         if (TryGetNotPresence(events, out var time))
         {
-            return DailyOverview.From(user, time!);
+            return DailyOverview.From(new User(user), time!);
         }
 
         var nextEvent = events.MaxBy(e => e.DinnerTime.Time);
-        return GetUserPresence(nextEvent, user);
+        return GetUserPresence(nextEvent, new User(user));
     }
     
     private static DailyOverview GetUserPresence(EventBase? eventBase, User user)

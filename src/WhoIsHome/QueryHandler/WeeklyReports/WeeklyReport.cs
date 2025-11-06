@@ -1,5 +1,4 @@
-﻿using WhoIsHome.Aggregates;
-using WhoIsHome.Entities;
+﻿using WhoIsHome.Entities;
 
 namespace WhoIsHome.QueryHandler.WeeklyReports;
 

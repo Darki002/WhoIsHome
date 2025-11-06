@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WhoIsHome.External;
 using WhoIsHome.Shared.Authentication;
-using WhoIsHome.Shared.Exceptions;
 using System.Security.Claims;
 
 namespace WhoIsHome.Host.Authentication;
 
+// TODO: move to middleware
 public class UserContext(
     IHttpContextAccessor httpContextAccessor,
     IDbContextFactory<WhoIsHomeContext> contextFactory,

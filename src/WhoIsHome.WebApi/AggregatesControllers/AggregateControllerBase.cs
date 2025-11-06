@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using WhoIsHome.Aggregates;
 using WhoIsHome.Services;
 using WhoIsHome.Shared.Authentication;
 

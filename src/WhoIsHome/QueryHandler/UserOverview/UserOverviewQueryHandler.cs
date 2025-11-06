@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WhoIsHome.Aggregates;
-using WhoIsHome.Aggregates.Mappers;
+using WhoIsHome.Entities;
 using WhoIsHome.External;
 using WhoIsHome.Shared.Helper;
 
@@ -73,13 +72,12 @@ public class UserOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contex
             })
             .ToList();
 
-        var user = (await context.Users
-                .SingleAsync(u => u.Id == userId, cancellationToken))
-            .ToAggregate();
+        var user = await context.Users
+            .SingleAsync(u => u.Id == userId, cancellationToken);
 
         return new UserOverview
         {
-            User = user,
+            User = new User(user),
             Today = todaysEvents,
             ThisWeek = thisWeeksEvents,
             FutureEvents = eventsAfterThisWeek

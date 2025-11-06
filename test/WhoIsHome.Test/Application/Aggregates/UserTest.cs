@@ -1,6 +1,4 @@
-﻿using WhoIsHome.Aggregates;
-using WhoIsHome.Entities;
-using WhoIsHome.Shared.Exceptions;
+﻿using WhoIsHome.Entities;
 
 namespace WhoIsHome.Test.Application.Aggregates;
 
@@ -19,7 +17,7 @@ public class UserTest
             const string password = "securePassword1234";
         
             // Act
-            var result = User.Create(userName, email, password);
+            var result = new User(userName, email, password);
         
             // Assert
             result.Id.Should().BeNull();
@@ -29,33 +27,35 @@ public class UserTest
         }
 
         [Test]
-        public void ThrowsFormatException_WhenEmailIsInvalidFormat()
+        public void ReturnsValidationError_WhenEmailIsInvalidFormat()
         {
             // Arrange
             const string userName = "Darki123";
             const string invalidEmail = "missingAt.dev";
             const string password = "securePassword1234";
+            var user = new User(userName, invalidEmail, password);
         
             // Act
-            var act = () => User.Create(userName, invalidEmail, password);
+            var result = user.Validate();
         
             // Assert
-            act.Should().Throw<FormatException>();
+            result.Should().HaveCount(1);
         }
     
         [Test]
-        public void ThrowsInvalidModelException_WhenUserNameIsTooLong()
+        public void ReturnsValidationError_WhenUserNameIsTooLong()
         {
             // Arrange
             var userName = string.Join("", Enumerable.Repeat('a', 32));
             const string invalidEmail = "darki@whoishome.dev";
             const string password = "securePassword1234";
+            var user = new User(userName, invalidEmail, password);
         
             // Act
-            var act = () => User.Create(userName, invalidEmail, password);
+            var result = user.Validate();
         
             // Assert
-            act.Should().Throw<InvalidModelException>();
+            result.Should().HaveCount(1);
         }
         
         [Test]
@@ -65,12 +65,13 @@ public class UserTest
             const string userName = "";
             const string invalidEmail = "darki@whoishome.dev";
             const string password = "securePassword1234";
+            var user = new User(userName, invalidEmail, password);
         
             // Act
-            var act = () => User.Create(userName, invalidEmail, password);
+            var result = user.Validate();
         
             // Assert
-            act.Should().Throw<InvalidModelException>();
+            result.Should().HaveCount(1);
         }
     }
 }

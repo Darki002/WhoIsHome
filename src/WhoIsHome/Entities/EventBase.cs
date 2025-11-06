@@ -1,7 +1,4 @@
-﻿using WhoIsHome.Shared.BaseTypes;
-using WhoIsHome.Shared.Exceptions;
-
-namespace WhoIsHome.Aggregates;
+﻿namespace WhoIsHome.Entities;
 
 public abstract class EventBase(
     int? id,
@@ -10,7 +7,6 @@ public abstract class EventBase(
     TimeOnly? endTime,
     DinnerTime dinnerTime,
     int userId)
-    : AggregateBase
 {
     public int? Id { get; } = id;
 

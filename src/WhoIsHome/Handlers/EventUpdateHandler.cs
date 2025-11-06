@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using WhoIsHome.Aggregates;
-using WhoIsHome.Aggregates.Mappers;
+using WhoIsHome.Entities;
 using WhoIsHome.External;
 using WhoIsHome.External.PushUp;
 using WhoIsHome.External.Translation;

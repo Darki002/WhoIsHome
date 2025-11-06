@@ -1,6 +1,5 @@
-using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.QueryHandler.UserOverview;
-using WhoIsHome.Shared.Helper;
+using WhoIsHome.Test.Shared.Helper;
 using WhoIsHome.Test.TestData;
 
 namespace WhoIsHome.Test.Application.QueryHandler;
