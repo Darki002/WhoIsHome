@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WhoIsHome.Entities;
 using WhoIsHome.External;
+using WhoIsHome.External.Models;
 using WhoIsHome.External.PushUp;
 using WhoIsHome.External.Translation;
 using WhoIsHome.Shared.BackgroundTasks;
@@ -17,7 +18,7 @@ public class EventUpdateHandler(
     IBackgroundTaskQueue backgroundTaskQueue,
     ILogger<EventUpdateHandler> logger) : IEventUpdateHandler
 {
-    public async Task HandleAsync(EventBase updatedEvent, UpdateAction updateAction)
+    public async Task HandleAsync(EventModel updatedEvent, UpdateAction updateAction)
     {
         await backgroundTaskQueue.QueueBackgroundWorkItemAsync(RunAsync);
         return;
@@ -55,39 +56,27 @@ public class EventUpdateHandler(
         }
     }
 
-    private static bool CheckDelete(EventBase updatedEvent, List<EventBase> events)
+    private static bool CheckDelete(EventModel updatedEvent, List<EventModel> events)
     {
-        var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime.Time);
-        return dinnerTimeEvent is null || dinnerTimeEvent.DinnerTime.Time < updatedEvent.DinnerTime.Time;
+        var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime);
+        return dinnerTimeEvent is null || dinnerTimeEvent.DinnerTime < updatedEvent.DinnerTime;
     }
 
-    private static bool CheckUpdate(EventBase updatedEvent, List<EventBase> events)
+    private static bool CheckUpdate(EventModel updatedEvent, List<EventModel> events)
     {
-        var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime.Time);
+        var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime);
         return dinnerTimeEvent?.Id == updatedEvent.Id;
     }
 
-    private async Task<List<EventBase>> GetUserEventsFromTodayAsync(EventBase updatedEvent, CancellationToken cancellationToken)
+    private async Task<List<EventModel>> GetUserEventsFromTodayAsync(EventModel updatedEvent, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         
-        var oneTimeEvents = (await context.OneTimeEvents
-                .Where(e => e.UserId == updatedEvent.UserId)
-                .Where(e => e.PresenceType != PresenceType.Unknown)
-                .Where(e => e.Date == dateTimeProvider.CurrentDate)
-                .ToListAsync(cancellationToken))
-            .Select(e => e.ToAggregate());
-
-        var repeatedEvents = (await context.RepeatedEvents
-                .Where(e => e.UserId == updatedEvent.UserId)
-                .Where(e => e.PresenceType != PresenceType.Unknown)
-                .Where(e => e.FirstOccurrence <= dateTimeProvider.CurrentDate)
-                .Where(e => e.LastOccurrence >= dateTimeProvider.CurrentDate)
-                .ToListAsync(cancellationToken))
-            .Select(e => e.ToAggregate())
-            .Where(e => e.IsEventAt(dateTimeProvider.CurrentDate));
-
-         return [..oneTimeEvents, ..repeatedEvents];
+        return await context.Events
+            .Where(e => e.UserId == updatedEvent.UserId)
+            .Where(e => e.PresenceType != PresenceType.Unknown)
+            .Where(e => e.Date == dateTimeProvider.CurrentDate)
+            .ToListAsync(cancellationToken);
     }
     
     public enum UpdateAction
@@ -96,9 +85,4 @@ public class EventUpdateHandler(
         Update,
         Delete
     }
-}
-
-public interface IEventUpdateHandler
-{
-    Task HandleAsync(EventBase updatedEvent, EventUpdateHandler.UpdateAction updateAction);
 }

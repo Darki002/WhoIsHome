@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Moq.EntityFrameworkCore;
-using WhoIsHome.Aggregates.Mappers;
 using WhoIsHome.External;
 using WhoIsHome.External.Models;
 using WhoIsHome.Handlers;
@@ -35,11 +34,10 @@ public class EventUpdateHandlerTest : InMemoryDbTest
 
         var factory = GetDbFactoryMock(context =>
         {
-            context.Setup(c => c.RepeatedEvents).ReturnsDbSet([]);
-            context.Setup(c => c.OneTimeEvents).ReturnsDbSet([updatedEvent.ToModel()]);
+            context.Setup(c => c.Events).ReturnsDbSet([updatedEvent]);
             context.Setup(c => c.Users).ReturnsDbSet(userModels);
         });
-        var handler = GetHandler(pushUpClientFake, backgroundTaskQueueFake, factory.Object);
+        var handler = new EventUpdateHandler(factory.Object, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
 
         // Act
         await handler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Create);
@@ -68,11 +66,10 @@ public class EventUpdateHandlerTest : InMemoryDbTest
 
         var factory = GetDbFactoryMock(context =>
         {
-            context.Setup(c => c.RepeatedEvents).ReturnsDbSet([]);
-            context.Setup(c => c.OneTimeEvents).ReturnsDbSet([updatedEvent.ToModel(), effectiveEvent.ToModel()]);
+            context.Setup(c => c.Events).ReturnsDbSet([updatedEvent.ToModel(), effectiveEvent.ToModel()]);
             context.Setup(c => c.Users).ReturnsDbSet(userModels);
         });
-        var handler = GetHandler(pushUpClientFake, backgroundTaskQueueFake, factory.Object);
+        var handler = new EventUpdateHandler(factory.Object, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
 
         // Act
         await handler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Create);
@@ -97,11 +94,11 @@ public class EventUpdateHandlerTest : InMemoryDbTest
 
         var factory = GetDbFactoryMock(context =>
         {
-            context.Setup(c => c.RepeatedEvents).ReturnsDbSet([]);
-            context.Setup(c => c.OneTimeEvents).ReturnsDbSet([effectiveEvent.ToModel()]);
+            context.Setup(c => c.Events).ReturnsDbSet([effectiveEvent.ToModel()]);
             context.Setup(c => c.Users).ReturnsDbSet(userModels);
         });
-        var handler = GetHandler(pushUpClientFake, backgroundTaskQueueFake, factory.Object);
+        
+        var handler = new EventUpdateHandler(factory.Object, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
 
         // Act
         await handler.HandleAsync(deletedEvent, EventUpdateHandler.UpdateAction.Delete);
@@ -125,13 +122,5 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         factory.Setup(f => f.CreateDbContextAsync(CancellationToken.None))
             .ReturnsAsync(context.Object);
         return factory;
-    }
-
-    private EventUpdateHandler GetHandler(
-        PushUpContextFake pushUpContextFake,
-        BackgroundTaskQueueFake backgroundTaskQueueFake,
-        IDbContextFactory<WhoIsHomeContext> factory)
-    {
-        return new EventUpdateHandler(factory, pushUpContextFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
     }
 }
