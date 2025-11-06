@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using WhoIsHome.Shared.Exceptions;
 
 namespace WhoIsHome.External.PushUp.ApiClient;
 
@@ -35,7 +34,7 @@ public class PushApiClient
 
         if (ticketResponse is null)
         {
-            throw new PushApiClientException("No response from Request!");
+            throw new HttpRequestException("No response from Request!");
         }
         
         return ticketResponse;
@@ -57,7 +56,7 @@ public class PushApiClient
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new PushApiClientException($"Request for ${typeof(TRequest).Name} failed with {response.StatusCode}");
+            throw new HttpRequestException($"Request for ${typeof(TRequest).Name} failed with {response.StatusCode}");
         }
         
         var rawResponseBody = await response.Content.ReadAsStringAsync();
