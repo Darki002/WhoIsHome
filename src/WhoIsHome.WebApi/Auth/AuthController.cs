@@ -40,7 +40,7 @@ public class AuthController(
         logger.LogInformation("New Login for {UserName} with ID {Id} from IP {IP} | UserAgent: {UserAgent}", user.UserName, user.Id, ip, userAgent);
         
         var token = await jwtTokenService.GenerateTokenAsync(user, cancellationToken);
-        return Ok(new { token.JwtToken, token.RefreshToken });
+        return Ok(new { token.JwtToken, RefreshToken = token.RefreshToken });
     }
 
     [HttpPost]
@@ -69,16 +69,15 @@ public class AuthController(
     [HttpPost]
     public async Task<IActionResult> Refresh([FromHeader(Name = "RefreshToken")] string refreshToken, CancellationToken cancellationToken)
     {
-        try
+        var result = await jwtTokenService.RefreshTokenAsync(refreshToken, cancellationToken);
+
+        if (result.HasError)
         {
-            var token = await jwtTokenService.RefreshTokenAsync(refreshToken, cancellationToken);
-            return Ok(new { token.JwtToken, token.RefreshToken });
-        }
-        catch (InvalidRefreshTokenException e)
-        {
-            logger.LogInformation("Refresh Token is Invalid. ExpiredAt: {ExpiredAt} | Reason: {Message}", e.ExpiredAt, e.Message);
+            logger.LogInformation("Refresh Token is Invalid. | Reason: {Message}", result.Error);
             return Unauthorized("Refresh Token is Invalid.");
         }
+        
+        return Ok(new { result.JwtToken, result.RefreshToken });
     }
 
     [HttpPost]

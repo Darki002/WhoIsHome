@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WhoIsHome.External;
+using WhoIsHome.External.Models;
 using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.AuthTokens;
 
 public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFactory, IDateTimeProvider dateTimeProvider, ILogger<RefreshTokenService> logger) : IRefreshTokenService
 {
-    public async Task<RefreshToken> CreateTokenAsync(int userId, CancellationToken cancellationToken)
+    public async Task<RefreshTokenModel> CreateTokenAsync(int userId, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         
@@ -16,47 +17,47 @@ public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFact
         
         do
         {
-            token = RefreshToken.Create(userId, dateTimeProvider);
+            token = RefreshToken.Create(userId, dateTimeProvider.Now);
             tokenExists = await context.RefreshTokens
                 .AsNoTracking()
                 .AnyAsync(t => t.Token == token.Token, cancellationToken: cancellationToken);
         } while (tokenExists);
 
-        var model = token.ToModel();
+        var model = new RefreshTokenModel
+        {
+            Token = token.Token,
+            Issued = token.Issued,
+            ExpiredAt = token.ExpiredAt,
+            UserId = token.UserId
+        };
+        
         var dbToken = await context.RefreshTokens.AddAsync(model, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
         
         logger.LogInformation("New Refresh Token was Generated for User {Id}", userId);
         
-        return dbToken.Entity.ToRefreshToken(dateTimeProvider);
+        return dbToken.Entity;
     }
 
-    public async Task<RefreshToken> RefreshAsync(string refreshToken, CancellationToken cancellationToken)
+    public async Task<ValidRefreshTokenResult> RefreshAsync(string refreshToken, CancellationToken cancellationToken)
     {
-        var token = await GetValidRefreshToken(refreshToken, cancellationToken);
-        
-        var newRefreshToken = token.Refresh();
+        var result = await GetValidRefreshToken(refreshToken, cancellationToken);
 
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-        var ka = context.RefreshTokens.AsNoTracking().ToList();
-        ka.ForEach(t => Console.WriteLine(t.Token));
-        
-        var tokenExists = await context.RefreshTokens
-            .AsNoTracking()
-            .AnyAsync(t => t.Token == newRefreshToken.Token, cancellationToken: cancellationToken);
-        
-        while (tokenExists)
+        if (result.HasError)
         {
-            newRefreshToken = RefreshToken.Create(token.UserId, dateTimeProvider);
-            tokenExists = await context.RefreshTokens
-                .AsNoTracking()
-                .AnyAsync(t => t.Token == newRefreshToken.Token, cancellationToken: cancellationToken);
+            return result;
         }
+        
+        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
 
-        context.RefreshTokens.Update(token.ToModel());
-        var dbToken = await context.RefreshTokens.AddAsync(newRefreshToken.ToModel(), cancellationToken);
+        result.Value.ExpiredAt = dateTimeProvider.Now;
+        var newRefreshToken = await CreateTokenAsync(result.Value.UserId, cancellationToken);
+
+        context.RefreshTokens.Update(result.Value);
+        var dbToken = await context.RefreshTokens.AddAsync(newRefreshToken, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
-        return dbToken.Entity.ToRefreshToken(dateTimeProvider);
+        
+        return new ValidRefreshTokenResult(dbToken.Entity, null);
     }
 
     public async Task LogOutAsync(int userId, CancellationToken cancellationToken)
@@ -75,32 +76,24 @@ public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFact
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<RefreshToken> GetValidRefreshToken(string tokenToCheck, CancellationToken cancellationToken)
+    private async Task<ValidRefreshTokenResult> GetValidRefreshToken(string tokenToCheck, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-        var model = await context.RefreshTokens
+        var token = await context.RefreshTokens
             .AsNoTracking()
             .SingleOrDefaultAsync(t => t.Token == tokenToCheck, cancellationToken);
         
-        if (model is null)
+        if (token is null)
         {
-            throw new InvalidRefreshTokenException("No Token was found", null);
-        }
-        
-        var token = model.ToRefreshToken(dateTimeProvider);
-
-        if (token.IsValid() is false)
-        {
-            throw new InvalidRefreshTokenException("Token is invalid", token.ExpiredAt);
+            return new ValidRefreshTokenResult(null, "No Token was found");
         }
 
-        return token;
+        if (token.ExpiredAt < dateTimeProvider.Now)
+        {
+            logger.LogInformation("Refresh Token is Invalid. ExpiredAt: {ExpiredAt}", token.ExpiredAt);
+            return new ValidRefreshTokenResult(null, "Token is invalid");
+        }
+
+        return new ValidRefreshTokenResult(token, null);
     }
-}
-
-public interface IRefreshTokenService
-{
-    Task<RefreshToken> CreateTokenAsync(int userId, CancellationToken cancellationToken);
-    Task<RefreshToken> RefreshAsync(string refreshToken, CancellationToken cancellationToken);
-    Task LogOutAsync(int userId, CancellationToken cancellationToken);
 }

@@ -3,7 +3,7 @@ using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.AuthTokens;
 
-public class RefreshToken(int? id, int userId, string token, DateTime issued, DateTime expiredAt, IDateTimeProvider dateTimeProvider)
+public class RefreshToken(int? id, int userId, string token, DateTime issued, DateTime expiredAt)
 {
     private const int ExpiresInDays = 14;
 
@@ -19,23 +19,12 @@ public class RefreshToken(int? id, int userId, string token, DateTime issued, Da
 
     public DateTime ExpiredAt { get; private set; } = expiredAt;
 
-    public bool IsValid()
-    {
-        return ExpiredAt >= dateTimeProvider.Now;
-    }
-
-    public static RefreshToken Create(int userId, IDateTimeProvider dateTimeProvider)
+    public static RefreshToken Create(int userId, DateTime currentTime)
     {
         var token = GenerateToken();
-        var issues = dateTimeProvider.Now;
-        var expiresAt = dateTimeProvider.Now.AddDays(ExpiresInDays);
-        return new RefreshToken(null, userId, token, issues, expiresAt, dateTimeProvider);
-    }
-
-    public RefreshToken Refresh()
-    {
-        ExpiredAt = dateTimeProvider.Now;
-        return Create(UserId, dateTimeProvider);
+        var issues = currentTime;
+        var expiresAt = currentTime.AddDays(ExpiresInDays);
+        return new RefreshToken(null, userId, token, issues, expiresAt);
     }
     
     private static string GenerateToken()

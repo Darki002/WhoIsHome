@@ -21,11 +21,22 @@ public class JwtTokenService(IConfiguration configuration, IRefreshTokenService 
 
     public async Task<AuthToken> RefreshTokenAsync(string token, CancellationToken cancellationToken)
     {
-        var newRefreshToken = await refreshTokenService.RefreshAsync(token, cancellationToken);
-        var user = await userService.GetAsync(newRefreshToken.UserId, cancellationToken);
-        var jwtToken = GenerateJwtToken(user);
+        var result = await refreshTokenService.RefreshAsync(token, cancellationToken);
+
+        if (result.HasError)
+        {
+            return new AuthToken(result.Error!);
+        }
         
-        return new AuthToken(jwtToken, newRefreshToken.Token);
+        var user = await userService.GetAsync(result.Value.UserId, cancellationToken);
+
+        if (user is null)
+        {
+            return new AuthToken("No user found to generate Token for.");
+        }
+        
+        var jwtToken = GenerateJwtToken(user);
+        return new AuthToken(jwtToken, result.Value.Token);
     }
 
     private string GenerateJwtToken(User user)
