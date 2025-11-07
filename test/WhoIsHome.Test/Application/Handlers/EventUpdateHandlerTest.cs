@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Moq.EntityFrameworkCore;
 using WhoIsHome.External;
-using WhoIsHome.External.Models;
 using WhoIsHome.Handlers;
 using WhoIsHome.Test.TestData;
 

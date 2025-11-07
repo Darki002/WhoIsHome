@@ -1,37 +1,28 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using WhoIsHome.External;
-using WhoIsHome.External.Models;
+using WhoIsHome.External.Database;
 using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.AuthTokens;
 
 public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFactory, IDateTimeProvider dateTimeProvider, ILogger<RefreshTokenService> logger) : IRefreshTokenService
 {
-    public async Task<RefreshTokenModel> CreateTokenAsync(int userId, CancellationToken cancellationToken)
+    public async Task<RefreshToken> CreateTokenAsync(int userId, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         
-        RefreshToken token;
+        RefreshToken refreshToken;
         bool tokenExists;
         
         do
         {
-            token = RefreshToken.Create(userId, dateTimeProvider.Now);
+            refreshToken = RefreshToken.Generate(userId, dateTimeProvider.Now);
             tokenExists = await context.RefreshTokens
                 .AsNoTracking()
-                .AnyAsync(t => t.Token == token.Token, cancellationToken: cancellationToken);
+                .AnyAsync(t => t.Token == refreshToken.Token, cancellationToken: cancellationToken);
         } while (tokenExists);
-
-        var model = new RefreshTokenModel
-        {
-            Token = token.Token,
-            Issued = token.Issued,
-            ExpiredAt = token.ExpiredAt,
-            UserId = token.UserId
-        };
         
-        var dbToken = await context.RefreshTokens.AddAsync(model, cancellationToken);
+        var dbToken = await context.RefreshTokens.AddAsync(refreshToken, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
         
         logger.LogInformation("New Refresh Token was Generated for User {Id}", userId);

@@ -1,10 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
+using WhoIsHome.Entities;
 
-namespace WhoIsHome.External.Models;
+namespace WhoIsHome.External.PushUp;
 
-public class PushUpSettingsModel
+[Table("PushUpSetting")]
+public class PushUpSettings
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -23,5 +25,5 @@ public class PushUpSettingsModel
     public int UserId { get; set; }
     
     [Required]
-    public UserModel User { get; set; } = null!;
+    public User User { get; set; } = null!;
 }

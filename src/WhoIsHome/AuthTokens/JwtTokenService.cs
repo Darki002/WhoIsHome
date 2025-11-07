@@ -14,7 +14,7 @@ public class JwtTokenService(IConfiguration configuration, IRefreshTokenService 
 {
     public async Task<AuthToken> GenerateTokenAsync(User user, CancellationToken cancellationToken)
     {
-        var refreshToken = await refreshTokenService.CreateTokenAsync(user.Id!.Value, cancellationToken);
+        var refreshToken = await refreshTokenService.CreateTokenAsync(user.Id, cancellationToken);
         var jwtToken = GenerateJwtToken(user);
         return new AuthToken(jwtToken, refreshToken.Token);
     }

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.External;
-using WhoIsHome.External.Models;
 using WhoIsHome.Shared.Authentication;
 
 namespace WhoIsHome.WebApi.PushUp;

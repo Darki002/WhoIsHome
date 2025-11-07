@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 using WhoIsHome.Entities;
-using WhoIsHome.External.Models;
 using WhoIsHome.Services;
 using WhoIsHome.Test.Shared.Helper;
 using WhoIsHome.Test.TestData;

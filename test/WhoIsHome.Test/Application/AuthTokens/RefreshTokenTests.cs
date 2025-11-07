@@ -8,16 +8,15 @@ public class RefreshTokenTests
     private readonly DateTimeProviderFake dateTimeProviderFake = new();
     
     [TestFixture]
-    private class Create : RefreshTokenTests
+    private class Generate : RefreshTokenTests
     {
         [Test]
         public void ReturnsNewToken()
         {
             // Act
-            var token = RefreshToken.Create(1, dateTimeProviderFake.Now);
+            var token = RefreshToken.Generate(1, dateTimeProviderFake.Now);
             
             // Assert
-            token.Id.Should().BeNull();
             token.UserId.Should().Be(1);
             token.Token.Should().NotBeEmpty();
             token.Issued.Should().Be(dateTimeProviderFake.Now);

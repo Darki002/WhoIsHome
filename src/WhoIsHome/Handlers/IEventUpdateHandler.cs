@@ -1,6 +1,4 @@
-﻿using WhoIsHome.External.Models;
-
-namespace WhoIsHome.Handlers;
+﻿namespace WhoIsHome.Handlers;
 
 public interface IEventUpdateHandler
 {

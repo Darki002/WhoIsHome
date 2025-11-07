@@ -1,25 +1,33 @@
-﻿using System.Net.Mail;
-using WhoIsHome.External.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Net.Mail;
+using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Validations;
 
 namespace WhoIsHome.Entities;
 
-public class User(int? id, string userName, string email, string password)
+[Table("User")]
+[Index(nameof(Email), IsUnique = true)]
+public class User
 {
     private const int UserNameMinLength = 1;
     private const int UserNameMaxLength = 30;
 
-    public int? Id { get; } = id;
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
-    public string UserName { get; private set; } = userName;
+    [Required]
+    [MaxLength(UserNameMaxLength)]
+    public required string UserName { get; set; }
 
-    public string Email { get; } = email;
+    [Required]
+    [MaxLength(100)]
+    public required string Email { get; set; }
 
-    public string Password { get; private set; } = password;
-
-    public User(string userName, string email, string password) : this(null, userName, email, password) { }
-    
-    public User(UserModel user) : this(user.Id, user.UserName, user.Email, user.Password) { }
+    [Required]
+    [MaxLength(100)]
+    public required string Password { get; set; }
 
     public List<ValidationError> Validate()
     {

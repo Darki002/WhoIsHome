@@ -25,7 +25,7 @@ public static class DateOnlyHelper
         return difference < 0 ? difference + 7 : difference;
     }
 
-    private static DayOfWeek Normalize(this DayOfWeek dayOfWeek)
+    public static DayOfWeek Normalize(this DayOfWeek dayOfWeek)
     {
         return (DayOfWeek)(((int)dayOfWeek + 6) % 7);
     }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Moq;
 using WhoIsHome.External;
+using WhoIsHome.External.Database;
 
 namespace WhoIsHome.Test;
 

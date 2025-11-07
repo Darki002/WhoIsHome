@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WhoIsHome.External;
 using WhoIsHome.Shared.Authentication;
 using System.Security.Claims;
+using WhoIsHome.External.Database;
 
 namespace WhoIsHome.Host.Authentication;
 

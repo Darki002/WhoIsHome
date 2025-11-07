@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using WhoIsHome.AuthTokens;
-using WhoIsHome.External.Models;
 
 namespace WhoIsHome.Test.Application.AuthTokens;
 
@@ -43,7 +42,7 @@ public class RefreshTokenServiceTests : InMemoryDbTest
         public async Task SavesNewTokenToDb()
         {
             // Arrange
-            var token = RefreshToken.Create(1, dateTimeProviderFake.Now);
+            var token = RefreshToken.Generate(1, dateTimeProviderFake.Now);
             await SaveToDbAsync(token);
             
             // Act
@@ -63,7 +62,7 @@ public class RefreshTokenServiceTests : InMemoryDbTest
             
             var issued = new DateTime(2024, 10, 21);
             var expiresAt = dateTimeProviderFake.Now.AddHours(-1);
-            var token = new RefreshToken(1, 1, "", issued, expiresAt);
+            var token = new RefreshToken(1, "", issued, expiresAt);
             await SaveToDbAsync(token);
             
             // Act
@@ -76,16 +75,7 @@ public class RefreshTokenServiceTests : InMemoryDbTest
     
     private async Task SaveToDbAsync(RefreshToken refreshToken)
     {
-        var model = new RefreshTokenModel
-        {
-            Id = 0,
-            Token = refreshToken.Token,
-            ExpiredAt = refreshToken.ExpiredAt,
-            Issued = refreshToken.Issued,
-            UserId = refreshToken.UserId
-        };
-        
-        await Db.RefreshTokens.AddAsync(model);
+        await Db.RefreshTokens.AddAsync(refreshToken);
         await Db.SaveChangesAsync();
         Db.ChangeTracker.Clear();
     }

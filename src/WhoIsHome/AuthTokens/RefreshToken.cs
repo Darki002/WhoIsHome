@@ -1,30 +1,50 @@
-﻿using System.Security.Cryptography;
-using WhoIsHome.Shared.Helper;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
+using WhoIsHome.Entities;
 
 namespace WhoIsHome.AuthTokens;
 
-public class RefreshToken(int? id, int userId, string token, DateTime issued, DateTime expiredAt)
+[Table("RefreshToken")]
+[Index(nameof(Token), IsUnique = true)]
+public class RefreshToken()
 {
     private const int ExpiresInDays = 14;
-
     private const int RefreshTokenLength = 64;
-
-    public int? Id { get; } = id;
-
-    public int UserId { get; } = userId;
     
-    public string Token { get; } = token;
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+    
+    [Required] 
+    [MaxLength(100)]
+    public string Token { get; set; }
 
-    public DateTime Issued { get; } = issued;
+    [Required]
+    public DateTime Issued { get; set; }
 
-    public DateTime ExpiredAt { get; private set; } = expiredAt;
+    public DateTime ExpiredAt { get; set; }
+    
+    [Required]
+    public int UserId { get; set; }
+    
+    [Required]
+    public User User { get; set; } = null!;
+    
+    public RefreshToken(int userId, string token, DateTime issued, DateTime expiredAt) : this()
+    {
+        Token = token;
+        Issued = issued;
+        ExpiredAt = expiredAt;
+        UserId = userId;
+    }
 
-    public static RefreshToken Create(int userId, DateTime currentTime)
+    public static RefreshToken Generate(int userId, DateTime currentTime)
     {
         var token = GenerateToken();
-        var issues = currentTime;
         var expiresAt = currentTime.AddDays(ExpiresInDays);
-        return new RefreshToken(null, userId, token, issues, expiresAt);
+        return new RefreshToken(userId, token, currentTime, expiresAt);
     }
     
     private static string GenerateToken()

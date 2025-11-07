@@ -2,23 +2,23 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WhoIsHome.External.Models;
+using WhoIsHome.AuthTokens;
+using WhoIsHome.Entities;
+using WhoIsHome.External.PushUp;
 
-namespace WhoIsHome.External;
+namespace WhoIsHome.External.Database;
 
 public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbContext(options)
 {
-    public virtual DbSet<UserModel> Users { get; set; }
+    public virtual DbSet<User> Users { get; set; }
     
-    public virtual DbSet<EventTemplateModel> EventTemplates { get; set; }
+    public virtual DbSet<EventTemplate> EventTemplates { get; set; }
     
     public virtual DbSet<EventModel> Events { get; set; }
     
-    public virtual DbSet<RefreshTokenModel> RefreshTokens { get; set; }
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
     
-    public virtual DbSet<PushUpSettingsModel> PushUpSettings { get; set; }
-    
-    public virtual DbSet<ChoreModel> Chores { get; set; }
+    public virtual DbSet<PushUpSettings> PushUpSettings { get; set; }
     
     private static readonly ValueConverter<TimeOnly, TimeSpan> TimeOnlyConverter = new(
         only => only.ToTimeSpan(),
@@ -36,26 +36,26 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // EventTemplateModel
-        modelBuilder.Entity<EventTemplateModel>()
+        modelBuilder.Entity<EventTemplate>()
             .Property(e => e.StartDate)
             .HasConversion(DateOnlyConverter);
-        modelBuilder.Entity<EventTemplateModel>()
+        modelBuilder.Entity<EventTemplate>()
             .Property(e => e.EndDate)
             .HasConversion(
                 d => d.HasValue ? d.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
                 d => d.HasValue ? DateOnly.FromDateTime(d.Value) : null);
     
-        modelBuilder.Entity<EventTemplateModel>()
+        modelBuilder.Entity<EventTemplate>()
             .Property(e => e.StartTime)
             .HasConversion(TimeOnlyConverter);
     
-        modelBuilder.Entity<EventTemplateModel>()
+        modelBuilder.Entity<EventTemplate>()
             .Property(e => e.EndTime)
             .HasConversion(
                 t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,
                 t => t.HasValue ? TimeOnly.FromTimeSpan(t.Value) : null);
     
-        modelBuilder.Entity<EventTemplateModel>()
+        modelBuilder.Entity<EventTemplate>()
             .Property(e => e.DinnerTime)
             .HasConversion(
                 t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,
@@ -66,8 +66,6 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
             .Property(e => e.Date)
             .HasConversion(DateOnlyConverter);
         
-      
-    
         modelBuilder.Entity<EventModel>()
             .Property(e => e.StartTime)
             .HasConversion(TimeOnlyConverter);
@@ -85,7 +83,7 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
                 t => t.HasValue ? TimeOnly.FromTimeSpan(t.Value) : null);
         
         // PushUpSettings
-        modelBuilder.Entity<PushUpSettingsModel>()
+        modelBuilder.Entity<PushUpSettings>()
             .Property(e => e.LanguageCode)
             .HasConversion(CultureConverter);
     }

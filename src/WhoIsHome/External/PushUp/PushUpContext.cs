@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using WhoIsHome.External.Database;
 using WhoIsHome.External.PushUp.ApiClient;
 using WhoIsHome.External.Translation;
 using WhoIsHome.Shared.Configurations;
