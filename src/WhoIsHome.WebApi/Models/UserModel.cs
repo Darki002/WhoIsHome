@@ -14,7 +14,7 @@ public class UserModel
     {
         return new UserModel
         {
-            Id = user.Id!.Value,
+            Id = user.Id,
             Email = user.Email,
             UserName = user.UserName
         };

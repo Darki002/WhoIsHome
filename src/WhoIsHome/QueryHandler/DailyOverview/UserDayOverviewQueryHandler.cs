@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Entities;
 using WhoIsHome.External;
+using WhoIsHome.External.Database;
 using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.QueryHandler.DailyOverview;
@@ -11,54 +12,41 @@ public class UserDayOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> con
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
 
-        var user = (await context.Users.SingleOrDefaultAsync(u => u.Id == id, cancellationToken));
+        var user = await context.Users.SingleOrDefaultAsync(u => u.Id == id, cancellationToken);
         
         if (user is null)
         {
-            throw new NotFoundException($"User with ID {id} was not found for UserDayOverview");
+            return DailyOverview.Error($"User with ID {id} was not found for UserDayOverview");
         }
 
-        var oneTimeEvents = (await context.OneTimeEvents
-                .Where(e => e.UserId == id)
-                .Where(e => e.PresenceType != PresenceType.Unknown)
-                .Where(e => e.Date == date)
-                .ToListAsync(cancellationToken))
-            .Select(e => e.ToAggregate());
-
-        var repeatedEvents = (await context.RepeatedEvents
-                .Where(e => e.UserId == id)
-                .Where(e => e.PresenceType != PresenceType.Unknown)
-                .Where(e => e.FirstOccurrence <= date)
-                .Where(e => e.LastOccurrence == null || e.LastOccurrence >= date)
-                .ToListAsync(cancellationToken))
-            .Select(e => e.ToAggregate())
-            .Where(e => e.IsEventAt(date));
-
-        List<EventBase> events = [..oneTimeEvents, ..repeatedEvents];
+        var eventList = await context.EventInstances
+            .Where(e => e.UserId == id)
+            .Where(e => e.PresenceType != PresenceType.Unknown)
+            .Where(e => e.Date == date)
+            .ToListAsync(cancellationToken);
         
-        if (events.Count == 0)
+        if (eventList.Count == 0)
         {
-            return DailyOverview.Empty(new User(user));
+            return DailyOverview.Empty(user);
         }
 
-        if (TryGetNotPresence(events, out var time))
+        if (TryGetNotPresence(eventList, out var result))
         {
-            return DailyOverview.From(new User(user), time!);
+            return DailyOverview.From(result!);
         }
 
-        var nextEvent = events.MaxBy(e => e.DinnerTime.Time);
-        return GetUserPresence(nextEvent, new User(user));
+        var nextEvent = eventList.MaxBy(e => e.DinnerTime);
+        return GetUserPresence(nextEvent, user);
     }
     
-    private static DailyOverview GetUserPresence(EventBase? eventBase, User user)
+    private static DailyOverview GetUserPresence(EventInstance? eventInstance, User user)
     {
-        return eventBase == null ? DailyOverview.Empty(user) : DailyOverview.From(user, eventBase.DinnerTime);
+        return eventInstance is null ? DailyOverview.Empty(user) : DailyOverview.From(eventInstance);
     }
     
-    private static bool TryGetNotPresence(IReadOnlyCollection<EventBase> events, out DinnerTime? dinnerTime)
+    private static bool TryGetNotPresence(IReadOnlyCollection<EventInstance> events, out EventInstance? result)
     {
-        var result = events.FirstOrDefault(e => e.DinnerTime.PresenceType == PresenceType.NotPresent);
-        dinnerTime = result?.DinnerTime;
+        result = events.FirstOrDefault(e => e.PresenceType is PresenceType.NotPresent);
         return result is not null;
     }
 }

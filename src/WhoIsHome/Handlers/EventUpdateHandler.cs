@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WhoIsHome.Entities;
-using WhoIsHome.External;
+using WhoIsHome.External.Database;
 using WhoIsHome.External.PushUp;
 using WhoIsHome.External.Translation;
 using WhoIsHome.Shared.BackgroundTasks;
@@ -17,7 +17,7 @@ public class EventUpdateHandler(
     IBackgroundTaskQueue backgroundTaskQueue,
     ILogger<EventUpdateHandler> logger) : IEventUpdateHandler
 {
-    public async Task HandleAsync(EventModel updatedEvent, UpdateAction updateAction)
+    public async Task HandleAsync(EventInstance updatedEvent, UpdateAction updateAction)
     {
         await backgroundTaskQueue.QueueBackgroundWorkItemAsync(RunAsync);
         return;
@@ -55,23 +55,22 @@ public class EventUpdateHandler(
         }
     }
 
-    private static bool CheckDelete(EventModel updatedEvent, List<EventModel> events)
+    private static bool CheckDelete(EventInstance updatedEvent, List<EventInstance> events)
     {
         var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime);
         return dinnerTimeEvent is null || dinnerTimeEvent.DinnerTime < updatedEvent.DinnerTime;
     }
 
-    private static bool CheckUpdate(EventModel updatedEvent, List<EventModel> events)
+    private static bool CheckUpdate(EventInstance updatedEvent, List<EventInstance> events)
     {
         var dinnerTimeEvent = events.MaxBy(e => e.DinnerTime);
         return dinnerTimeEvent?.Id == updatedEvent.Id;
     }
 
-    private async Task<List<EventModel>> GetUserEventsFromTodayAsync(EventModel updatedEvent, CancellationToken cancellationToken)
+    private async Task<List<EventInstance>> GetUserEventsFromTodayAsync(EventInstance updatedEvent, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-        
-        return await context.Events
+        return await context.EventInstances
             .Where(e => e.UserId == updatedEvent.UserId)
             .Where(e => e.PresenceType != PresenceType.Unknown)
             .Where(e => e.Date == dateTimeProvider.CurrentDate)

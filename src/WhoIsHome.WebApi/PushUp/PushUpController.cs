@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.External;
+using WhoIsHome.External.Database;
+using WhoIsHome.External.PushUp;
 using WhoIsHome.Shared.Authentication;
 
 namespace WhoIsHome.WebApi.PushUp;
@@ -16,24 +18,24 @@ public class PushUpController(
     : Controller
 {
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] PushUpSettings pushUpSettings, CancellationToken cancellationToken)
+    public async Task<IActionResult> Post([FromBody] PushUpSettingsDto pushUpSettings, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-        var model = await context.PushUpSettings.SingleOrDefaultAsync(s => s.UserId == userContext.UserId, cancellationToken);
+        var settings = await context.PushUpSettings.SingleOrDefaultAsync(s => s.UserId == userContext.UserId, cancellationToken);
 
-        if (model is null)
+        if (settings is null)
         {
             await CreateSettingAsync(pushUpSettings, cancellationToken);
             return Ok("ExpoPushToken is saved.");
         }
 
-        await UpdateSettingAsync(pushUpSettings, model, cancellationToken);
+        await UpdateSettingAsync(pushUpSettings, settings, cancellationToken);
         return Ok("ExpoPushToken is saved.");
     }
 
-    private async Task CreateSettingAsync(PushUpSettings pushUpSettings, CancellationToken cancellationToken)
+    private async Task CreateSettingAsync(PushUpSettingsDto pushUpSettings, CancellationToken cancellationToken)
     {
-        var model = new PushUpSettingsModel
+        var settings = new PushUpSettings
         {
             Enabled = pushUpSettings.Enable ?? true,
             UserId = userContext.UserId,
@@ -42,18 +44,18 @@ public class PushUpController(
         };
         
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-        await context.PushUpSettings.AddAsync(model, cancellationToken);
+        await context.PushUpSettings.AddAsync(settings, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task UpdateSettingAsync(PushUpSettings pushUpSettings, PushUpSettingsModel model, CancellationToken cancellationToken)
+    private async Task UpdateSettingAsync(PushUpSettingsDto pushUpSettings, PushUpSettings settings, CancellationToken cancellationToken)
     {
-        model.Token = pushUpSettings.Token;
-        model.Enabled = pushUpSettings.Enable ?? model.Enabled;
-        model.LanguageCode = Convert(pushUpSettings.LanguageCode, model.LanguageCode!);
+        settings.Token = pushUpSettings.Token;
+        settings.Enabled = pushUpSettings.Enable ?? settings.Enabled;
+        settings.LanguageCode = Convert(pushUpSettings.LanguageCode, settings.LanguageCode!);
         
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-        context.PushUpSettings.Update(model);
+        context.PushUpSettings.Update(settings);
         await context.SaveChangesAsync(cancellationToken);
     }
 

@@ -6,5 +6,5 @@ public record WeeklyReport
 {
     public required User User { get; init; }
 
-    public required Dictionary<DateOnly, (bool IsAtHome, TimeOnly? DinnerTime)> DailyOverviews { get; init; }
+    public required WeeklyReportResult Report { get; init; }
 }

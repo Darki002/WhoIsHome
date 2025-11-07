@@ -11,7 +11,6 @@ using WhoIsHome.QueryHandler.DailyOverview;
 using WhoIsHome.QueryHandler.UserOverview;
 using WhoIsHome.QueryHandler.WeeklyReports;
 using WhoIsHome.Services;
-using WhoIsHome.Services.ChoreServices;
 using WhoIsHome.Shared.Configurations;
 
 namespace WhoIsHome;
@@ -22,7 +21,6 @@ public static class ServiceProviderConfig
     {
         services.AddScoped<IRepeatedEventAggregateService, RepeatedEventAggregateService>();
         services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IChoreService, ChoreService>();
 
         services.AddTransient<UserDayOverviewQueryHandler>();
         services.AddTransient<DailyOverviewQueryHandler>();

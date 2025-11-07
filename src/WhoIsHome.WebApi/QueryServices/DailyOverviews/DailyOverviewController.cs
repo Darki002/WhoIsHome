@@ -4,24 +4,27 @@ using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.WebApi.QueryServices.DailyOverviews;
 
-public class DailyOverviewController(DailyOverviewQueryHandler queryHandler, IDateTimeProvider dateTimeProvider)
-    : WhoIsHomeControllerBase<IReadOnlyCollection<DailyOverview>, IReadOnlyCollection<DailyOverviewModel>>
+public class DailyOverviewController(DailyOverviewQueryHandler queryHandler, IDateTimeProvider dateTimeProvider) : Controller
 {
     [HttpGet]
     public async Task<ActionResult<IReadOnlyCollection<DailyOverviewModel>>> GetAsync(
         CancellationToken cancellationToken)
     {
         var result = await queryHandler.HandleAsync(dateTimeProvider.CurrentDate, cancellationToken);
-        return await BuildResponseAsync(result);
+
+        var errors = result.Where(r => r.HasError).ToList();
+        if (errors.Count > 0)
+        {
+            return BadRequest(errors.Select(e => e.ErrorMessage));
+        }
+        
+        return Ok(ToModel(result));
     }
 
-    protected override Task<IReadOnlyCollection<DailyOverviewModel>> ConvertToModelAsync(
-        IReadOnlyCollection<DailyOverview> data)
+    private static List<DailyOverviewModel> ToModel(IReadOnlyCollection<DailyOverview> data)
     {
-        var result = data
+        return data
             .Select(DailyOverviewModel.From)
             .ToList();
-
-        return Task.FromResult<IReadOnlyCollection<DailyOverviewModel>>(result);
     }
 }

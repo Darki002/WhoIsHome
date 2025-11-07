@@ -1,6 +1,8 @@
-﻿namespace WhoIsHome.Handlers;
+﻿using WhoIsHome.Entities;
+
+namespace WhoIsHome.Handlers;
 
 public interface IEventUpdateHandler
 {
-    Task HandleAsync(EventModel updatedEvent, EventUpdateHandler.UpdateAction updateAction);
+    Task HandleAsync(EventInstance updatedEvent, EventUpdateHandler.UpdateAction updateAction);
 }

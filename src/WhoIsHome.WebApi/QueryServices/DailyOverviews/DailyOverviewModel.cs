@@ -15,7 +15,7 @@ public record DailyOverviewModel
     {
         return new DailyOverviewModel
         {
-            User = new SimpleUserModel(dailyOverview.User.Id!.Value, dailyOverview.User.UserName),
+            User = new SimpleUserModel(dailyOverview.User.Id, dailyOverview.User.UserName),
             IsAtHome = dailyOverview.IsAtHome,
             DinnerTime = dailyOverview.DinnerTime
         };

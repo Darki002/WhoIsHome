@@ -13,8 +13,8 @@ public record WeeklyReportModel
     {
         return new WeeklyReportModel
         {
-            User = new SimpleUserModel(dailyOverview.User.Id!.Value, dailyOverview.User.UserName),
-            DailyOverviews = dailyOverview.DailyOverviews
+            User = new SimpleUserModel(dailyOverview.User.Id, dailyOverview.User.UserName),
+            DailyOverviews = dailyOverview.Report.Report
                 .Select(o => new DailyOverviewReport(o.Key, o.Value.IsAtHome, o.Value.DinnerTime))
                 .ToList(),
         };

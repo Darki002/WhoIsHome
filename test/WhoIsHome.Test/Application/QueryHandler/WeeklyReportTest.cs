@@ -35,8 +35,8 @@ public class WeeklyReportTest : InMemoryDbTest
         
         // Asser
         result.Should().HaveCount(2);
-        result[0].DailyOverviews.Should().HaveCount(7);
-        result[1].DailyOverviews.Should().HaveCount(7);
+        result[0].Report.Should().HaveCount(7);
+        result[1].Report.Should().HaveCount(7);
     }
 
     [Test]
@@ -60,7 +60,7 @@ public class WeeklyReportTest : InMemoryDbTest
         var result = await queryHandler.HandleAsync(CancellationToken.None);
         
         // Assert
-        var (isAtHome, dinnerTime) = result.Single().DailyOverviews[dateTimeProviderFake.CurrentDate];
+        var (isAtHome, dinnerTime) = result.Single().Report[dateTimeProviderFake.CurrentDate];
         dinnerTime.Should().Be(expectedDinnerTime);
         isAtHome.Should().BeTrue();
     }
@@ -86,7 +86,7 @@ public class WeeklyReportTest : InMemoryDbTest
         var result = await queryHandler.HandleAsync(CancellationToken.None);
         
         // Assert
-        var (isAtHome, dinnerTime) = result.Single().DailyOverviews[dateTimeProviderFake.CurrentDate];
+        var (isAtHome, dinnerTime) = result.Single().Report[dateTimeProviderFake.CurrentDate];
         dinnerTime.Should().Be(expectedDinnerTime);
         isAtHome.Should().BeTrue();
     }
@@ -107,8 +107,8 @@ public class WeeklyReportTest : InMemoryDbTest
         
         // Assert
         result.Should().HaveCount(1);
-        result.Single().DailyOverviews.Should().HaveCount(7);
-        result.Single().DailyOverviews.First().Key.Should().Be(expectedFirstDate);
-        result.Single().DailyOverviews.Last().Key.Should().Be(expectedLastDate);
+        result.Single().Report.Should().HaveCount(7);
+        result.Single().Report.First().Key.Should().Be(expectedFirstDate);
+        result.Single().Report.Last().Key.Should().Be(expectedLastDate);
     }
 }

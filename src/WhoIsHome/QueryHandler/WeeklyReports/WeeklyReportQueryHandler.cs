@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WhoIsHome.Entities;
-using WhoIsHome.External;
+using WhoIsHome.External.Database;
 using WhoIsHome.QueryHandler.DailyOverview;
 using WhoIsHome.Shared.Helper;
 
@@ -20,8 +19,8 @@ public class WeeklyReportQueryHandler(
 
         var result =
             userIds.ToDictionary(
-                keySelector: k => new User(k), 
-                elementSelector: _ => new Dictionary<DateOnly, (bool IsAtHome, TimeOnly? DinnerTime)>());
+                keySelector: k => k, 
+                elementSelector: _ => new WeeklyReportResult());
         
         for (var i = 0; i < 7; i++)
         {
@@ -30,7 +29,14 @@ public class WeeklyReportQueryHandler(
             
             foreach (var dailyOverview in overview)
             {
-                result[dailyOverview.User][date] = (dailyOverview.IsAtHome, dailyOverview.DinnerTime);
+                if (dailyOverview.HasError)
+                {
+                    result[dailyOverview.User].ErrorMessage = dailyOverview.ErrorMessage;
+                }
+                else
+                {
+                    result[dailyOverview.User].Report[date] = (dailyOverview.IsAtHome, dailyOverview.DinnerTime);
+                }
             }
         }
 
@@ -38,7 +44,13 @@ public class WeeklyReportQueryHandler(
             .Select(r => new WeeklyReport
             {
                 User = r.Key,
-                DailyOverviews = r.Value
+                Report = r.Value
             }).ToList();
     }
+}
+
+public record WeeklyReportResult
+{
+    public readonly Dictionary<DateOnly, (bool IsAtHome, TimeOnly? DinnerTime)> Report = [];
+    public string? ErrorMessage { get; set; }
 }

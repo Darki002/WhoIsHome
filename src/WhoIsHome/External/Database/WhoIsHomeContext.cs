@@ -14,7 +14,7 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
     
     public virtual DbSet<EventTemplate> EventTemplates { get; set; }
     
-    public virtual DbSet<EventModel> Events { get; set; }
+    public virtual DbSet<EventInstance> EventInstances { get; set; }
     
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
     
@@ -62,21 +62,25 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
                 t => t.HasValue ? TimeOnly.FromTimeSpan(t.Value) : null);
         
         // EventModel
-        modelBuilder.Entity<EventModel>()
+        modelBuilder.Entity<EventInstance>()
             .Property(e => e.Date)
             .HasConversion(DateOnlyConverter);
         
-        modelBuilder.Entity<EventModel>()
+        modelBuilder.Entity<EventInstance>()
+            .Property(e => e.OriginalDate)
+            .HasConversion(DateOnlyConverter);
+        
+        modelBuilder.Entity<EventInstance>()
             .Property(e => e.StartTime)
             .HasConversion(TimeOnlyConverter);
     
-        modelBuilder.Entity<EventModel>()
+        modelBuilder.Entity<EventInstance>()
             .Property(e => e.EndTime)
             .HasConversion(
                 t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,
                 t => t.HasValue ? TimeOnly.FromTimeSpan(t.Value) : null);
     
-        modelBuilder.Entity<EventModel>()
+        modelBuilder.Entity<EventInstance>()
             .Property(e => e.DinnerTime)
             .HasConversion(
                 t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,

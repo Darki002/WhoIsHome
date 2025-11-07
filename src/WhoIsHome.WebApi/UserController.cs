@@ -6,8 +6,7 @@ using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi;
 
-public class UserController(IUserContext context, IUserService service) 
-    : WhoIsHomeControllerBase<User, UserModel>
+public class UserController(IUserContext context, IUserService service) : Controller
 {
     [HttpGet("Me")]
     public async Task<ActionResult<UserModel>> GetMe(CancellationToken cancellationToken)
@@ -19,16 +18,22 @@ public class UserController(IUserContext context, IUserService service)
     public async Task<ActionResult<UserModel>> GetUser(int id, CancellationToken cancellationToken)
     {
         var user = await service.GetAsync(id, cancellationToken);
-        return await BuildResponseAsync(user);
+
+        if (user is null)
+        {
+            return NotFound($"No User with id {id} found.");
+        }
+        
+        return Ok(ToModel(user));
     }
     
-    protected override Task<UserModel> ConvertToModelAsync(User data)
+    private static UserModel ToModel(User data)
     {
-        return Task.FromResult(new UserModel
+        return new UserModel
         {
-            Id = data.Id!.Value,
+            Id = data.Id,
             UserName = data.UserName,
             Email = data.Email
-        });
+        };
     }
 }

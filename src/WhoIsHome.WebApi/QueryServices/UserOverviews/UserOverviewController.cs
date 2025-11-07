@@ -4,8 +4,7 @@ using WhoIsHome.Shared.Authentication;
 
 namespace WhoIsHome.WebApi.QueryServices.UserOverviews;
 
-public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUserContext userContext)
-    : WhoIsHomeControllerBase<UserOverview, UserOverviewModel>
+public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUserContext userContext) : Controller
 {
     [HttpGet]
     public async Task<ActionResult<UserOverviewModel>> GetCurrentUserOverviewAsync(CancellationToken cancellationToken)
@@ -14,23 +13,20 @@ public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUser
     }
 
     [HttpGet("{userId:int}")]
-    public async Task<ActionResult<UserOverviewModel>> GetUserOverviewAsync(int userId,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<UserOverviewModel>> GetUserOverviewAsync(int userId, CancellationToken cancellationToken)
     {
         var result = await queryHandler.HandleAsync(userId, cancellationToken);
-        return await BuildResponseAsync(result);
+        return Ok(ToModel(result));
     }
 
-    protected override Task<UserOverviewModel> ConvertToModelAsync(UserOverview data)
+    private static UserOverviewModel ToModel(UserOverview data)
     {
-        var model = new UserOverviewModel
+        return new UserOverviewModel
         {
-            UserId = data.User.Id!.Value,
+            UserId = data.User.Id,
             Today = data.Today.Select(UserOverviewEventModel.From).ToList(),
             ThisWeek = data.ThisWeek.Select(UserOverviewEventModel.From).ToList(),
             FutureEvents = data.FutureEvents.Select(UserOverviewEventModel.From).ToList()
         };
-
-        return Task.FromResult(model);
     }
 }

@@ -14,7 +14,7 @@ public record UserOverviewEventModel
 
     public TimeOnly? EndTime { get; init; }
 
-    public required string EventType { get; init; }
+    public required int TemplateId { get; init; }
 
     public static UserOverviewEventModel From(UserOverviewEvent userOverviewEvent)
     {
@@ -22,10 +22,10 @@ public record UserOverviewEventModel
         {
             Id = userOverviewEvent.Id,
             Title = userOverviewEvent.Title,
-            Date = userOverviewEvent.Date,
+            Date = userOverviewEvent.NextDate,
             StartTime = userOverviewEvent.StartTime,
             EndTime = userOverviewEvent.EndTime,
-            EventType = userOverviewEvent.EventType.ToString()
+            TemplateId = userOverviewEvent.TemplateId
         };
     }
 }

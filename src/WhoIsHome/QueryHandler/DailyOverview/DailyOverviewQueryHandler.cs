@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.External;
+using WhoIsHome.External.Database;
 
 namespace WhoIsHome.QueryHandler.DailyOverview;
 
