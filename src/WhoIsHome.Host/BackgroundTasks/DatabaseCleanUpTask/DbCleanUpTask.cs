@@ -1,11 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using WhoIsHome.External.Database;
+using WhoIsHome.Services;
 using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.Host.BackgroundTasks.DatabaseCleanUpTask;
 
-public class DbCleanUpTask(IOptions<DbCleanUpTaskOptions> options, IServiceScopeFactory scopeFactory, ILogger<DbCleanUpTask> logger) : BackgroundService
+public class DbCleanUpTask(
+    IOptions<DbCleanUpTaskOptions> options, 
+    IServiceScopeFactory scopeFactory, 
+    ILogger<DbCleanUpTask> logger) : BackgroundService
 {
     private readonly DbCleanUpTaskOptions options = options.Value;
     
@@ -13,7 +17,7 @@ public class DbCleanUpTask(IOptions<DbCleanUpTaskOptions> options, IServiceScope
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var now     = DateTime.Now;
+            var now   = DateTime.Now;
             var nextRun = CalculateNextRun(now, options.DayOfWeek, options.Time);
             var delay   = nextRun - now;
 
@@ -44,23 +48,31 @@ public class DbCleanUpTask(IOptions<DbCleanUpTaskOptions> options, IServiceScope
         return from.Date.AddDays(daysUntil).Add(at);
     }
     
-    private async Task RunDatabaseCleanupAsync(CancellationToken ct)
+    private async Task RunDatabaseCleanupAsync(CancellationToken stoppingToken)
     {
         using var scope = scopeFactory.CreateScope();
-        var dbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<WhoIsHomeContext>>();
-        var db = await dbFactory.CreateDbContextAsync(ct);
+        var db = scope.ServiceProvider.GetRequiredService<WhoIsHomeContext>();
         var dateTimeProvider = scope.ServiceProvider.GetRequiredService<IDateTimeProvider>();
 
         var cutoff = dateTimeProvider.CurrentDate.AddDays(-options.DaysToKeep);
         
-        var deletedEventTemplates = await db.EventGroups
+        var eventGroups = await db.EventGroups
+            .Include(e => e.Events)
             .Where(e => e.EndDate < cutoff)
-            .ExecuteDeleteAsync(ct);
-        logger.LogInformation("Deleted {Count} Event Templates events older than {Cutoff}.", deletedEventTemplates, cutoff);
+            .ToListAsync(stoppingToken);
         
-        var deletedEvents = await db.Events
-            .Where(e => e.Date < cutoff)
-            .ExecuteDeleteAsync(ct);
-        logger.LogInformation("Deleted {Count} events older than {Cutoff}.", deletedEvents, cutoff);
+        foreach (var eventGroup in eventGroups)
+        {
+            db.EventInstances.RemoveRange(eventGroup.Events);
+            db.EventGroups.Remove(eventGroup);
+            await db.SaveChangesAsync(stoppingToken);
+            
+            logger.LogInformation(
+                "Deleted Event Groups with EndDate {EndDate} and removed {Count} Event Instances.", 
+                eventGroup.EndDate, 
+                eventGroup.Events.Count);
+        }
+        
+        logger.LogInformation("Deleted {Count} Event Groups older than {Cutoff}.", eventGroups.Count, cutoff);
     }
 }
