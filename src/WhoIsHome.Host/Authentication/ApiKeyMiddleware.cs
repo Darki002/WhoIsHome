@@ -1,37 +1,46 @@
-﻿using WhoIsHome.Shared.Configurations;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using WhoIsHome.Shared.Configurations;
 
 namespace WhoIsHome.Host.Authentication;
 
-public class ApiKeyMiddleware(RequestDelegate next, ILogger<ApiKeyMiddleware> logger)
+public class ApiKeyMiddleware(IConfiguration configuration, ILogger<ApiKeyMiddleware> logger) : IAsyncAuthorizationFilter
 {
     public const string ApiKeyHeaderName = "X-API-KEY";
 
-    public async Task InvokeAsync(HttpContext context, IConfiguration configuration)
+    public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        if (context.Request.Path.StartsWithSegments("/health"))
+        if (context.HttpContext.Request.Path.StartsWithSegments("/health"))
         {
-            await next(context);
             return;
         }
         
-        if (!context.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
+        if (!context.HttpContext.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
         {
             logger.LogWarning("No API Key  in request header!");
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsync("API Key is missing.");
+            
+            var error = new
+            {
+                error = "Unauthorized",
+                message = "API Key is missing."
+            };
+
+            context.Result = new UnauthorizedObjectResult(error);
             return;
         }
-
 
         var apiKey = configuration.GetApiKey();
         if (!apiKey.Equals(extractedApiKey))
         {
             logger.LogInformation("Unauthorized access with wrong API Key");
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsync("Unauthorized access (invalid API Key)");
-            return;
-        }
+            
+            var error = new
+            {
+                error = "Unauthorized",
+                message = "Unauthorized access (invalid API Key)."
+            };
 
-        await next(context);
+            context.Result = new UnauthorizedObjectResult(error);
+        }
     }
 }
