@@ -9,5 +9,5 @@ public interface IUserService
     
     Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken);
 
-    Task<UserValidationResult> CreateUserAsync(string userName, string email, string password, CancellationToken cancellationToken);
+    Task<ValidationResult<User>> CreateUserAsync(string userName, string email, string password, CancellationToken cancellationToken);
 }

@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.QueryHandler.WeeklyReports;
 
 namespace WhoIsHome.WebApi.QueryServices.WeeklyReports;
 
+[Authorize]
 public class WeeklyReportController(WeeklyReportQueryHandler queryHandler) : Controller
 {
     [HttpGet]

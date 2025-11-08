@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Entities;
 using WhoIsHome.Services;
@@ -6,6 +7,7 @@ using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi;
 
+[Authorize]
 public class UserController(IUserContext context, IUserService service) : Controller
 {
     [HttpGet("Me")]

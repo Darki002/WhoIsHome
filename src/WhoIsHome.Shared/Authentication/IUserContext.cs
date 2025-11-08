@@ -4,9 +4,7 @@ public interface IUserContext
 {
     int UserId { get; }
     
-    Task<AuthenticatedUser> GetCurrentUserAsync();
-    
-    Task<AuthenticatedUser> GetCurrentUserAsync(CancellationToken cancellationToken);
+    Task<AuthenticatedUser> GetCurrentUserAsync(CancellationToken cancellationToken = default);
     
     bool IsUserPermitted(int permittedUserId);
 }

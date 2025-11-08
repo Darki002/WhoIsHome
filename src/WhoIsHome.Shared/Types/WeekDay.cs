@@ -56,4 +56,16 @@ public static class WeekDayExtensions
 
         return result;
     }
+    
+    public static WeekDay ToWeekDays(this IEnumerable<DayOfWeek> weekDays)
+    {
+        WeekDay result = 0;
+        
+        foreach (var day in weekDays)
+        {
+            result |= day.ToWeekDay();
+        }
+
+        return result;
+    }
 }

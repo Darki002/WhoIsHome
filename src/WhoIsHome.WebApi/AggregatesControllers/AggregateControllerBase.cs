@@ -4,20 +4,20 @@ using WhoIsHome.Shared.Authentication;
 
 namespace WhoIsHome.WebApi.AggregatesControllers;
 
-public abstract class AggregateControllerBase<T, TModel>(IAggregateService<T> aggregateService) 
+public abstract class AggregateControllerBase<T, TModel>(IAggregateService<T> groupService) 
     : WhoIsHomeControllerBase<T, TModel>
 {
     [HttpGet("{id:int}")]
     public async Task<ActionResult<TModel>> Get(int id, CancellationToken cancellationToken)
     {
-        var result = await aggregateService.GetAsync(id, cancellationToken);
+        var result = await groupService.GetAsync(id, cancellationToken);
         return await BuildResponseAsync(result);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<ActionResult<TModel>> Delete(int id, CancellationToken cancellationToken)
     {
-        await aggregateService.DeleteAsync(id, cancellationToken);
+        await groupService.DeleteAsync(id, cancellationToken);
         return Ok();
     }
 }

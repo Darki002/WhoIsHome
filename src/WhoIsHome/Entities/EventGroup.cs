@@ -8,7 +8,7 @@ using WhoIsHome.Validations;
 namespace WhoIsHome.Entities;
 
 [Table("EventTemplate")]
-public class EventTemplate()
+public class EventGroup()
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -16,7 +16,7 @@ public class EventTemplate()
     
     [Required]
     [MaxLength(50)]
-    public required string Title { get; set; }
+    public string Title { get; set; } = null!;
 
     [Required]
     public DateOnly StartDate { get; set; }
@@ -42,8 +42,10 @@ public class EventTemplate()
     
     [Required]
     public User User { get; set; } = null!;
+
+    public List<EventInstance> Events { get; set; } = [];
     
-    public EventTemplate(
+    public EventGroup(
         string title,
         DateOnly startDate,
         DateOnly? endDate,

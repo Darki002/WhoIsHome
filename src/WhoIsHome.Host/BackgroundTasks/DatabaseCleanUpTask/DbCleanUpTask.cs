@@ -53,7 +53,7 @@ public class DbCleanUpTask(IOptions<DbCleanUpTaskOptions> options, IServiceScope
 
         var cutoff = dateTimeProvider.CurrentDate.AddDays(-options.DaysToKeep);
         
-        var deletedEventTemplates = await db.EventTemplates
+        var deletedEventTemplates = await db.EventGroups
             .Where(e => e.EndDate < cutoff)
             .ExecuteDeleteAsync(ct);
         logger.LogInformation("Deleted {Count} Event Templates events older than {Cutoff}.", deletedEventTemplates, cutoff);

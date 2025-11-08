@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.QueryHandler.DailyOverview;
 using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.WebApi.QueryServices.DailyOverviews;
 
+[Authorize]
 public class DailyOverviewController(DailyOverviewQueryHandler queryHandler, IDateTimeProvider dateTimeProvider) : Controller
 {
     [HttpGet]

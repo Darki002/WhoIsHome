@@ -20,9 +20,6 @@ public class EventInstance
     public DateOnly Date { get; set; }
     
     [Required]
-    public DateOnly OriginalDate { get; set; }
-    
-    [Required]
     public TimeOnly StartTime { get; set; }
 
     public TimeOnly? EndTime { get; set; }
@@ -34,10 +31,16 @@ public class EventInstance
     public TimeOnly? DinnerTime { get; set; }
     
     [Required]
+    public bool IsOriginal { get; set; }
+    
+    [Required]
+    public DateOnly OriginalDate { get; set; }
+    
+    [Required]
     public int EventTemplateId { get; set; }
 
     [Required] 
-    public EventTemplate EventTemplate { get; set; } = null!;
+    public EventGroup EventGroup { get; set; } = null!;
     
     [Required]
     public int UserId { get; set; }

@@ -24,9 +24,9 @@ internal class UserService(IDbContextFactory<WhoIsHomeContext> contextFactory, I
             .SingleOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<UserValidationResult> CreateUserAsync(string userName, string email, string password, CancellationToken cancellationToken)
+    public async Task<ValidationResult<User>> CreateUserAsync(string userName, string email, string password, CancellationToken cancellationToken)
     {
-        var result = new UserValidationResult();
+        var result = new ValidationResult<User>();
         
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var isEmailInUse = context.Users.Any(u => u.Email == email);
@@ -53,6 +53,6 @@ internal class UserService(IDbContextFactory<WhoIsHomeContext> contextFactory, I
         
         var dbUser = context.Users.Add(user);
         await context.SaveChangesAsync(cancellationToken);
-        return new UserValidationResult { User = dbUser.Entity };
+        return ValidationResult<User>.Success(dbUser.Entity);
     }
 }

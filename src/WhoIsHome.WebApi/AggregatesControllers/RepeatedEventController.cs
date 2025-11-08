@@ -1,60 +1,76 @@
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Entities;
 using WhoIsHome.Services;
-using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Helper;
+using WhoIsHome.Shared.Types;
 using WhoIsHome.WebApi.Models.Dto;
 using WhoIsHome.WebApi.Models.Response;
 
 namespace WhoIsHome.WebApi.AggregatesControllers;
 
-public class RepeatedEventController(IRepeatedEventAggregateService repeatedEventAggregateService)
-    : AggregateControllerBase<RepeatedEvent, RepeatedEventModel>(repeatedEventAggregateService)
+[Route("event-groups")]
+[Authorize]
+public class EventGroupController(IEventGroupService eventGroupService) : Controller
 {
     [HttpPost]
-    public async Task<ActionResult<RepeatedEventModel>> CreateEvent([FromBody] RepeatedEventModelDto eventModelDto,
+    public async Task<ActionResult<EventGroupModel>> CreateEventAsync([FromBody] EventGroupModelDto eventModelDto,
         CancellationToken cancellationToken)
     {
-        var result = await repeatedEventAggregateService.CreateAsync(
+        var result = await eventGroupService.CreateAsync(
             title: eventModelDto.Title,
             firstOccurrence: eventModelDto.FirstOccurrence,
             lastOccurrence: eventModelDto.LastOccurrence,
             startTime: eventModelDto.StartTime,
             endTime: eventModelDto.EndTime,
+            weekDays: eventModelDto.WeekDays.ToWeekDays(),
             presenceType: PresenceTypeHelper.FromString(eventModelDto.PresenceType),
             time: eventModelDto.DinnerTime,
             cancellationToken: cancellationToken);
 
-        return await BuildResponseAsync(result);
+        return Ok(ToModel(result));
     }
 
     [HttpPatch("{id:int}")]
-    public async Task<ActionResult<RepeatedEventModel>> UpdateEvent(
+    public async Task<ActionResult<EventGroupModel>> UpdateEventAsync(
         int id,
-        [FromBody] RepeatedEventModelDto eventModel,
+        [FromBody] EventGroupModelDto eventModelDto,
         CancellationToken cancellationToken)
     {
-        var result = await repeatedEventAggregateService.UpdateAsync(
+        var result = await eventGroupService.UpdateAsync(
             id: id,
-            title: eventModel.Title,
-            firstOccurrence: eventModel.FirstOccurrence,
-            lastOccurrence: eventModel.LastOccurrence,
-            startTime: eventModel.StartTime,
-            endTime: eventModel.EndTime,
-            presenceType: PresenceTypeHelper.FromString(eventModel.PresenceType),
-            time: eventModel.DinnerTime,
+            title: eventModelDto.Title,
+            startDate: eventModelDto.FirstOccurrence,
+            endDate: eventModelDto.LastOccurrence,
+            startTime: eventModelDto.StartTime,
+            endTime: eventModelDto.EndTime,
+            weekDays: eventModelDto.WeekDays.ToWeekDays(),
+            presenceType: PresenceTypeHelper.FromString(eventModelDto.PresenceType),
+            time: eventModelDto.DinnerTime,
             cancellationToken: cancellationToken);
 
-        return await BuildResponseAsync(result);
-    }
+        if (result.HasErrors)
+        {
+            return BadRequest(result.ValidationErrors.Select(e => e.Message));
+        }
 
-    [HttpPost("end/{id:int}")]
-    public async Task<ActionResult<RepeatedEventModel>> EndAsync(int id, [FromBody] EndRepeatedEventDto dto, CancellationToken cancellationToken)
-    {
-        var result = await repeatedEventAggregateService.EndAsync(id: id, dto.EndDate, cancellationToken: cancellationToken);
-
-        return await BuildResponseAsync(result);
+        return Ok(ToModel(result.Result));
     }
     
-    protected override Task<RepeatedEventModel> ConvertToModelAsync(RepeatedEvent data) => Task.FromResult(RepeatedEventModel.From(data));
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult<EventGroupModel>> DeleteEventAsync(int id, CancellationToken cancellationToken)
+    {
+        var result = await eventGroupService.DeleteAsync(id: id, cancellationToken: cancellationToken);
+
+        if (result is not null)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok();
+    }
+    
+    private static ActionResult<EventGroupModel> ToModel(EventGroup result)
+    {
+        return EventGroupModel.From(result);
+    }
 }

@@ -8,12 +8,12 @@ using WhoIsHome.Test.TestData;
 namespace WhoIsHome.Test.Application.Services;
 
 [TestFixture]
-public class RepeatedEventAggregateServiceTest : InMemoryDbTest
+public class EventGroupServiceTest : InMemoryDbTest
 {
     private readonly UserContextFake userContextFake = new();
     
     private User user = null!;
-    private RepeatedEventAggregateService service;
+    private EventGroupService service;
 
     [SetUp]
     public void SetUp()
@@ -21,7 +21,7 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
         var eventUpdateHandlerMock = Mock.Of<IEventUpdateHandler>();
         
         userContextFake.SetUser(user, 1);
-        service = new RepeatedEventAggregateService(DbFactory, eventUpdateHandlerMock, userContextFake);
+        service = new EventGroupService(DbFactory, eventUpdateHandlerMock, userContextFake);
     }
 
     protected override async Task DbSetUpAsync()
@@ -33,7 +33,7 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
     }
 
     [TestFixture]
-    private class GetAsync : RepeatedEventAggregateServiceTest
+    private class GetAsync : EventGroupServiceTest
     {
         [Test]
         public async Task ReturnsEvent_WithTheExpectedId()
@@ -62,7 +62,7 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
     }
     
     [TestFixture]
-    private class DeleteAsync : RepeatedEventAggregateServiceTest
+    private class DeleteAsync : EventGroupServiceTest
     {
         [Test]
         public async Task DeletesEvent_WithTheGivenId()
@@ -108,7 +108,7 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
     }
     
     [TestFixture]
-    private class CreateAsync : RepeatedEventAggregateServiceTest
+    private class CreateAsync : EventGroupServiceTest
     {
         [Test]
         public async Task SaveGivenEventToDb()
@@ -130,7 +130,7 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
     }
     
     [TestFixture]
-    private class UpdateAsync : RepeatedEventAggregateServiceTest
+    private class UpdateAsync : EventGroupServiceTest
     {
         [Test]
         public async Task SaveGivenEventToDb()
@@ -154,7 +154,7 @@ public class RepeatedEventAggregateServiceTest : InMemoryDbTest
     }
     
     [TestFixture]
-    private class EndAsync : RepeatedEventAggregateServiceTest
+    private class EndAsync : EventGroupServiceTest
     {
         [Test]
         public async Task SetEndTimeOnAggregate()

@@ -1,5 +1,4 @@
 using System.Threading.RateLimiting;
-using WhoIsHome.Host;
 using WhoIsHome.Host.Authentication;
 using WhoIsHome.Host.BackgroundTasks;
 using WhoIsHome.Host.DataProtectionKeys;
@@ -46,6 +45,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
         
 app.UseMiddleware<ApiKeyMiddleware>();
+app.UseMiddleware<UserContextActionFilter>();
 
 app.UseRouting();
 app.UseRateLimiter();

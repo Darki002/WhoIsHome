@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WhoIsHome.AuthTokens;
@@ -18,6 +19,7 @@ public class AuthController(
     ILogger<AuthController> logger) : Controller
 {
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> Login(LoginDto loginDto, CancellationToken cancellationToken)
     {
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
@@ -44,6 +46,7 @@ public class AuthController(
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> Register(RegisterDto registerDto, CancellationToken cancellationToken)
     {
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
@@ -60,13 +63,14 @@ public class AuthController(
             return BadRequest(result.ValidationErrors);
         }
         
-        logger.LogInformation("New registration {UserName} with ID {Id} from IP {IP} | UserAgent: {UserAgent}", result.Value.UserName, result.Value.Id, ip, userAgent);
+        logger.LogInformation("New registration {UserName} with ID {Id} from IP {IP} | UserAgent: {UserAgent}", result.Result.UserName, result.Result.Id, ip, userAgent);
 
             
-        return Ok(new { result.Value.Id });
+        return Ok(new { result.Result.Id });
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> Refresh([FromHeader(Name = "RefreshToken")] string refreshToken, CancellationToken cancellationToken)
     {
         var result = await jwtTokenService.RefreshTokenAsync(refreshToken, cancellationToken);
@@ -81,6 +85,7 @@ public class AuthController(
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
         await jwtTokenService.LogOutAsync(userContext.UserId, cancellationToken);

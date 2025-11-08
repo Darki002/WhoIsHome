@@ -3,19 +3,21 @@ using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.WebApi.Models.Response;
 
-public class RepeatedEventModel
+public class EventGroupModel
 {
     public required int Id { get; set; }
 
     public required string Title { get; set; }
     
-    public required DateOnly FirstOccurrence { get; set; }
+    public required DateOnly StartDate { get; set; }
     
-    public DateOnly? LastOccurrence { get; set; }
+    public DateOnly? EndDate { get; set; }
 
     public required TimeOnly StartTime { get; set; }
 
     public TimeOnly? EndTime { get; set; }
+    
+    public required List<DayOfWeek> WeekDays { get; set; }
 
     public required string PresenceType { get; set; }
 
@@ -23,18 +25,19 @@ public class RepeatedEventModel
 
     public required int UserId { get; set; }
     
-    public static RepeatedEventModel From(RepeatedEvent data)
+    public static EventGroupModel From(EventGroup data)
     {
-        return new RepeatedEventModel
+        return new EventGroupModel
         {
-            Id = data.Id!.Value,
+            Id = data.Id,
             Title = data.Title,
-            FirstOccurrence = data.FirstOccurrence,
-            LastOccurrence = data.LastOccurrence,
+            StartDate = data.StartDate,
+            EndDate = data.EndDate,
             StartTime = data.StartTime,
             EndTime = data.EndTime,
-            PresenceType = data.DinnerTime.PresenceType.ToString(),
-            DinnerTime = data.DinnerTime.Time,
+            WeekDays = data.WeekDays.ToDayOfWeekList(),
+            PresenceType = data.PresenceType.ToString(),
+            DinnerTime = data.DinnerTime,
             UserId = data.UserId
         };
     }

@@ -12,7 +12,7 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
 {
     public virtual DbSet<User> Users { get; set; }
     
-    public virtual DbSet<EventTemplate> EventTemplates { get; set; }
+    public virtual DbSet<EventGroup> EventGroups { get; set; }
     
     public virtual DbSet<EventInstance> EventInstances { get; set; }
     
@@ -36,26 +36,26 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // EventTemplateModel
-        modelBuilder.Entity<EventTemplate>()
+        modelBuilder.Entity<EventGroup>()
             .Property(e => e.StartDate)
             .HasConversion(DateOnlyConverter);
-        modelBuilder.Entity<EventTemplate>()
+        modelBuilder.Entity<EventGroup>()
             .Property(e => e.EndDate)
             .HasConversion(
                 d => d.HasValue ? d.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
                 d => d.HasValue ? DateOnly.FromDateTime(d.Value) : null);
     
-        modelBuilder.Entity<EventTemplate>()
+        modelBuilder.Entity<EventGroup>()
             .Property(e => e.StartTime)
             .HasConversion(TimeOnlyConverter);
     
-        modelBuilder.Entity<EventTemplate>()
+        modelBuilder.Entity<EventGroup>()
             .Property(e => e.EndTime)
             .HasConversion(
                 t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,
                 t => t.HasValue ? TimeOnly.FromTimeSpan(t.Value) : null);
     
-        modelBuilder.Entity<EventTemplate>()
+        modelBuilder.Entity<EventGroup>()
             .Property(e => e.DinnerTime)
             .HasConversion(
                 t => t.HasValue ? t.Value.ToTimeSpan() : (TimeSpan?)null,

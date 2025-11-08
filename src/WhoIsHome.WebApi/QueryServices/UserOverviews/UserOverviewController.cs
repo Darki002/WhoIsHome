@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.QueryHandler.UserOverview;
 using WhoIsHome.Shared.Authentication;
 
 namespace WhoIsHome.WebApi.QueryServices.UserOverviews;
 
+[Authorize]
 public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUserContext userContext) : Controller
 {
     [HttpGet]
