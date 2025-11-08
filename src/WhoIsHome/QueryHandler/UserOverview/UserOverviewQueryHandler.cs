@@ -55,6 +55,6 @@ public class UserOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contex
             NextDate = e.Date,
             StartTime = e.StartTime,
             EndTime = e.EndTime,
-            TemplateId = e.EventTemplateId
+            TemplateId = e.EventGroupId
         };
 }

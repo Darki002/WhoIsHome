@@ -37,7 +37,7 @@ public class EventInstance
     public DateOnly OriginalDate { get; set; }
     
     [Required]
-    public int EventTemplateId { get; set; }
+    public int EventGroupId { get; set; }
 
     [Required] 
     public EventGroup EventGroup { get; set; } = null!;

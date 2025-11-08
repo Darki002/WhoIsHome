@@ -18,6 +18,12 @@ public static class DateOnlyHelper
         var diff = (7 + (dt.DayOfWeek - DayOfWeek.Monday)) % 7;
         return dt.AddDays(-diff).Date;
     }
+    
+    public static DateOnly StartOfWeek(this DateOnly dt)
+    {
+        var diff = (7 + (dt.DayOfWeek - DayOfWeek.Monday)) % 7;
+        return dt.AddDays(-diff);
+    }
 
     public static int DaysUntilNext(this DateOnly date, DayOfWeek targetDay)
     {

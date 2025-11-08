@@ -39,7 +39,7 @@ public static class ServiceProviderConfig
         IConfiguration configuration)
     {
         var connectionString = BuildConnectionString(configuration);
-        services.AddDbContextFactory<WhoIsHomeContext>(o => o.UseMySQL(connectionString));
+        services.AddDbContext<WhoIsHomeContext>(o => o.UseMySQL(connectionString));
 
         services.AddSingleton<ITranslationService, TranslationService>();
         

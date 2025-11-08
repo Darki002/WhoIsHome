@@ -4,7 +4,7 @@ using WhoIsHome.External.Database;
 
 namespace WhoIsHome.Host.Authentication;
 
-public class UserContext(IDbContextFactory<WhoIsHomeContext> contextFactory) : IUserContext
+public class UserContext(WhoIsHomeContext context) : IUserContext
 {
     private AuthenticatedUser? authenticatedUserCache;
 
@@ -17,7 +17,6 @@ public class UserContext(IDbContextFactory<WhoIsHomeContext> contextFactory) : I
             return authenticatedUserCache;
         }
 
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var user = await context.Users.AsNoTracking().SingleAsync(u => u.Id == UserId, cancellationToken);
 
         authenticatedUserCache = new AuthenticatedUser
