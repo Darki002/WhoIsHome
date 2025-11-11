@@ -66,40 +66,6 @@ public class EventGroup()
         DinnerTime = dinnerTime;
         UserId = userId;
     }
-
-    public bool IsEventAt(DateOnly date)
-    {
-        var weekDays = WeekDays.ToDayOfWeekList();
-        return weekDays.Contains(date.DayOfWeek) &&
-               date >= StartDate &&
-               (EndDate == null || date <= EndDate);
-    }
-
-    public DateOnly GetNextFrom(DateOnly date)
-    {
-        if (date > EndDate)
-        {
-            throw new InvalidOperationException("Can't get the next occurrence of an Event that is in the past.");
-        }
-
-        if (StartDate > date)
-        {
-            return StartDate;
-        }
-
-        if (IsEventAt(date))
-        {
-            return date;
-        }
-        
-        var nextWeekDay = WeekDays
-            .ToDayOfWeekList()
-            .OrderBy(d => d.Normalize())
-            .FirstOrDefault(d => d > date.DayOfWeek);
-        
-        var daysUntilNextOccurence = date.DaysUntilNext(nextWeekDay);
-        return date.AddDays(daysUntilNextOccurence);
-    }
     
     public List<ValidationError> Validate()
     {

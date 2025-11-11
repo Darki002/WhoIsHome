@@ -22,7 +22,13 @@ public class JwtTokenServiceTests
         var mockUserService = new Mock<IUserService>();
 
         mockUserService.Setup(u => u.GetAsync(1, CancellationToken.None))
-            .ReturnsAsync(() => new User("Test", "test@whoishome.dev", "test") { Id = 1 });
+            .ReturnsAsync(() => new User
+            {
+                Id = 1,
+                UserName = "Test", 
+                Email = "test@whoishome.dev", 
+                Password = "test"
+            });
         
         var mockConfiguration = new Mock<IConfiguration>();
         var sectionMock = new Mock<IConfigurationSection>();
@@ -54,7 +60,13 @@ public class JwtTokenServiceTests
                 .ReturnsAsync(refreshToken);
 
             var service = new JwtTokenService(configMock, refreshService.Object, userService, loggerMock);
-            var user = new User( "", "", "") { Id = 1 };
+            var user = new User
+            {
+                Id = 1,
+                UserName = "",
+                Email = "",
+                Password = ""
+            };
             
             // Act
             var result = await service.GenerateTokenAsync(user, CancellationToken.None);

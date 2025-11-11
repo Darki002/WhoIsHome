@@ -1,29 +1,32 @@
 ﻿using WhoIsHome.Entities;
 
-namespace WhoIsHome.Test.Application.Aggregates;
+namespace WhoIsHome.Test.Application.Entities;
 
 [TestFixture]
 public class UserTest
 {
     [TestFixture]
-    private class Create : UserTest
+    private class Validate : UserTest
     {
         [Test]
-        public void ReturnsNewUser_RepresentingAUserFromTheGivenData()
+        public void ReturnsNoValidationErrors_WhenUserDataIsCorrect()
         {
             // Arrange
             const string userName = "Darki123";
             const string email = "darki@whoishome.dev";
             const string password = "securePassword1234";
+            var user = new User
+            {
+                UserName = userName,
+                Email = email,
+                Password = password
+            };
         
             // Act
-            var result = new User(userName, email, password);
+            var result = user.Validate();
         
             // Assert
-            result.Id.Should().BeNull();
-            result.UserName.Should().Be(userName);
-            result.Email.Should().Be(email);
-            result.Password.Should().Be(password);
+            result.Should().HaveCount(0);
         }
 
         [Test]
@@ -33,7 +36,12 @@ public class UserTest
             const string userName = "Darki123";
             const string invalidEmail = "missingAt.dev";
             const string password = "securePassword1234";
-            var user = new User(userName, invalidEmail, password);
+            var user = new User
+            {
+                UserName = userName,
+                Email = invalidEmail,
+                Password = password
+            };
         
             // Act
             var result = user.Validate();
@@ -49,7 +57,12 @@ public class UserTest
             var userName = string.Join("", Enumerable.Repeat('a', 32));
             const string invalidEmail = "darki@whoishome.dev";
             const string password = "securePassword1234";
-            var user = new User(userName, invalidEmail, password);
+            var user = new User
+            {
+                UserName = userName,
+                Email = invalidEmail,
+                Password = password
+            };
         
             // Act
             var result = user.Validate();
@@ -65,7 +78,12 @@ public class UserTest
             const string userName = "";
             const string invalidEmail = "darki@whoishome.dev";
             const string password = "securePassword1234";
-            var user = new User(userName, invalidEmail, password);
+            var user = new User
+            {
+                UserName = userName,
+                Email = invalidEmail,
+                Password = password
+            };
         
             // Act
             var result = user.Validate();

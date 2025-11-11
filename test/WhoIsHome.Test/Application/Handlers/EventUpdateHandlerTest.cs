@@ -3,7 +3,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Moq.EntityFrameworkCore;
+using WhoIsHome.Entities;
 using WhoIsHome.External;
+using WhoIsHome.External.Database;
 using WhoIsHome.Handlers;
 using WhoIsHome.Test.TestData;
 
@@ -15,11 +17,11 @@ public class EventUpdateHandlerTest : InMemoryDbTest
 
     private readonly ILogger<EventUpdateHandler> logger = NullLogger<EventUpdateHandler>.Instance;
 
-    private readonly List<UserModel> userModels =
+    private readonly List<User> userModels =
     [
-        new() { Id = 1, UserName = "Darki" },
-        new() { Id = 2, UserName = "Test" },
-        new() { Id = 3, UserName = "Test2" }
+        new() { Id = 1, UserName = "Darki", Email = "", Password = "" },
+        new() { Id = 2, UserName = "Test", Email = "", Password = "" },
+        new() { Id = 3, UserName = "Test2", Email = "", Password = "" }
     ];
 
     [Test]
@@ -31,12 +33,12 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         
         var updatedEvent = OneTimeEventTestData.CreateDefault(id: 1, userId: 1, date: dateTimeProviderFake.CurrentDate);
 
-        var factory = GetDbFactoryMock(context =>
+        var dbMock = GetDbFactoryMock(context =>
         {
-            context.Setup(c => c.Events).ReturnsDbSet([updatedEvent]);
+            context.Setup(c => c.EventInstances).ReturnsDbSet([updatedEvent]);
             context.Setup(c => c.Users).ReturnsDbSet(userModels);
         });
-        var handler = new EventUpdateHandler(factory.Object, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
+        var handler = new EventUpdateHandler(dbMock.Object, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
 
         // Act
         await handler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Create);
@@ -63,12 +65,12 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         var effectiveEvent = OneTimeEventTestData.CreateDefault(id: 2, userId: 1, date: dateTimeProviderFake.CurrentDate,
             dinnerTime: new TimeOnly(19, 00, 00));
 
-        var factory = GetDbFactoryMock(context =>
+        var dbMock = GetDbFactoryMock(context =>
         {
-            context.Setup(c => c.Events).ReturnsDbSet([updatedEvent.ToModel(), effectiveEvent.ToModel()]);
+            context.Setup(c => c.EventInstances).ReturnsDbSet([updatedEvent.ToModel(), effectiveEvent.ToModel()]);
             context.Setup(c => c.Users).ReturnsDbSet(userModels);
         });
-        var handler = new EventUpdateHandler(factory.Object, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
+        var handler = new EventUpdateHandler(dbMock.Object, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
 
         // Act
         await handler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Create);
@@ -91,13 +93,13 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         var effectiveEvent = OneTimeEventTestData.CreateDefault(2, userId: 1, date: dateTimeProviderFake.CurrentDate,
             dinnerTime: new TimeOnly(18, 00, 00));
 
-        var factory = GetDbFactoryMock(context =>
+        var dbMock = GetDbFactoryMock(context =>
         {
-            context.Setup(c => c.Events).ReturnsDbSet([effectiveEvent.ToModel()]);
+            context.Setup(c => c.EventInstances).ReturnsDbSet([effectiveEvent.ToModel()]);
             context.Setup(c => c.Users).ReturnsDbSet(userModels);
         });
         
-        var handler = new EventUpdateHandler(factory.Object, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
+        var handler = new EventUpdateHandler(dbMock.Object, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
 
         // Act
         await handler.HandleAsync(deletedEvent, EventUpdateHandler.UpdateAction.Delete);
@@ -113,13 +115,10 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         pushUpClientFake.Command.UserIds.Should().BeEquivalentTo([2, 3]);
     }
 
-    private Mock<IDbContextFactory<WhoIsHomeContext>> GetDbFactoryMock(Action<Mock<WhoIsHomeContext>> setUp)
+    private static Mock<WhoIsHomeContext> GetDbFactoryMock(Action<Mock<WhoIsHomeContext>> setUp)
     {
         var context = new Mock<WhoIsHomeContext>(new DbContextOptions<WhoIsHomeContext>());
         setUp(context);
-        var factory = new Mock<IDbContextFactory<WhoIsHomeContext>>();
-        factory.Setup(f => f.CreateDbContextAsync(CancellationToken.None))
-            .ReturnsAsync(context.Object);
-        return factory;
+        return context;
     }
 }

@@ -11,7 +11,7 @@ using WhoIsHome.Shared.Types;
 namespace WhoIsHome.Handlers;
 
 public class EventUpdateHandler(
-    IDbContextFactory<WhoIsHomeContext> contextFactory, 
+    WhoIsHomeContext context, 
     IPushUpContext pushUpContext,
     IDateTimeProvider dateTimeProvider,
     IBackgroundTaskQueue backgroundTaskQueue,
@@ -39,8 +39,6 @@ public class EventUpdateHandler(
                 logger.LogDebug("Skip Push Up Notification, since there is no change in the DinnerTime for today.");
                 return;
             }
-
-            var context = await contextFactory.CreateDbContextAsync(cancellationToken);
             
             var user = await context.Users.SingleAsync(u => u.Id == updatedEvent.UserId, cancellationToken);
             var users = await context.Users
@@ -69,7 +67,6 @@ public class EventUpdateHandler(
 
     private async Task<List<EventInstance>> GetUserEventsFromTodayAsync(EventInstance updatedEvent, CancellationToken cancellationToken)
     {
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         return await context.EventInstances
             .Where(e => e.UserId == updatedEvent.UserId)
             .Where(e => e.PresenceType != PresenceType.Unknown)
