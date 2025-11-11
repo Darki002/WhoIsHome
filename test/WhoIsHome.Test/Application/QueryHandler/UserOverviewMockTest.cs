@@ -5,7 +5,7 @@ using WhoIsHome.Test.TestData;
 namespace WhoIsHome.Test.Application.QueryHandler;
 
 [TestFixture]
-public class UserOverviewTest : InMemoryDbTest
+public class UserOverviewMockTest : DbMockTest
 {
     private readonly DateTimeProviderFake dateTimeProviderFake = new DateTimeProviderFake();
     
@@ -39,9 +39,9 @@ public class UserOverviewTest : InMemoryDbTest
         var user = UserTestData.CreateDefaultUser().ToModel();
         await Db.Users.AddAsync(user);
         
-        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate).ToModel();
-        var oneTimeEvent2 = OneTimeEventTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(-1)).ToModel();
-        var oneTimeEvent3 = OneTimeEventTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(1)).ToModel();
+        var oneTimeEvent1 = EventInstanceTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate).ToModel();
+        var oneTimeEvent2 = EventInstanceTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(-1)).ToModel();
+        var oneTimeEvent3 = EventInstanceTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(1)).ToModel();
         
         var repeatedEvent1 = RepeatedEventTestData
             .CreateDefaultWithDefaultDateTimes(title: "4", firstOccurrence: dateTimeProviderFake.CurrentDate, lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7))
@@ -99,9 +99,9 @@ public class UserOverviewTest : InMemoryDbTest
         var user = UserTestData.CreateDefaultUser().ToModel();
         await Db.Users.AddAsync(user);
         
-        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate).ToModel();
-        var oneTimeEvent2 = OneTimeEventTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(1)).ToModel();
-        var oneTimeEvent3 = OneTimeEventTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(-1)).ToModel();
+        var oneTimeEvent1 = EventInstanceTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate).ToModel();
+        var oneTimeEvent2 = EventInstanceTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(1)).ToModel();
+        var oneTimeEvent3 = EventInstanceTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(-1)).ToModel();
         
         var repeatedEvent1 = RepeatedEventTestData
             .CreateDefaultWithDefaultDateTimes(title: "4", firstOccurrence: dateTimeProviderFake.CurrentDate, lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7))
@@ -136,9 +136,9 @@ public class UserOverviewTest : InMemoryDbTest
         var user = UserTestData.CreateDefaultUser().ToModel();
         await Db.Users.AddAsync(user);
         
-        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate).ToModel();
-        var oneTimeEvent2 = OneTimeEventTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(-1)).ToModel();
-        var oneTimeEvent3 = OneTimeEventTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(8)).ToModel();
+        var oneTimeEvent1 = EventInstanceTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate).ToModel();
+        var oneTimeEvent2 = EventInstanceTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(-1)).ToModel();
+        var oneTimeEvent3 = EventInstanceTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(8)).ToModel();
         
         var repeatedEvent1 = RepeatedEventTestData
             .CreateDefaultWithDefaultDateTimes(title: "4", firstOccurrence: dateTimeProviderFake.CurrentDate, lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7))

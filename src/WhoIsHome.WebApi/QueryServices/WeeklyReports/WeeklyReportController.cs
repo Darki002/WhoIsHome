@@ -21,7 +21,7 @@ public class WeeklyReportController(WeeklyReportQueryHandler queryHandler) : Con
         return Ok(ToModel(result));
     }
 
-    private static List<WeeklyReportModel> ToModel(IReadOnlyCollection<WeeklyReport> data)
+    private static List<WeeklyReportModel> ToModel(IReadOnlyCollection<WeeklyReportMock> data)
     {
         return data
             .Select(WeeklyReportModel.From)

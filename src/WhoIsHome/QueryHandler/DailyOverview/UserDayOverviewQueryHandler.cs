@@ -6,12 +6,10 @@ using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.QueryHandler.DailyOverview;
 
-public class UserDayOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contextFactory)
+public class UserDayOverviewQueryHandler(WhoIsHomeContext context)
 {
     public async Task<DailyOverview> HandleAsync(int id, DateOnly date, CancellationToken cancellationToken)
     {
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-
         var user = await context.Users.SingleOrDefaultAsync(u => u.Id == id, cancellationToken);
         
         if (user is null)

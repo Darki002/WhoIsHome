@@ -10,7 +10,7 @@ public class WeeklyReportQueryHandler(
     IDbContextFactory<WhoIsHomeContext> contextFactory,
     IDateTimeProvider dateTimeProvider)
 {
-    public async Task<IReadOnlyList<WeeklyReport>> HandleAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<WeeklyReportMock>> HandleAsync(CancellationToken cancellationToken)
     {
         var startOfWeek = DateOnly.FromDateTime(dateTimeProvider.Now.StartOfWeek());
 
@@ -41,7 +41,7 @@ public class WeeklyReportQueryHandler(
         }
 
         return result
-            .Select(r => new WeeklyReport
+            .Select(r => new WeeklyReportMock
             {
                 User = r.Key,
                 Report = r.Value

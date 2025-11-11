@@ -7,7 +7,7 @@ namespace WhoIsHome.QueryHandler.UserOverview;
 
 public class UserOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contextFactory, IDateTimeProvider dateTimeProvider)
 {
-    public async Task<UserOverview> HandleAsync(int userId, CancellationToken cancellationToken)
+    public async Task<UserOverviewMock> HandleAsync(int userId, CancellationToken cancellationToken)
     {
         var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var today = dateTimeProvider.CurrentDate;
@@ -38,7 +38,7 @@ public class UserOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contex
         var user = await context.Users
             .SingleAsync(u => u.Id == userId, cancellationToken);
 
-        return new UserOverview
+        return new UserOverviewMock
         {
             User = user,
             Today = todaysEvents,

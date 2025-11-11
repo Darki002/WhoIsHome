@@ -1,11 +1,12 @@
 using Microsoft.Extensions.Logging;
 using Moq;
+using Moq.EntityFrameworkCore;
 using WhoIsHome.AuthTokens;
 
 namespace WhoIsHome.Test.Application.AuthTokens;
 
 [TestFixture]
-public class RefreshTokenServiceTests : InMemoryDbTest
+public class RefreshTokenServiceTests : DbMockTest
 {
     private readonly DateTimeProviderFake dateTimeProviderFake = new();
     
@@ -15,7 +16,7 @@ public class RefreshTokenServiceTests : InMemoryDbTest
     public void SetUp()
     {
         var logger = Mock.Of<ILogger<RefreshTokenService>>();
-        service = new RefreshTokenService(DbFactory, dateTimeProviderFake, logger);
+        service = new RefreshTokenService(Db, dateTimeProviderFake, logger);
     }
     
     [TestFixture]
@@ -43,7 +44,7 @@ public class RefreshTokenServiceTests : InMemoryDbTest
         {
             // Arrange
             var token = RefreshToken.Generate(1, dateTimeProviderFake.Now);
-            await SaveToDbAsync(token);
+            DbMock.Setup(c => c.RefreshTokens).ReturnsDbSet([token]);
             
             // Act
             var result = await service.RefreshAsync(token.Token, CancellationToken.None);
@@ -63,7 +64,7 @@ public class RefreshTokenServiceTests : InMemoryDbTest
             var issued = new DateTime(2024, 10, 21);
             var expiresAt = dateTimeProviderFake.Now.AddHours(-1);
             var token = new RefreshToken(1, "", issued, expiresAt);
-            await SaveToDbAsync(token);
+            DbMock.Setup(c => c.RefreshTokens).ReturnsDbSet([token]);
             
             // Act
             var result = await service.RefreshAsync(token.Token, CancellationToken.None);
@@ -71,12 +72,5 @@ public class RefreshTokenServiceTests : InMemoryDbTest
             // Assert
             result.HasError.Should().BeTrue();
         }
-    }
-    
-    private async Task SaveToDbAsync(RefreshToken refreshToken)
-    {
-        await Db.RefreshTokens.AddAsync(refreshToken);
-        await Db.SaveChangesAsync();
-        Db.ChangeTracker.Clear();
     }
 }

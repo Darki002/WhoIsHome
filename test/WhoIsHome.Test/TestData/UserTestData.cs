@@ -10,11 +10,11 @@ public static class UserTestData
         string password = "test")
     {
         return new User
-        (
-            id: null,
-            userName: userName,
-            email: email,
-            password: password
-        );
+        {
+            Id = 0,
+            UserName = userName,
+            Email = email,
+            Password =  password
+        };
     }
 }

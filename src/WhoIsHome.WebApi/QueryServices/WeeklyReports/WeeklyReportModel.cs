@@ -9,7 +9,7 @@ public record WeeklyReportModel
     
     public required List<DailyOverviewReport> DailyOverviews { get; init; }
     
-    public static WeeklyReportModel From(WeeklyReport dailyOverview)
+    public static WeeklyReportModel From(WeeklyReportMock dailyOverview)
     {
         return new WeeklyReportModel
         {

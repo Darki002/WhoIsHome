@@ -6,7 +6,7 @@ using WhoIsHome.Test.TestData;
 namespace WhoIsHome.Test.Application.QueryHandler;
 
 [TestFixture]
-public class WeeklyReportTest : InMemoryDbTest
+public class WeeklyReportMockTest : DbMockTest
 {
     private readonly DateTimeProviderFake dateTimeProviderFake = new();
     
@@ -48,7 +48,7 @@ public class WeeklyReportTest : InMemoryDbTest
         var user1 = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
         await Db.Users.AddAsync(user1);
 
-        var oneTimeEvent = OneTimeEventTestData.CreateDefault(date: dateTimeProviderFake.CurrentDate,
+        var oneTimeEvent = EventInstanceTestData.CreateDefault(date: dateTimeProviderFake.CurrentDate,
                 startTime: new TimeOnly(18, 00, 00),
                 endTime: new TimeOnly(19, 00, 00), dinnerTime: expectedDinnerTime)
             .ToModel();

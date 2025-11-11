@@ -7,7 +7,7 @@ using WhoIsHome.Test.TestData;
 namespace WhoIsHome.Test.Application.Services;
 
 [TestFixture]
-public class UserServiceTest : InMemoryDbTest
+public class UserServiceMockTest : DbMockTest
 {
     private UserService service;
 
@@ -18,7 +18,7 @@ public class UserServiceTest : InMemoryDbTest
     }
 
     [TestFixture]
-    private class GetUserByEmailAsync : UserServiceTest
+    private class GetUserByEmailAsync : UserServiceMockTest
     {
         [Test]
         public async Task ReturnsExpectedUser_ByItsEmail()
@@ -45,7 +45,7 @@ public class UserServiceTest : InMemoryDbTest
     }
 
     [TestFixture]
-    private class CreateUserAsync : UserServiceTest
+    private class CreateUserAsync : UserServiceMockTest
     {
         [Test]
         public async Task ReturnsEmailInUseResult_WhenEmailIsAlreadyInUse()

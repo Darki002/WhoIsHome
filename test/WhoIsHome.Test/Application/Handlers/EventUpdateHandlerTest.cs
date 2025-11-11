@@ -1,17 +1,13 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using Moq.EntityFrameworkCore;
 using WhoIsHome.Entities;
-using WhoIsHome.External;
-using WhoIsHome.External.Database;
 using WhoIsHome.Handlers;
 using WhoIsHome.Test.TestData;
 
 namespace WhoIsHome.Test.Application.Handlers;
 
-public class EventUpdateHandlerTest : InMemoryDbTest
+public class EventUpdateHandlerTest : DbMockTest
 {
     private readonly DateTimeProviderFake dateTimeProviderFake = new();
 
@@ -31,14 +27,11 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         var pushUpClientFake = new PushUpContextFake();
         var backgroundTaskQueueFake = new BackgroundTaskQueueFake();
         
-        var updatedEvent = OneTimeEventTestData.CreateDefault(id: 1, userId: 1, date: dateTimeProviderFake.CurrentDate);
-
-        var dbMock = GetDbFactoryMock(context =>
-        {
-            context.Setup(c => c.EventInstances).ReturnsDbSet([updatedEvent]);
-            context.Setup(c => c.Users).ReturnsDbSet(userModels);
-        });
-        var handler = new EventUpdateHandler(dbMock.Object, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
+        var updatedEvent = EventInstanceTestData.CreateDefault(id: 1, userId: 1, date: dateTimeProviderFake.CurrentDate);
+        
+        DbMock.Setup(c => c.EventInstances).ReturnsDbSet([updatedEvent]);
+        DbMock.Setup(c => c.Users).ReturnsDbSet(userModels);
+        var handler = new EventUpdateHandler(Db, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
 
         // Act
         await handler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Create);
@@ -60,17 +53,14 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         var pushUpClientFake = new PushUpContextFake();
         var backgroundTaskQueueFake = new BackgroundTaskQueueFake();
         
-        var updatedEvent = OneTimeEventTestData.CreateDefault(id: 1, userId: 1, date: dateTimeProviderFake.CurrentDate,
+        var updatedEvent = EventInstanceTestData.CreateDefault(id: 1, userId: 1, date: dateTimeProviderFake.CurrentDate,
             dinnerTime: new TimeOnly(18, 00, 00));
-        var effectiveEvent = OneTimeEventTestData.CreateDefault(id: 2, userId: 1, date: dateTimeProviderFake.CurrentDate,
+        var effectiveEvent = EventInstanceTestData.CreateDefault(id: 2, userId: 1, date: dateTimeProviderFake.CurrentDate,
             dinnerTime: new TimeOnly(19, 00, 00));
 
-        var dbMock = GetDbFactoryMock(context =>
-        {
-            context.Setup(c => c.EventInstances).ReturnsDbSet([updatedEvent.ToModel(), effectiveEvent.ToModel()]);
-            context.Setup(c => c.Users).ReturnsDbSet(userModels);
-        });
-        var handler = new EventUpdateHandler(dbMock.Object, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
+        DbMock.Setup(c => c.EventInstances).ReturnsDbSet([updatedEvent, effectiveEvent]);
+        DbMock.Setup(c => c.Users).ReturnsDbSet(userModels);
+        var handler = new EventUpdateHandler(Db, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
 
         // Act
         await handler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Create);
@@ -88,18 +78,15 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         var pushUpClientFake = new PushUpContextFake();
         var backgroundTaskQueueFake = new BackgroundTaskQueueFake();
         
-        var deletedEvent = OneTimeEventTestData.CreateDefault(1, userId: 1, date: dateTimeProviderFake.CurrentDate,
+        var deletedEvent = EventInstanceTestData.CreateDefault(userId: 1, date: dateTimeProviderFake.CurrentDate,
             dinnerTime: new TimeOnly(19, 00, 00));
-        var effectiveEvent = OneTimeEventTestData.CreateDefault(2, userId: 1, date: dateTimeProviderFake.CurrentDate,
+        var effectiveEvent = EventInstanceTestData.CreateDefault(2, userId: 1, date: dateTimeProviderFake.CurrentDate,
             dinnerTime: new TimeOnly(18, 00, 00));
 
-        var dbMock = GetDbFactoryMock(context =>
-        {
-            context.Setup(c => c.EventInstances).ReturnsDbSet([effectiveEvent.ToModel()]);
-            context.Setup(c => c.Users).ReturnsDbSet(userModels);
-        });
+        DbMock.Setup(c => c.EventInstances).ReturnsDbSet([effectiveEvent]);
+        DbMock.Setup(c => c.Users).ReturnsDbSet(userModels);
         
-        var handler = new EventUpdateHandler(dbMock.Object, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
+        var handler = new EventUpdateHandler(Db, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
 
         // Act
         await handler.HandleAsync(deletedEvent, EventUpdateHandler.UpdateAction.Delete);
@@ -113,12 +100,5 @@ public class EventUpdateHandlerTest : InMemoryDbTest
         pushUpClientFake.Command.Body.Value.Should().Be("UserHasUpdated");
         pushUpClientFake.Command.Body.Args.Should().BeEquivalentTo(["Darki"]);
         pushUpClientFake.Command.UserIds.Should().BeEquivalentTo([2, 3]);
-    }
-
-    private static Mock<WhoIsHomeContext> GetDbFactoryMock(Action<Mock<WhoIsHomeContext>> setUp)
-    {
-        var context = new Mock<WhoIsHomeContext>(new DbContextOptions<WhoIsHomeContext>());
-        setUp(context);
-        return context;
     }
 }

@@ -8,7 +8,7 @@ using WhoIsHome.Test.TestData;
 namespace WhoIsHome.Test.Application.Services;
 
 [TestFixture]
-public class EventGroupServiceTest : InMemoryDbTest
+public class EventGroupServiceMockTest : DbMockTest
 {
     private readonly UserContextFake userContextFake = new();
     
@@ -33,7 +33,7 @@ public class EventGroupServiceTest : InMemoryDbTest
     }
 
     [TestFixture]
-    private class GetAsync : EventGroupServiceTest
+    private class GetAsync : EventGroupServiceMockTest
     {
         [Test]
         public async Task ReturnsEvent_WithTheExpectedId()
@@ -62,7 +62,7 @@ public class EventGroupServiceTest : InMemoryDbTest
     }
     
     [TestFixture]
-    private class DeleteAsync : EventGroupServiceTest
+    private class DeleteAsync : EventGroupServiceMockTest
     {
         [Test]
         public async Task DeletesEvent_WithTheGivenId()
@@ -108,7 +108,7 @@ public class EventGroupServiceTest : InMemoryDbTest
     }
     
     [TestFixture]
-    private class CreateAsync : EventGroupServiceTest
+    private class CreateAsync : EventGroupServiceMockTest
     {
         [Test]
         public async Task SaveGivenEventToDb()
@@ -130,7 +130,7 @@ public class EventGroupServiceTest : InMemoryDbTest
     }
     
     [TestFixture]
-    private class UpdateAsync : EventGroupServiceTest
+    private class UpdateAsync : EventGroupServiceMockTest
     {
         [Test]
         public async Task SaveGivenEventToDb()
@@ -154,7 +154,7 @@ public class EventGroupServiceTest : InMemoryDbTest
     }
     
     [TestFixture]
-    private class EndAsync : EventGroupServiceTest
+    private class EndAsync : EventGroupServiceMockTest
     {
         [Test]
         public async Task SetEndTimeOnAggregate()

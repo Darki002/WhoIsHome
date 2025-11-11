@@ -5,12 +5,10 @@ using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.AuthTokens;
 
-public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFactory, IDateTimeProvider dateTimeProvider, ILogger<RefreshTokenService> logger) : IRefreshTokenService
+public class RefreshTokenService(WhoIsHomeContext context, IDateTimeProvider dateTimeProvider, ILogger<RefreshTokenService> logger) : IRefreshTokenService
 {
     public async Task<RefreshToken> CreateTokenAsync(int userId, CancellationToken cancellationToken)
     {
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-        
         RefreshToken refreshToken;
         bool tokenExists;
         
@@ -39,8 +37,6 @@ public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFact
             return result;
         }
         
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-
         result.Value.ExpiredAt = dateTimeProvider.Now;
         var newRefreshToken = await CreateTokenAsync(result.Value.UserId, cancellationToken);
 
@@ -53,7 +49,6 @@ public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFact
 
     public async Task LogOutAsync(int userId, CancellationToken cancellationToken)
     {
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var tokens = await context.RefreshTokens
             .Where(t => t.UserId == userId)
             .Where(t => t.ExpiredAt >= dateTimeProvider.Now)
@@ -69,7 +64,6 @@ public class RefreshTokenService(IDbContextFactory<WhoIsHomeContext> contextFact
 
     private async Task<ValidRefreshTokenResult> GetValidRefreshToken(string tokenToCheck, CancellationToken cancellationToken)
     {
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var token = await context.RefreshTokens
             .AsNoTracking()
             .SingleOrDefaultAsync(t => t.Token == tokenToCheck, cancellationToken);

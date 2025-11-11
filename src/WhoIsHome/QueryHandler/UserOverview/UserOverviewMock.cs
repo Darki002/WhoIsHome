@@ -2,7 +2,7 @@ using WhoIsHome.Entities;
 
 namespace WhoIsHome.QueryHandler.UserOverview;
 
-public class UserOverview
+public class UserOverviewMock
 {
     public required User User { get; init; }
     

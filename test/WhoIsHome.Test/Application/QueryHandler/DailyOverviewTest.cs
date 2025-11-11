@@ -1,19 +1,19 @@
+using Moq.EntityFrameworkCore;
 using WhoIsHome.QueryHandler.DailyOverview;
-using WhoIsHome.Test.Shared.Helper;
 using WhoIsHome.Test.TestData;
 
 namespace WhoIsHome.Test.Application.QueryHandler;
 
 [TestFixture]
-public class DailyOverviewTest : InMemoryDbTest
+public class DailyOverviewTest : DbMockTest
 {
     private readonly DateTimeProviderFake dateTimeProviderFake = new();
     
     [SetUp]
     public void SetUp()
     {
-        var handler = new UserDayOverviewQueryHandler(DbFactory);
-        queryHandler = new DailyOverviewQueryHandler(DbFactory, handler);
+        var handler = new UserDayOverviewQueryHandler(Db);
+        queryHandler = new DailyOverviewQueryHandler(Db, handler);
     }
 
     private DailyOverviewQueryHandler queryHandler;
@@ -24,9 +24,7 @@ public class DailyOverviewTest : InMemoryDbTest
         // Arrange
         var user1 = UserTestData.CreateDefaultUser(email: "test1@whoishome.dev");
         var user2 = UserTestData.CreateDefaultUser(email: "test2@whoishome.dev");
-        await Db.Users.AddAsync(user1.ToModel());
-        await Db.Users.AddAsync(user2.ToModel());
-        await Db.SaveChangesAsync();
+        DbMock.Setup(c => c.Users).ReturnsDbSet([user1, user2]);
 
         // Act
         var result = await queryHandler.HandleAsync(dateTimeProviderFake.CurrentDate, CancellationToken.None);
@@ -41,19 +39,15 @@ public class DailyOverviewTest : InMemoryDbTest
         // Arrange
         var expectedDinnerTime = new TimeOnly(20, 00, 00);
 
-        var user1 = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
-        await Db.Users.AddAsync(user1);
+        var user1 = UserTestData.CreateDefaultUser(email: "test@whoishome.dev");
+        DbMock.Setup(c => c.Users).ReturnsDbSet([user1]);
 
-        var oneTimeEvent1 = OneTimeEventTestData.CreateDefault(date: dateTimeProviderFake.CurrentDate).ToModel();
-        await Db.OneTimeEvents.AddAsync(oneTimeEvent1);
-
-        var oneTimeEvent2 = OneTimeEventTestData.CreateDefault(date: dateTimeProviderFake.CurrentDate,
+        var eventInstance1 = EventInstanceTestData.CreateDefault(date: dateTimeProviderFake.CurrentDate);
+        var eventInstance2 = EventInstanceTestData.CreateDefault(date: dateTimeProviderFake.CurrentDate,
                 startTime: new TimeOnly(18, 00, 00),
-                endTime: new TimeOnly(19, 00, 00), dinnerTime: expectedDinnerTime)
-            .ToModel();
-        await Db.OneTimeEvents.AddAsync(oneTimeEvent2);
-
-        await Db.SaveChangesAsync();
+                endTime: new TimeOnly(19, 00, 00), dinnerTime: expectedDinnerTime);
+        
+        DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance1, eventInstance2]);
 
         // Act
         var result = await queryHandler.HandleAsync(dateTimeProviderFake.CurrentDate, CancellationToken.None);
@@ -70,25 +64,20 @@ public class DailyOverviewTest : InMemoryDbTest
         // Arrange
         var expectedDinnerTime = new TimeOnly(20, 00, 00);
 
-        var user1 = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
-        await Db.Users.AddAsync(user1);
+        var user1 = UserTestData.CreateDefaultUser(email: "test@whoishome.dev");
+        DbMock.Setup(c => c.Users).ReturnsDbSet([user1]);
 
         var repeatedEvent1 = RepeatedEventTestData
             .CreateDefaultWithDefaultDateTimes(firstOccurrence: dateTimeProviderFake.CurrentDate, 
                 lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7), 
-                userId: 1)
-            .ToModel();
-        await Db.RepeatedEvents.AddAsync(repeatedEvent1);
-
+                userId: 1);
         var repeatedEvent2 = RepeatedEventTestData.CreateDefaultWithDefaultDateTimes(firstOccurrence: dateTimeProviderFake.CurrentDate,
                 lastOccurrence: dateTimeProviderFake.CurrentDate.AddDays(7), startTime: new TimeOnly(18, 00, 00),
                 endTime: new TimeOnly(19, 00, 00), 
                 dinnerTime: expectedDinnerTime,
-                userId: 1)
-            .ToModel();
-        await Db.RepeatedEvents.AddAsync(repeatedEvent2);
-
-        await Db.SaveChangesAsync();
+                userId: 1);
+        
+        DbMock.Setup(c => c.EventInstances).ReturnsDbSet([repeatedEvent1, repeatedEvent2]);
 
         // Act
         var result = await queryHandler.HandleAsync(dateTimeProviderFake.CurrentDate, CancellationToken.None);
@@ -109,7 +98,7 @@ public class DailyOverviewTest : InMemoryDbTest
         var user1 = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
         await Db.Users.AddAsync(user1);
 
-        var oneTimeEvent = OneTimeEventTestData
+        var oneTimeEvent = EventInstanceTestData
             .CreateDefault(date: dateTimeProviderFake.CurrentDate)
             .ToModel();
         await Db.OneTimeEvents.AddAsync(oneTimeEvent);
@@ -164,7 +153,7 @@ public class DailyOverviewTest : InMemoryDbTest
         var user1 = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
         await Db.Users.AddAsync(user1);
 
-        var oneTimeEvent = OneTimeEventTestData
+        var oneTimeEvent = EventInstanceTestData
             .CreateWithNotPresent(date: dateTimeProviderFake.CurrentDate)
             .ToModel();
         await Db.OneTimeEvents.AddAsync(oneTimeEvent);
@@ -187,12 +176,12 @@ public class DailyOverviewTest : InMemoryDbTest
         var user1 = UserTestData.CreateDefaultUser(email: "test@whoishome.dev").ToModel();
         await Db.Users.AddAsync(user1);
 
-        var oneTimeEvent = OneTimeEventTestData
+        var oneTimeEvent = EventInstanceTestData
             .CreateWithNotPresent(date: dateTimeProviderFake.CurrentDate)
             .ToModel();
         await Db.OneTimeEvents.AddAsync(oneTimeEvent);
         
-        var oneTimeEvent2 = OneTimeEventTestData
+        var oneTimeEvent2 = EventInstanceTestData
             .CreateDefault(date: dateTimeProviderFake.CurrentDate)
             .ToModel();
         await Db.OneTimeEvents.AddAsync(oneTimeEvent2);

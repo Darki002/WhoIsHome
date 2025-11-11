@@ -7,7 +7,7 @@ using WhoIsHome.Test.TestData;
 namespace WhoIsHome.Test.Application.Services;
 
 [TestFixture]
-public class OneTimeEventAggregateServiceTest : InMemoryDbTest
+public class OneTimeEventAggregateServiceMockTest : DbMockTest
 {
     private User user = null!;
     private UserContextFake userContextFake;
@@ -32,13 +32,13 @@ public class OneTimeEventAggregateServiceTest : InMemoryDbTest
     }
 
     [TestFixture]
-    private class GetAsync : OneTimeEventAggregateServiceTest
+    private class GetAsync : OneTimeEventAggregateServiceMockTest
     {
         [Test]
         public async Task ReturnsEvent_WithTheExpectedId()
         {
             // Arrange
-            var oneTimeEvent = OneTimeEventTestData.CreateDefault();
+            var oneTimeEvent = EventInstanceTestData.CreateDefault();
             await SaveToDb(oneTimeEvent);
             
             // Act
@@ -61,13 +61,13 @@ public class OneTimeEventAggregateServiceTest : InMemoryDbTest
     }
     
     [TestFixture]
-    private class DeleteAsync : OneTimeEventAggregateServiceTest
+    private class DeleteAsync : OneTimeEventAggregateServiceMockTest
     {
         [Test]
         public async Task DeletesEvent_WithTheGivenId()
         {
             // Arrange
-            var oneTimeEvent = OneTimeEventTestData.CreateDefault();
+            var oneTimeEvent = EventInstanceTestData.CreateDefault();
             await SaveToDb(oneTimeEvent);
             
             // Act
@@ -95,7 +95,7 @@ public class OneTimeEventAggregateServiceTest : InMemoryDbTest
             await Db.Users.AddAsync(newUser);
             await Db.SaveChangesAsync();
             
-            var oneTimeEvent = OneTimeEventTestData.CreateDefault(userId: 2);
+            var oneTimeEvent = EventInstanceTestData.CreateDefault(userId: 2);
             await SaveToDb(oneTimeEvent);
             
             // Act
@@ -107,13 +107,13 @@ public class OneTimeEventAggregateServiceTest : InMemoryDbTest
     }
     
     [TestFixture]
-    private class CreateAsync : OneTimeEventAggregateServiceTest
+    private class CreateAsync : OneTimeEventAggregateServiceMockTest
     {
         [Test]
         public async Task SaveGivenEventToDb()
         {
             // Arrange
-            var oneTimeEvent = OneTimeEventTestData.CreateDefault(title: "SaveGivenEventToDb");
+            var oneTimeEvent = EventInstanceTestData.CreateDefault(title: "SaveGivenEventToDb");
             
             // Act
             var result = await service.CreateAsync(oneTimeEvent.Title, oneTimeEvent.Date, oneTimeEvent.StartTime,
@@ -129,13 +129,13 @@ public class OneTimeEventAggregateServiceTest : InMemoryDbTest
     }
     
     [TestFixture]
-    private class UpdateAsync : OneTimeEventAggregateServiceTest
+    private class UpdateAsync : OneTimeEventAggregateServiceMockTest
     {
         [Test]
         public async Task SaveGivenEventToDb()
         {
             // Arrange
-            var oneTimeEvent = OneTimeEventTestData.CreateDefault(title: "SaveGivenEventToDb");
+            var oneTimeEvent = EventInstanceTestData.CreateDefault(title: "SaveGivenEventToDb");
             await SaveToDb(oneTimeEvent);
             
             // Act
