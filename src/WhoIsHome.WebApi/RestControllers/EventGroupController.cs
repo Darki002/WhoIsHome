@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.Entities;
 using WhoIsHome.Services;
@@ -6,10 +7,10 @@ using WhoIsHome.Shared.Types;
 using WhoIsHome.WebApi.Models.Dto;
 using WhoIsHome.WebApi.Models.Response;
 
-namespace WhoIsHome.WebApi.AggregatesControllers;
+namespace WhoIsHome.WebApi.RestControllers;
 
-[Route("event-groups")]
 [Authorize]
+[Route("event-groups")]
 public class EventGroupController(IEventGroupService eventGroupService) : Controller
 {
     [HttpPost]

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WhoIsHome.External;
+using Microsoft.Extensions.Logging;
 using WhoIsHome.External.Database;
 using WhoIsHome.External.PushUp;
 using WhoIsHome.Shared.Authentication;
@@ -14,55 +14,56 @@ namespace WhoIsHome.WebApi.PushUp;
 [Route("api/v1/[controller]")]
 public class PushUpController(
     IUserContext userContext,
-    IDbContextFactory<WhoIsHomeContext> contextFactory) 
+    WhoIsHomeContext context,
+    ILogger<PushUpController> logger) 
     : Controller
 {
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] PushUpSettingsDto pushUpSettings, CancellationToken cancellationToken)
     {
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+        var language = Convert(pushUpSettings.LanguageCode, CultureInfo.GetCultureInfo("en"));
+        if (language is null)
+        {
+            return BadRequest(new  { Message = $"Unknown Language Code {pushUpSettings.LanguageCode}." });
+        }
+        
         var settings = await context.PushUpSettings.SingleOrDefaultAsync(s => s.UserId == userContext.UserId, cancellationToken);
 
-        if (settings is null)
+        if (settings is not null)
         {
-            await CreateSettingAsync(pushUpSettings, cancellationToken);
-            return Ok("ExpoPushToken is saved.");
+            settings.Token = pushUpSettings.Token;
+            settings.Enabled = pushUpSettings.Enable ?? settings.Enabled;
+            settings.LanguageCode = Convert(pushUpSettings.LanguageCode, settings.LanguageCode!);
+            context.PushUpSettings.Update(settings);
+        }
+        else
+        {
+            var newSettings = new PushUpSettings
+            {
+                Enabled = pushUpSettings.Enable ?? true,
+                UserId = userContext.UserId,
+                Token = pushUpSettings.Token,
+                LanguageCode = Convert(pushUpSettings.LanguageCode, CultureInfo.GetCultureInfo("en"))
+            };
+            await context.PushUpSettings.AddAsync(newSettings, cancellationToken);
         }
 
-        await UpdateSettingAsync(pushUpSettings, settings, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
         return Ok("ExpoPushToken is saved.");
     }
 
-    private async Task CreateSettingAsync(PushUpSettingsDto pushUpSettings, CancellationToken cancellationToken)
+    private CultureInfo? Convert(string? languageCode, CultureInfo fallback)
     {
-        var settings = new PushUpSettings
+        try
         {
-            Enabled = pushUpSettings.Enable ?? true,
-            UserId = userContext.UserId,
-            Token = pushUpSettings.Token,
-            LanguageCode = Convert(pushUpSettings.LanguageCode, CultureInfo.GetCultureInfo("en"))
-        };
-        
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-        await context.PushUpSettings.AddAsync(settings, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
-    }
-
-    private async Task UpdateSettingAsync(PushUpSettingsDto pushUpSettings, PushUpSettings settings, CancellationToken cancellationToken)
-    {
-        settings.Token = pushUpSettings.Token;
-        settings.Enabled = pushUpSettings.Enable ?? settings.Enabled;
-        settings.LanguageCode = Convert(pushUpSettings.LanguageCode, settings.LanguageCode!);
-        
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-        context.PushUpSettings.Update(settings);
-        await context.SaveChangesAsync(cancellationToken);
-    }
-
-    private static CultureInfo Convert(string? languageCode, CultureInfo fallback)
-    {
-        return languageCode is not null
-            ? CultureInfo.GetCultureInfo(languageCode)
-            : fallback;
+            return languageCode is not null
+                ? CultureInfo.GetCultureInfo(languageCode)
+                : fallback;
+        }
+        catch
+        {
+            logger.LogError("Failed to create Culture from {Orig}.", languageCode);
+            return null;
+        }
     }
 }

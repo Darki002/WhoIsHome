@@ -1,6 +1,8 @@
-﻿namespace WhoIsHome.WebApi.Models.Response;
+﻿using WhoIsHome.Entities;
 
-public class OneTimeEventModel
+namespace WhoIsHome.WebApi.Models.Response;
+
+public class EventInstanceModel
 {
     public required int Id { get; set; }
 
@@ -15,20 +17,23 @@ public class OneTimeEventModel
     public required string PresenceType { get; set; }
 
     public TimeOnly? DinnerTime { get; set; } = null;
+    
+    public required int EventGroupId { get; set; }
 
     public required int UserId { get; set; }
     
-    public static OneTimeEventModel From(OneTimeEvent data)
+    public static EventInstanceModel From(EventInstance data)
     {
-        return new OneTimeEventModel
+        return new EventInstanceModel
         {
-            Id = data.Id!.Value,
+            Id = data.Id,
             Title = data.Title,
             Date = data.Date,
             StartTime = data.StartTime,
             EndTime = data.EndTime,
-            PresenceType = data.DinnerTime.PresenceType.ToString(),
-            DinnerTime = data.DinnerTime.Time,
+            PresenceType = data.PresenceType.ToString(),
+            DinnerTime = data.DinnerTime,
+            EventGroupId = data.EventGroupId,
             UserId = data.UserId
         };
     }
