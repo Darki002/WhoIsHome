@@ -2,7 +2,7 @@
 
 namespace WhoIsHome.QueryHandler.WeeklyReports;
 
-public record WeeklyReportMock
+public record WeeklyReport
 {
     public required User User { get; init; }
 

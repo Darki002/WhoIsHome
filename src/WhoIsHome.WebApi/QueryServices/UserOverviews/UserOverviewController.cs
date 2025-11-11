@@ -21,7 +21,7 @@ public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUser
         return Ok(ToModel(result));
     }
 
-    private static UserOverviewModel ToModel(UserOverviewMock data)
+    private static UserOverviewModel ToModel(UserOverview data)
     {
         return new UserOverviewModel
         {

@@ -13,9 +13,9 @@ public abstract class DbMockTest
     public void SetUpDb()
     {
         DbMock = new Mock<WhoIsHomeContext>();
-        DbSetUpAsync(DbMock);
+        DbSetUp(DbMock);
     }
 
     // Optional Override for Set Up in test
-    protected virtual void DbSetUpAsync(Mock<WhoIsHomeContext> mock) { }
+    protected virtual void DbSetUp(Mock<WhoIsHomeContext> mock) { }
 }

@@ -5,11 +5,10 @@ using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.QueryHandler.UserOverview;
 
-public class UserOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contextFactory, IDateTimeProvider dateTimeProvider)
+public class UserOverviewQueryHandler(WhoIsHomeContext context, IDateTimeProvider dateTimeProvider)
 {
-    public async Task<UserOverviewMock> HandleAsync(int userId, CancellationToken cancellationToken)
+    public async Task<UserOverview> HandleAsync(int userId, CancellationToken cancellationToken)
     {
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var today = dateTimeProvider.CurrentDate;
 
         var eventList = await context.EventInstances
@@ -38,7 +37,7 @@ public class UserOverviewQueryHandler(IDbContextFactory<WhoIsHomeContext> contex
         var user = await context.Users
             .SingleAsync(u => u.Id == userId, cancellationToken);
 
-        return new UserOverviewMock
+        return new UserOverview
         {
             User = user,
             Today = todaysEvents,

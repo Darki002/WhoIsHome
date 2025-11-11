@@ -7,14 +7,13 @@ namespace WhoIsHome.QueryHandler.WeeklyReports;
 
 public class WeeklyReportQueryHandler(
     DailyOverviewQueryHandler dailyOverviewQueryHandler, 
-    IDbContextFactory<WhoIsHomeContext> contextFactory,
+    WhoIsHomeContext context,
     IDateTimeProvider dateTimeProvider)
 {
-    public async Task<IReadOnlyList<WeeklyReportMock>> HandleAsync(CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<WeeklyReport>> HandleAsync(CancellationToken cancellationToken)
     {
         var startOfWeek = DateOnly.FromDateTime(dateTimeProvider.Now.StartOfWeek());
 
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var userIds = await context.Users.ToListAsync(cancellationToken);
 
         var result =
@@ -35,13 +34,13 @@ public class WeeklyReportQueryHandler(
                 }
                 else
                 {
-                    result[dailyOverview.User].Report[date] = (dailyOverview.IsAtHome, dailyOverview.DinnerTime);
+                    result[dailyOverview.User].Value[date] = (dailyOverview.IsAtHome, dailyOverview.DinnerTime);
                 }
             }
         }
 
         return result
-            .Select(r => new WeeklyReportMock
+            .Select(r => new WeeklyReport
             {
                 User = r.Key,
                 Report = r.Value
@@ -51,6 +50,6 @@ public class WeeklyReportQueryHandler(
 
 public record WeeklyReportResult
 {
-    public readonly Dictionary<DateOnly, (bool IsAtHome, TimeOnly? DinnerTime)> Report = [];
+    public readonly Dictionary<DateOnly, (bool IsAtHome, TimeOnly? DinnerTime)> Value = [];
     public string? ErrorMessage { get; set; }
 }

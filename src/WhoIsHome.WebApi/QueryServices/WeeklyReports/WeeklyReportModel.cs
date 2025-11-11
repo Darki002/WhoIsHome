@@ -9,12 +9,12 @@ public record WeeklyReportModel
     
     public required List<DailyOverviewReport> DailyOverviews { get; init; }
     
-    public static WeeklyReportModel From(WeeklyReportMock dailyOverview)
+    public static WeeklyReportModel From(WeeklyReport dailyOverview)
     {
         return new WeeklyReportModel
         {
             User = new SimpleUserModel(dailyOverview.User.Id, dailyOverview.User.UserName),
-            DailyOverviews = dailyOverview.Report.Report
+            DailyOverviews = dailyOverview.Report.Value
                 .Select(o => new DailyOverviewReport(o.Key, o.Value.IsAtHome, o.Value.DinnerTime))
                 .ToList(),
         };

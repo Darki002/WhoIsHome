@@ -1,5 +1,7 @@
 using Moq;
+using Moq.EntityFrameworkCore;
 using WhoIsHome.Entities;
+using WhoIsHome.External.Database;
 using WhoIsHome.Handlers;
 using WhoIsHome.Services;
 using WhoIsHome.Test.Shared.Helper;
@@ -8,9 +10,9 @@ using WhoIsHome.Test.TestData;
 namespace WhoIsHome.Test.Application.Services;
 
 [TestFixture]
-public class EventGroupServiceMockTest : DbMockTest
+public class EventGroupServiceTest : DbMockTest
 {
-    private readonly UserContextFake userContextFake = new();
+    private readonly UserContextFake userContextFake = new UserContextFake();
     
     private User user = null!;
     private EventGroupService service;
@@ -18,57 +20,56 @@ public class EventGroupServiceMockTest : DbMockTest
     [SetUp]
     public void SetUp()
     {
-        var eventUpdateHandlerMock = Mock.Of<IEventUpdateHandler>();
+        var eventServiceMock = Mock.Of<IEventService>();
         
         userContextFake.SetUser(user, 1);
-        service = new EventGroupService(DbFactory, eventUpdateHandlerMock, userContextFake);
+        service = new EventGroupService(Db, eventServiceMock, userContextFake);
     }
 
-    protected override async Task DbSetUpAsync()
+    protected override void DbSetUp(Mock<WhoIsHomeContext> mock)
     {
         user = UserTestData.CreateDefaultUser();
-        await Db.Users.AddAsync(user.ToModel());
-        await Db.SaveChangesAsync();
-        Db.ChangeTracker.Clear();
+        mock.Setup(c => c.Users).ReturnsDbSet([user]);
     }
 
     [TestFixture]
-    private class GetAsync : EventGroupServiceMockTest
+    private class GetAsync : EventGroupServiceTest
     {
         [Test]
         public async Task ReturnsEvent_WithTheExpectedId()
         {
             // Arrange
-            var repeatedEvent = RepeatedEventTestData.CreateDefaultWithDefaultDateTimes();
-            await SaveToDb(repeatedEvent);
+            var eventGroup = EventGroupTestData.CreateDefaultWithDefaultDateTimes();
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
             
             // Act
             var result = await service.GetAsync(1, CancellationToken.None);
             
             // Assert
-            result.Id.Should().Be(1);
-            result.Title.Should().Be(repeatedEvent.Title);
+            result.Value.Id.Should().Be(1);
+            result.Value.Title.Should().Be(eventGroup.Title);
         }
         
         [Test]
         public async Task ThrowsNotFoundException_WhenNoEventWithTheGivenIdWasFound()
         {
             // Act
-            var act = async () => await service.GetAsync(1, CancellationToken.None);
+            var result = await service.GetAsync(1, CancellationToken.None);
             
             // Assert
-            await act.Should().ThrowAsync<NotFoundException>();
+            result.HasError.Should().BeTrue();
+            result.Error.Should().NotBeNull();
         }
     }
     
     [TestFixture]
-    private class DeleteAsync : EventGroupServiceMockTest
+    private class DeleteAsync : EventGroupServiceTest
     {
         [Test]
         public async Task DeletesEvent_WithTheGivenId()
         {
             // Arrange
-            var repeatedEvent = RepeatedEventTestData.CreateDefaultWithDefaultDateTimes();
+            var repeatedEvent = EventGroupTestData.CreateDefaultWithDefaultDateTimes();
             await SaveToDb(repeatedEvent);
             
             // Act
@@ -96,7 +97,7 @@ public class EventGroupServiceMockTest : DbMockTest
             await Db.Users.AddAsync(newUser);
             await Db.SaveChangesAsync();
             
-            var repeatedEvent = RepeatedEventTestData.CreateDefaultWithDefaultDateTimes(userId: 2);
+            var repeatedEvent = EventGroupTestData.CreateDefaultWithDefaultDateTimes(userId: 2);
             await SaveToDb(repeatedEvent);
             
             // Act
@@ -108,13 +109,13 @@ public class EventGroupServiceMockTest : DbMockTest
     }
     
     [TestFixture]
-    private class CreateAsync : EventGroupServiceMockTest
+    private class CreateAsync : EventGroupServiceTest
     {
         [Test]
         public async Task SaveGivenEventToDb()
         {
             // Arrange
-            var repeatedEvent = RepeatedEventTestData.CreateDefaultWithDefaultDateTimes(title: "SaveGivenEventToDb");
+            var repeatedEvent = EventGroupTestData.CreateDefaultWithDefaultDateTimes(title: "SaveGivenEventToDb");
             
             // Act
             var result = await service.CreateAsync(repeatedEvent.Title, repeatedEvent.FirstOccurrence, repeatedEvent.LastOccurrence, repeatedEvent.StartTime,
@@ -130,13 +131,13 @@ public class EventGroupServiceMockTest : DbMockTest
     }
     
     [TestFixture]
-    private class UpdateAsync : EventGroupServiceMockTest
+    private class UpdateAsync : EventGroupServiceTest
     {
         [Test]
         public async Task SaveGivenEventToDb()
         {
             // Arrange
-            var repeatedEvent = RepeatedEventTestData.CreateDefaultWithDefaultDateTimes(title: "SaveGivenEventToDb");
+            var repeatedEvent = EventGroupTestData.CreateDefaultWithDefaultDateTimes(title: "SaveGivenEventToDb");
             await SaveToDb(repeatedEvent);
             
             // Act
@@ -154,7 +155,7 @@ public class EventGroupServiceMockTest : DbMockTest
     }
     
     [TestFixture]
-    private class EndAsync : EventGroupServiceMockTest
+    private class EndAsync : EventGroupServiceTest
     {
         [Test]
         public async Task SetEndTimeOnAggregate()
@@ -162,7 +163,7 @@ public class EventGroupServiceMockTest : DbMockTest
             // Arrange
             var expected = new DateOnly(2025, 1, 1);
             
-            var repeatedEvent = RepeatedEventTestData.CreateDefault(title: "SetEndTimeOnAggregate");
+            var repeatedEvent = EventGroupTestData.CreateDefault(title: "SetEndTimeOnAggregate");
             await SaveToDb(repeatedEvent);
             
             // Act
@@ -178,7 +179,7 @@ public class EventGroupServiceMockTest : DbMockTest
         {
             // Arrange
             var expected = new DateOnly(2025, 1, 1);
-            var repeatedEvent = RepeatedEventTestData.CreateDefault(title: "SetEndTimeOnAggregate", lastOccurrence: expected);
+            var repeatedEvent = EventGroupTestData.CreateDefault(title: "SetEndTimeOnAggregate", endDate: expected);
             await SaveToDb(repeatedEvent);
             
             // Act
@@ -193,7 +194,7 @@ public class EventGroupServiceMockTest : DbMockTest
         {
             // Arrange
             var expected = new DateOnly(2025, 1, 1);
-            var repeatedEvent = RepeatedEventTestData.CreateDefault(title: "SetEndTimeOnAggregate", firstOccurrence: expected.AddDays(7), lastOccurrence: expected);
+            var repeatedEvent = EventGroupTestData.CreateDefault(title: "SetEndTimeOnAggregate", startDate: expected.AddDays(7), endDate: expected);
             await SaveToDb(repeatedEvent);
             
             // Act
@@ -202,13 +203,5 @@ public class EventGroupServiceMockTest : DbMockTest
             // Assert
             await action.Should().ThrowAsync<InvalidModelException>();
         }
-    }
-    
-    private async Task SaveToDb(RepeatedEvent oneTimeEvent)
-    {
-        var model = oneTimeEvent.ToModel();
-        await Db.RepeatedEvents.AddAsync(model);
-        await Db.SaveChangesAsync();
-        Db.ChangeTracker.Clear();
     }
 }
