@@ -19,13 +19,13 @@ public class EventGroupController(IEventGroupService eventGroupService) : Contro
     {
         var result = await eventGroupService.CreateAsync(
             title: eventModelDto.Title,
-            firstOccurrence: eventModelDto.FirstOccurrence,
-            lastOccurrence: eventModelDto.LastOccurrence,
+            startDate: eventModelDto.FirstOccurrence,
+            endDate: eventModelDto.LastOccurrence,
             startTime: eventModelDto.StartTime,
             endTime: eventModelDto.EndTime,
             weekDays: eventModelDto.WeekDays.ToWeekDays(),
             presenceType: PresenceTypeHelper.FromString(eventModelDto.PresenceType),
-            time: eventModelDto.DinnerTime,
+            dinnerTime: eventModelDto.DinnerTime,
             cancellationToken: cancellationToken);
 
         return Ok(ToModel(result));
@@ -46,7 +46,7 @@ public class EventGroupController(IEventGroupService eventGroupService) : Contro
             endTime: eventModelDto.EndTime,
             weekDays: eventModelDto.WeekDays.ToWeekDays(),
             presenceType: PresenceTypeHelper.FromString(eventModelDto.PresenceType),
-            time: eventModelDto.DinnerTime,
+            dinnerTime: eventModelDto.DinnerTime,
             cancellationToken: cancellationToken);
 
         if (result.HasErrors)
