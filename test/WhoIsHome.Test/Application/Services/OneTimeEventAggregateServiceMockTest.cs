@@ -1,162 +1,276 @@
 using Moq;
+using Moq.EntityFrameworkCore;
 using WhoIsHome.Entities;
+using WhoIsHome.External.Database;
 using WhoIsHome.Handlers;
-using WhoIsHome.Test.Shared.Helper;
+using WhoIsHome.Services;
+using WhoIsHome.Shared.Types;
 using WhoIsHome.Test.TestData;
 
 namespace WhoIsHome.Test.Application.Services;
 
 [TestFixture]
-public class OneTimeEventAggregateServiceMockTest : DbMockTest
+public class EventServiceTest : DbMockTest
 {
     private User user = null!;
-    private UserContextFake userContextFake;
-    private OneTimeEventAggregateService service;
+    private DateTimeProviderFake dateTimeProvider;
+    private Mock<IEventUpdateHandler> eventUpdateHandlerMock;
+    private EventService service;
 
     [SetUp]
     public void SetUp()
     {
-        var eventUpdateHandlerMock = Mock.Of<IEventUpdateHandler>();
-        
-        userContextFake = new UserContextFake();
-        userContextFake.SetUser(user, 1);
-        service = new OneTimeEventAggregateService(DbFactory, eventUpdateHandlerMock, userContextFake);
+        eventUpdateHandlerMock = new Mock<IEventUpdateHandler>();
+        dateTimeProvider = new DateTimeProviderFake();
+        service = new EventService(Db, eventUpdateHandlerMock.Object, dateTimeProvider);
     }
 
-    protected override async Task DbSetUpAsync()
+    protected override void DbSetUp(Mock<WhoIsHomeContext> mock)
     {
         user = UserTestData.CreateDefaultUser();
-        await Db.Users.AddAsync(user.ToModel());
-        await Db.SaveChangesAsync();
-        Db.ChangeTracker.Clear();
+        mock.Setup(c => c.Users).ReturnsDbSet([user]);
     }
 
     [TestFixture]
-    private class GetAsync : OneTimeEventAggregateServiceMockTest
+    private class GenerateNewAsync : EventServiceTest
     {
         [Test]
-        public async Task ReturnsEvent_WithTheExpectedId()
+        public async Task GeneratesExpectedEvents_FromGivenEventGroup()
         {
             // Arrange
-            var oneTimeEvent = EventInstanceTestData.CreateDefault();
-            await SaveToDb(oneTimeEvent);
+            const WeekDay weekDays = WeekDay.Monday | WeekDay.Friday;
+            var eventGroup = EventGroupTestData.CreateDefault(
+                startDate: dateTimeProvider.CurrentDate, 
+                endDate: dateTimeProvider.CurrentDate.AddDays(14), 
+                weekDays: weekDays);
+            
+            List<EventInstance> result = [];
+            
+            DbMock.Setup(c =>
+                    c.EventInstances.AddRangeAsync(It.IsAny<List<EventInstance>>(), It.IsAny<CancellationToken>()))
+                .Callback<List<EventInstance>>(r => result = r);
             
             // Act
-            var result = await service.GetAsync(1, CancellationToken.None);
+            await service.GenerateNewAsync(eventGroup, CancellationToken.None);
             
             // Assert
-            result.Id.Should().Be(1);
-            result.Title.Should().Be(oneTimeEvent.Title);
+            result.Should().HaveCount(4);
+            result.Should().AllSatisfy(i => i.Date.Should().Be(i.OriginalDate));
+            result[0].Date.Should().Be(new DateOnly(2024, 11, 29));
+            result[1].Date.Should().Be(new DateOnly(2024, 12, 2));
+            result[2].Date.Should().Be(new DateOnly(2024, 12, 6));
+            result[3].Date.Should().Be(new DateOnly(2024, 12, 9));
+            eventUpdateHandlerMock.Verify(
+                void (x) => x.HandleAsync(
+                    It.IsAny<EventInstance>(), 
+                    It.IsAny<EventUpdateHandler.UpdateAction>())
+                , Times.Never);
         }
         
         [Test]
-        public async Task ThrowsNotFoundException_WhenNoEventWithTheGivenIdWasFound()
+        public async Task TriggersEventUpdateHandler_WhenEventIsGeneratedToday()
         {
+            // Arrange
+            const WeekDay weekDays = WeekDay.Tuesday;
+            var eventGroup = EventGroupTestData.CreateDefault(
+                startDate: dateTimeProvider.CurrentDate, 
+                endDate: dateTimeProvider.CurrentDate.AddDays(3),
+                weekDays: weekDays);
+            
             // Act
-            var act = async () => await service.GetAsync(1, CancellationToken.None);
+            await service.GenerateNewAsync(eventGroup, CancellationToken.None);
             
             // Assert
-            await act.Should().ThrowAsync<NotFoundException>();
+            eventUpdateHandlerMock.Verify(
+                void (x) => x.HandleAsync(
+                    It.Is<EventInstance>(e => e.Date == dateTimeProvider.CurrentDate), 
+                    It.Is<EventUpdateHandler.UpdateAction>(a => a == EventUpdateHandler.UpdateAction.Create))
+                , Times.Exactly(1));
         }
     }
     
     [TestFixture]
-    private class DeleteAsync : OneTimeEventAggregateServiceMockTest
+    private class GenerateUpdateAsync : EventServiceTest
     {
         [Test]
-        public async Task DeletesEvent_WithTheGivenId()
+        public async Task GeneratesExpectedUpdate_FromGivenEventGroup()
         {
             // Arrange
-            var oneTimeEvent = EventInstanceTestData.CreateDefault();
-            await SaveToDb(oneTimeEvent);
+            const WeekDay weekDays = WeekDay.Wednesday | WeekDay.Thursday;
+            var eventGroup = EventGroupTestData.CreateDefault(
+                startDate: dateTimeProvider.CurrentDate, 
+                endDate: dateTimeProvider.CurrentDate.AddDays(4),
+                weekDays: weekDays);
+            
+            List<EventInstance> result = [];
+            List<EventInstance> deletes = [];
+
+            var event1 = EventInstanceTestData.CreateDefault(date: new DateOnly(2024, 11, 25));
+            var event2 = EventInstanceTestData.CreateDefault(date: new DateOnly(2024, 11, 26));
+
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([event1, event2]);
+            DbMock.Setup(c =>
+                    c.EventInstances.AddRangeAsync(It.IsAny<List<EventInstance>>(), It.IsAny<CancellationToken>()))
+                .Callback<List<EventInstance>>(r => result = r);
+            DbMock.Setup(c =>
+                    c.EventInstances.RemoveRange(It.IsAny<EventInstance[]>()))
+                .Callback<EventInstance[]>(r => deletes = r.ToList());
             
             // Act
-            await service.DeleteAsync(1, CancellationToken.None);
+            await service.GenerateUpdateAsync(eventGroup, CancellationToken.None);
             
             // Assert
-            Db.OneTimeEvents.Should().HaveCount(0);
+            deletes.Should().HaveCount(2);
+            result.Should().HaveCount(2);
+            result.Should().AllSatisfy(i => i.Date.Should().Be(i.OriginalDate));
+            result[0].Date.Should().Be(new DateOnly(2024, 11, 27));
+            result[1].Date.Should().Be(new DateOnly(2024, 11, 28));
+            eventUpdateHandlerMock.Verify(
+                void (x) => x.HandleAsync(
+                    It.IsAny<EventInstance>(), 
+                    It.IsAny<EventUpdateHandler.UpdateAction>())
+                , Times.Never);
         }
         
         [Test]
-        public async Task ThrowsNotFoundException_WhenNoEventWithTheGivenIdWasFound()
+        public async Task DoesNotDeleteEditedInstances_AndRegeneratesOriginals()
         {
+            // Arrange
+            const WeekDay weekDays = WeekDay.Wednesday | WeekDay.Friday;
+            var eventGroup = EventGroupTestData.CreateDefault(
+                startDate: dateTimeProvider.CurrentDate, 
+                endDate: dateTimeProvider.CurrentDate.AddDays(4),
+                weekDays: weekDays);
+            
+            List<EventInstance> result = [];
+            List<EventInstance> deletes = [];
+
+            var event1 = EventInstanceTestData.CreateDefault(
+                date: new DateOnly(2024, 11, 27), 
+                originalDate: new DateOnly(2024, 11, 28), 
+                dinnerTime: new TimeOnly(19, 00), 
+                isOriginal: false);
+
+            var date = new DateOnly(2024, 11, 29);
+            var event2 = EventInstanceTestData.CreateDefault(date: date);
+
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([event1, event2]);
+            DbMock.Setup(c =>
+                    c.EventInstances.AddRangeAsync(It.IsAny<List<EventInstance>>(), It.IsAny<CancellationToken>()))
+                .Callback<List<EventInstance>>(r => result = r);
+            DbMock.Setup(c =>
+                    c.EventInstances.RemoveRange(It.IsAny<EventInstance[]>()))
+                .Callback<EventInstance[]>(r => deletes = r.ToList());
+            
             // Act
-            var act = async () => await service.DeleteAsync(1, CancellationToken.None);
+            await service.GenerateUpdateAsync(eventGroup, CancellationToken.None);
             
             // Assert
-            await act.Should().ThrowAsync<NotFoundException>();
+            deletes.Should().HaveCount(1);
+            deletes.Single().Date.Should().Be(date);
+            result.Should().HaveCount(1);
+            result.Single().Date.Should().Be(date);
         }
         
         [Test]
-        public async Task ThrowsActionNotAllowedException_WhenUserIdDoesNotMatch()
+        public async Task UpdatesTitleOfNonOriginalInstances()
         {
             // Arrange
-            var newUser = UserTestData.CreateDefaultUser().ToModel();
-            await Db.Users.AddAsync(newUser);
-            await Db.SaveChangesAsync();
+            const string newTitle = "new";
+            const WeekDay weekDays = WeekDay.Wednesday;
+            var eventGroup = EventGroupTestData.CreateDefault(
+                startDate: dateTimeProvider.CurrentDate,
+                endDate: dateTimeProvider.CurrentDate.AddDays(4),
+                weekDays: weekDays);
+
+            var eventInstance = EventInstanceTestData.CreateDefault(
+                title: "false",
+                date: new DateOnly(2024, 11, 27), 
+                originalDate: new DateOnly(2024, 11, 28), 
+                dinnerTime: new TimeOnly(19, 00), 
+                isOriginal: false);
+
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance]);
             
-            var oneTimeEvent = EventInstanceTestData.CreateDefault(userId: 2);
-            await SaveToDb(oneTimeEvent);
+            List<EventInstance> result = [];
+            DbMock.Setup(c =>
+                    c.EventInstances.UpdateRange(It.IsAny<EventInstance[]>()))
+                .Callback<EventInstance[]>(r => result = r.ToList());
             
             // Act
-            var act = async () => await service.DeleteAsync(1, CancellationToken.None);
+            await service.GenerateUpdateAsync(eventGroup, CancellationToken.None);
             
             // Assert
-            await act.Should().ThrowAsync<ActionNotAllowedException>();
+            result.Should().HaveCount(1);
+            result.Single().Title.Should().Be(newTitle);
+        }
+        
+        [Test]
+        public async Task TriggersEventUpdateHandler_WhenEventIsGeneratedToday()
+        {
+            // Arrange
+            const WeekDay weekDays = WeekDay.Tuesday;
+            var eventGroup = EventGroupTestData.CreateDefault(
+                startDate: dateTimeProvider.CurrentDate, 
+                endDate: dateTimeProvider.CurrentDate.AddDays(4),
+                weekDays: weekDays);
+            
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([]);
+            
+            // Act
+            await service.GenerateUpdateAsync(eventGroup, CancellationToken.None);
+            
+            // Assert
+            eventUpdateHandlerMock.Verify(
+                void (x) => x.HandleAsync(
+                    It.Is<EventInstance>(e => e.Date == dateTimeProvider.CurrentDate), 
+                    It.Is<EventUpdateHandler.UpdateAction>(a => a == EventUpdateHandler.UpdateAction.Update))
+                , Times.Exactly(1));
         }
     }
-    
+
     [TestFixture]
-    private class CreateAsync : OneTimeEventAggregateServiceMockTest
+    private class DeleteAsync : EventServiceTest
     {
         [Test]
-        public async Task SaveGivenEventToDb()
+        public async Task DeletesAllOriginalDates_FromGivenEventGroup()
         {
             // Arrange
-            var oneTimeEvent = EventInstanceTestData.CreateDefault(title: "SaveGivenEventToDb");
+            var event1 = EventInstanceTestData.CreateDefault(isOriginal: false);
+            var date = new DateOnly(2024, 11, 29);
+            var event2 = EventInstanceTestData.CreateDefault(date: date);
+
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([event1, event2]);
+            
+            List<EventInstance> deletes = [];
+            DbMock.Setup(c =>
+                    c.EventInstances.RemoveRange(It.IsAny<EventInstance[]>()))
+                .Callback<EventInstance[]>(r => deletes = r.ToList());
             
             // Act
-            var result = await service.CreateAsync(oneTimeEvent.Title, oneTimeEvent.Date, oneTimeEvent.StartTime,
-                oneTimeEvent.EndTime, oneTimeEvent.DinnerTime.PresenceType, oneTimeEvent.DinnerTime.Time,
-                CancellationToken.None);
+            await service.DeleteAsync(1);
             
             // Assert
-            Db.OneTimeEvents.Should().HaveCount(1);
-            Db.OneTimeEvents.Single().Id.Should().Be(1);
-            result.Id.Should().Be(1);
-            Db.OneTimeEvents.Single().Title.Should().BeEquivalentTo(oneTimeEvent.Title);
+            deletes.Should().HaveCount(1);
+            deletes.Single().Date.Should().Be(date);
         }
-    }
-    
-    [TestFixture]
-    private class UpdateAsync : OneTimeEventAggregateServiceMockTest
-    {
+        
         [Test]
-        public async Task SaveGivenEventToDb()
+        public async Task TriggersEventUpdateHandler_WhenDeletingEventFromToday()
         {
             // Arrange
-            var oneTimeEvent = EventInstanceTestData.CreateDefault(title: "SaveGivenEventToDb");
-            await SaveToDb(oneTimeEvent);
+            var eventInstance = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate);
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance]);
             
             // Act
-            var result = await service.UpdateAsync(1, "This is a new title", oneTimeEvent.Date, oneTimeEvent.StartTime,
-                oneTimeEvent.EndTime, oneTimeEvent.DinnerTime.PresenceType, oneTimeEvent.DinnerTime.Time,
-                CancellationToken.None);
+            await service.DeleteAsync(1);
             
             // Assert
-            Db.OneTimeEvents.Should().HaveCount(1);
-            Db.OneTimeEvents.Single().Id.Should().Be(1);
-            result.Id.Should().Be(1);
-            Db.OneTimeEvents.Single().Title.Should().Be("This is a new title");
-            result.Title.Should().Be("This is a new title");
+            eventUpdateHandlerMock.Verify(
+                void (x) => x.HandleAsync(
+                    It.Is<EventInstance>(e => e.Date == dateTimeProvider.CurrentDate), 
+                    It.Is<EventUpdateHandler.UpdateAction>(a => a == EventUpdateHandler.UpdateAction.Delete))
+                , Times.Exactly(1));
         }
-    }
-    
-    private async Task SaveToDb(OneTimeEvent oneTimeEvent)
-    {
-        var model = oneTimeEvent.ToModel();
-        await Db.OneTimeEvents.AddAsync(model);
-        await Db.SaveChangesAsync();
-        Db.ChangeTracker.Clear();
     }
 }

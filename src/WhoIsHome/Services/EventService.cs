@@ -38,7 +38,7 @@ public class EventService(
 
         var editedEvents = existingEvents
             .Where(e => !e.IsOriginal)
-            .Select(e => e.Date)
+            .Select(e => e.OriginalDate)
             .ToHashSet();
 
         var updatedEvents = GenerateFor(eventGroup, editedEvents);

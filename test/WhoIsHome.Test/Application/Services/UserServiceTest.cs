@@ -1,31 +1,57 @@
 using Microsoft.AspNetCore.Identity;
+using Moq.EntityFrameworkCore;
 using WhoIsHome.Entities;
 using WhoIsHome.Services;
-using WhoIsHome.Test.Shared.Helper;
 using WhoIsHome.Test.TestData;
 
 namespace WhoIsHome.Test.Application.Services;
 
 [TestFixture]
-public class UserServiceMockTest : DbMockTest
+public class UserServiceTest : DbMockTest
 {
     private UserService service;
 
     [SetUp]
     public void SetUp()
     {
-        service = new UserService(DbFactory, new PasswordHasher<User>());
+        service = new UserService(Db, new PasswordHasher<User>());
     }
 
     [TestFixture]
-    private class GetUserByEmailAsync : UserServiceMockTest
+    private class GetAsync : UserServiceTest
+    {
+        [Test]
+        public async Task ReturnsExpectedUser_ByItsId()
+        {
+            // Arrange
+            const string email = "expected.user@whoishome.dev";
+            
+            var user1 = UserTestData.CreateDefaultUser();
+            var user2 = UserTestData.CreateDefaultUser(id: 2, userName: "Test", email: email, password: "Test");
+            DbMock.Setup(c => c.Users).ReturnsDbSet([user1, user2]);
+
+            // Act
+            var user = await service.GetAsync(2, CancellationToken.None);
+
+            // Assert
+            user.Should().NotBeNull();
+            user!.Id.Should().Be(2);
+            user.Email.Should().Be(email);
+        }
+    }
+    
+    [TestFixture]
+    private class GetUserByEmailAsync : UserServiceTest
     {
         [Test]
         public async Task ReturnsExpectedUser_ByItsEmail()
         {
             // Arrange
             const string email = "expected.user@whoishome.dev";
-            _ = await CreateAndSaveDefault(email: email);
+            
+            var user1 = UserTestData.CreateDefaultUser();
+            var user2 = UserTestData.CreateDefaultUser(id: 2, userName: "Test", email: email, password: "Test");
+            DbMock.Setup(c => c.Users).ReturnsDbSet([user1, user2]);
 
             // Act
             var user = await service.GetUserByEmailAsync(email, CancellationToken.None);
@@ -35,24 +61,20 @@ public class UserServiceMockTest : DbMockTest
             user!.Id.Should().Be(2);
             user.Email.Should().Be(email);
         }
-
-        protected override async Task DbSetUpAsync()
-        {
-            var user = UserTestData.CreateDefaultUser();
-            await Db.Users.AddAsync(user.ToModel());
-            await Db.SaveChangesAsync();
-        }
     }
 
     [TestFixture]
-    private class CreateUserAsync : UserServiceMockTest
+    private class CreateUserAsync : UserServiceTest
     {
         [Test]
         public async Task ReturnsEmailInUseResult_WhenEmailIsAlreadyInUse()
         {
             // Arrange
-            await CreateAndSaveDefault();
-            var user = UserTestData.CreateDefaultUser();
+            const string email = "test@test.dev";
+            var existingUser = UserTestData.CreateDefaultUser(email: email);
+            DbMock.Setup(c => c.Users).ReturnsDbSet([existingUser]);
+            
+            var user = UserTestData.CreateDefaultUser(email: email);
 
             // Act
             var result =
@@ -112,16 +134,5 @@ public class UserServiceMockTest : DbMockTest
             newUser.UserName.Should().Be(user.UserName);
             newUser.Email.Should().Be(user.Email);
         }
-    }
-
-    private async Task<UserModel> CreateAndSaveDefault(
-        string userName = "Test User",
-        string email = "test.user@whoishome.dev",
-        string password = "test")
-    {
-        var user = UserTestData.CreateDefaultUser(userName, email, password);
-        await Db.Users.AddAsync(user.ToModel());
-        await Db.SaveChangesAsync();
-        return user.ToModel();
     }
 }

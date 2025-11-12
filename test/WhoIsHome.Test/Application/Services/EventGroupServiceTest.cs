@@ -2,9 +2,7 @@ using Moq;
 using Moq.EntityFrameworkCore;
 using WhoIsHome.Entities;
 using WhoIsHome.External.Database;
-using WhoIsHome.Handlers;
 using WhoIsHome.Services;
-using WhoIsHome.Test.Shared.Helper;
 using WhoIsHome.Test.TestData;
 
 namespace WhoIsHome.Test.Application.Services;
@@ -16,14 +14,15 @@ public class EventGroupServiceTest : DbMockTest
     
     private User user = null!;
     private EventGroupService service;
+    private Mock<IEventService> eventServiceMock;
 
     [SetUp]
     public void SetUp()
     {
-        var eventServiceMock = Mock.Of<IEventService>();
+        eventServiceMock = new Mock<IEventService>();
         
         userContextFake.SetUser(user, 1);
-        service = new EventGroupService(Db, eventServiceMock, userContextFake);
+        service = new EventGroupService(Db, eventServiceMock.Object, userContextFake);
     }
 
     protected override void DbSetUp(Mock<WhoIsHomeContext> mock)
@@ -69,42 +68,43 @@ public class EventGroupServiceTest : DbMockTest
         public async Task DeletesEvent_WithTheGivenId()
         {
             // Arrange
-            var repeatedEvent = EventGroupTestData.CreateDefaultWithDefaultDateTimes();
-            await SaveToDb(repeatedEvent);
+            var eventGroup = EventGroupTestData.CreateDefaultWithDefaultDateTimes();
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
             
             // Act
-            await service.DeleteAsync(1, CancellationToken.None);
+            var result = await service.DeleteAsync(1, CancellationToken.None);
             
             // Assert
-            Db.RepeatedEvents.Should().HaveCount(0);
+            DbMock.VerifyRemove(c => c.Remove(eventGroup));
+            eventServiceMock.Verify(c => c.DeleteAsync(eventGroup.Id));
+            result.Should().BeNull();
         }
         
         [Test]
-        public async Task ThrowsNotFoundException_WhenNoEventWithTheGivenIdWasFound()
+        public async Task ReturnsError_WhenNoEventWithTheGivenIdWasFound()
         {
+            // Arrange
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([]);
+            
             // Act
-            var act = async () => await service.DeleteAsync(1, CancellationToken.None);
+            var result = await service.DeleteAsync(1, CancellationToken.None);
             
             // Assert
-            await act.Should().ThrowAsync<NotFoundException>();
+            result.Should().NotBeNull();
         }
         
         [Test]
         public async Task ThrowsActionNotAllowedException_WhenUserIdDoesNotMatch()
         {
             // Arrange
-            var newUser = UserTestData.CreateDefaultUser().ToModel();
-            await Db.Users.AddAsync(newUser);
-            await Db.SaveChangesAsync();
-            
-            var repeatedEvent = EventGroupTestData.CreateDefaultWithDefaultDateTimes(userId: 2);
-            await SaveToDb(repeatedEvent);
+            var eventGroup = EventGroupTestData.CreateDefaultWithDefaultDateTimes(userId: 2);
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
             
             // Act
-            var act = async () => await service.DeleteAsync(1, CancellationToken.None);
+            var result = await service.DeleteAsync(1, CancellationToken.None);
             
             // Assert
-            await act.Should().ThrowAsync<ActionNotAllowedException>();
+            result.Should().NotBeNull();
         }
     }
     
@@ -115,18 +115,24 @@ public class EventGroupServiceTest : DbMockTest
         public async Task SaveGivenEventToDb()
         {
             // Arrange
-            var repeatedEvent = EventGroupTestData.CreateDefaultWithDefaultDateTimes(title: "SaveGivenEventToDb");
+            const string title = "SaveGivenEventToDb";
+            var eventGroup = EventGroupTestData.CreateDefaultWithDefaultDateTimes(title: title);
             
             // Act
-            var result = await service.CreateAsync(repeatedEvent.Title, repeatedEvent.FirstOccurrence, repeatedEvent.LastOccurrence, repeatedEvent.StartTime,
-                repeatedEvent.EndTime, repeatedEvent.DinnerTime.PresenceType, repeatedEvent.DinnerTime.Time,
+            var result = await service.CreateAsync(
+                eventGroup.Title, 
+                eventGroup.StartDate, 
+                eventGroup.EndDate, 
+                eventGroup.WeekDays, 
+                eventGroup.StartTime,
+                eventGroup.EndTime, 
+                eventGroup.PresenceType, 
+                eventGroup.DinnerTime,
                 CancellationToken.None);
             
             // Assert
-            Db.RepeatedEvents.Should().HaveCount(1);
-            Db.RepeatedEvents.Single().Id.Should().Be(1);
-            result.Id.Should().Be(1);
-            Db.RepeatedEvents.Single().Title.Should().BeEquivalentTo(repeatedEvent.Title);
+            result.Title.Should().Be(title);
+            DbMock.VerifyAdd(c => c.AddAsync(eventGroup));
         }
     }
     
@@ -137,71 +143,54 @@ public class EventGroupServiceTest : DbMockTest
         public async Task SaveGivenEventToDb()
         {
             // Arrange
-            var repeatedEvent = EventGroupTestData.CreateDefaultWithDefaultDateTimes(title: "SaveGivenEventToDb");
-            await SaveToDb(repeatedEvent);
+            const string title = "SaveGivenEventToDb";
+            var eventGroup = EventGroupTestData.CreateDefaultWithDefaultDateTimes(title: "old-title");
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
             
             // Act
-            var result = await service.UpdateAsync(1, "This is a new title", repeatedEvent.FirstOccurrence, repeatedEvent.LastOccurrence, repeatedEvent.StartTime,
-                repeatedEvent.EndTime, repeatedEvent.DinnerTime.PresenceType, repeatedEvent.DinnerTime.Time,
+            var result = await service.UpdateAsync(
+                id: eventGroup.Id,
+                title,
+                eventGroup.StartDate, 
+                eventGroup.EndDate, 
+                eventGroup.WeekDays, 
+                eventGroup.StartTime,
+                eventGroup.EndTime, 
+                eventGroup.PresenceType, 
+                eventGroup.DinnerTime,
                 CancellationToken.None);
             
             // Assert
-            Db.RepeatedEvents.Should().HaveCount(1);
-            Db.RepeatedEvents.Single().Id.Should().Be(1);
-            result.Id.Should().Be(1);
-            Db.RepeatedEvents.Single().Title.Should().Be("This is a new title");
-            result.Title.Should().Be("This is a new title");
-        }
-    }
-    
-    [TestFixture]
-    private class EndAsync : EventGroupServiceTest
-    {
-        [Test]
-        public async Task SetEndTimeOnAggregate()
-        {
-            // Arrange
-            var expected = new DateOnly(2025, 1, 1);
-            
-            var repeatedEvent = EventGroupTestData.CreateDefault(title: "SetEndTimeOnAggregate");
-            await SaveToDb(repeatedEvent);
-            
-            // Act
-            var result = await service.EndAsync(1, expected, CancellationToken.None);
-            
-            // Assert
-            result.Id.Should().Be(1);
-            result.LastOccurrence.Should().Be(expected);
+            result.HasErrors.Should().BeFalse();
+            result.Value.Should().NotBeNull();
+            result.Result.Title.Should().Be(title);
+            DbMock.Verify(c => c.Update(It.Is<EventGroup>(e => e.Title == title)));
         }
         
         [Test]
-        public async Task ThrowIfLastOccurrenceIsAlreadySet()
+        public async Task ReturnsError_WhenEventGroupDoesNotExist()
         {
             // Arrange
-            var expected = new DateOnly(2025, 1, 1);
-            var repeatedEvent = EventGroupTestData.CreateDefault(title: "SetEndTimeOnAggregate", endDate: expected);
-            await SaveToDb(repeatedEvent);
+            const string title = "SaveGivenEventToDb";
+            var eventGroup = EventGroupTestData.CreateDefaultWithDefaultDateTimes(title: "old-title");
             
             // Act
-            var action = async () => await service.EndAsync(1, expected, CancellationToken.None);
+            var result = await service.UpdateAsync(
+                id: 2,
+                title,
+                eventGroup.StartDate, 
+                eventGroup.EndDate, 
+                eventGroup.WeekDays, 
+                eventGroup.StartTime,
+                eventGroup.EndTime, 
+                eventGroup.PresenceType, 
+                eventGroup.DinnerTime,
+                CancellationToken.None);
             
             // Assert
-            await action.Should().ThrowAsync<InvalidModelException>();
-        }
-        
-        [Test]
-        public async Task ThrowIfLastOccurrenceIsBeforeFirstOccurrence()
-        {
-            // Arrange
-            var expected = new DateOnly(2025, 1, 1);
-            var repeatedEvent = EventGroupTestData.CreateDefault(title: "SetEndTimeOnAggregate", startDate: expected.AddDays(7), endDate: expected);
-            await SaveToDb(repeatedEvent);
-            
-            // Act
-            var action = async () => await service.EndAsync(1, expected, CancellationToken.None);
-            
-            // Assert
-            await action.Should().ThrowAsync<InvalidModelException>();
+            result.HasErrors.Should().BeTrue();
+            result.Value.Should().BeNull();
+            result.ValidationErrors.Should().HaveCountGreaterThan(0);
         }
     }
 }

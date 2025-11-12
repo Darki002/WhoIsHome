@@ -6,11 +6,10 @@ using WhoIsHome.Validations;
 
 namespace WhoIsHome.Services;
 
-internal class UserService(IDbContextFactory<WhoIsHomeContext> contextFactory, IPasswordHasher<User> passwordHasher) : IUserService
+internal class UserService(WhoIsHomeContext context, IPasswordHasher<User> passwordHasher) : IUserService
 {
     public async Task<User?> GetAsync(int id, CancellationToken cancellationToken)
     {
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         return await context.Users
             .Where(u => u.Id == id)
             .SingleOrDefaultAsync(cancellationToken);
@@ -18,7 +17,6 @@ internal class UserService(IDbContextFactory<WhoIsHomeContext> contextFactory, I
     
     public async Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         return await context.Users
             .Where(u => u.Email == email)
             .SingleOrDefaultAsync(cancellationToken);
@@ -28,7 +26,6 @@ internal class UserService(IDbContextFactory<WhoIsHomeContext> contextFactory, I
     {
         var result = new ValidationResult<User>();
         
-        var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         var isEmailInUse = context.Users.Any(u => u.Email == email);
 
         if (isEmailInUse)

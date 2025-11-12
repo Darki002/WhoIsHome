@@ -13,8 +13,15 @@ internal class EventGroupService(
     IUserContext userContext) 
     : IEventGroupService
 {
-    public async Task<EventGroup> CreateAsync(string title, DateOnly startDate, DateOnly? endDate,
-        TimeOnly startTime, TimeOnly? endTime, WeekDay weekDays, PresenceType presenceType, TimeOnly? time,
+    public async Task<EventGroup> CreateAsync(
+        string title, 
+        DateOnly startDate, 
+        DateOnly? endDate, 
+        WeekDay weekDays, 
+        TimeOnly startTime, 
+        TimeOnly? endTime,
+        PresenceType presenceType, 
+        TimeOnly? dinnerTime, 
         CancellationToken cancellationToken)
     {
         var eventGroup = new EventGroup(
@@ -25,7 +32,7 @@ internal class EventGroupService(
             startTime: startTime, 
             endTime: endTime, 
             presenceType: presenceType,
-            dinnerTime: time, 
+            dinnerTime: dinnerTime, 
             userId: userContext.UserId);
 
         var result = await context.EventGroups.AddAsync(eventGroup, cancellationToken);
@@ -37,8 +44,16 @@ internal class EventGroupService(
         return result.Entity;
     }
 
-    public async Task<ValidationResult<EventGroup>> UpdateAsync(int id, string title, DateOnly startDate,
-        DateOnly? endDate, TimeOnly startTime, TimeOnly? endTime, WeekDay weekDays, PresenceType presenceType, TimeOnly? time,
+    public async Task<ValidationResult<EventGroup>> UpdateAsync(
+        int id, 
+        string title, 
+        DateOnly startDate, 
+        DateOnly? endDate, 
+        WeekDay weekDays, 
+        TimeOnly startTime, 
+        TimeOnly? endTime,
+        PresenceType presenceType, 
+        TimeOnly? dinnerTime, 
         CancellationToken cancellationToken)
     {
         var eventGroup = context.EventGroups.SingleOrDefault(e => e.Id == id);
@@ -61,7 +76,7 @@ internal class EventGroupService(
         eventGroup.EndTime = endTime;
         eventGroup.WeekDays = weekDays;
         eventGroup.PresenceType = presenceType;
-        eventGroup.DinnerTime = time;
+        eventGroup.DinnerTime = dinnerTime;
         
         var result = context.EventGroups.Update(eventGroup);
         await context.SaveChangesAsync(cancellationToken);
