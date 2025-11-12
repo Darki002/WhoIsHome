@@ -273,4 +273,77 @@ public class EventServiceTest : DbMockTest
                 , Times.Exactly(1));
         }
     }
+
+    [TestFixture]
+    private class EditSingleInstanceAsync : EventServiceTest
+    {
+        [Test]
+        public async Task DeletesSingleEventInstance()
+        {
+            // Arrange
+            var date = new DateOnly(2024, 11, 29);
+            var event1 = EventInstanceTestData.CreateDefault(id: 1, date: new DateOnly(2024, 11, 28));
+            var event2 = EventInstanceTestData.CreateDefault(id: 2, date: date);
+
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([event1, event2]);
+            
+            EventInstance? editedEvent = null;
+            DbMock.Setup(c =>
+                    c.EventInstances.Update(It.IsAny<EventInstance>()))
+                .Callback<EventInstance>(r => editedEvent = r);
+
+            var newDate = new DateOnly(2024, 11, 30);
+            var newStartTime = new TimeOnly(18, 00);
+            var newEndTime = new TimeOnly(19, 00);
+            var newPresenceType = PresenceType.Late;
+            var newDinnerTime = new TimeOnly(20, 00);
+            
+            // Act
+            await service.EditSingleInstanceAsync(
+                originalDate: date,
+                date: newDate,
+                startTime: newStartTime,
+                endTime: newEndTime,
+                presenceType: newPresenceType,
+                dinnerTime: newDinnerTime);
+            
+            // Assert
+            editedEvent.Should().NotBeNull();
+            editedEvent!.Id.Should().Be(2);
+            editedEvent.OriginalDate.Should().Be(date);
+            editedEvent.IsOriginal.Should().BeFalse();
+            editedEvent.Date.Should().Be(newDate);
+            editedEvent.StartTime.Should().Be(newStartTime);
+            editedEvent.EndTime.Should().Be(newEndTime);
+            editedEvent.PresenceType.Should().Be(newPresenceType);
+            editedEvent.DinnerTime.Should().Be(newDinnerTime);
+        }
+    }
+    
+    [TestFixture]
+    private class DeleteSingleInstanceAsync : EventServiceTest
+    {
+        [Test]
+        public async Task DeletesSingleEventInstance()
+        {
+            // Arrange
+            var date = new DateOnly(2024, 11, 29);
+            var event1 = EventInstanceTestData.CreateDefault(id: 1, date: new DateOnly(2024, 11, 28));
+            var event2 = EventInstanceTestData.CreateDefault(id: 2, date: date);
+
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([event1, event2]);
+            
+            EventInstance? deletedEvent = null;
+            DbMock.Setup(c =>
+                    c.EventInstances.Remove(It.IsAny<EventInstance>()))
+                .Callback<EventInstance>(r => deletedEvent = r);
+            
+            // Act
+            await service.DeleteSingleInstanceAsync(date);
+            
+            // Assert
+            deletedEvent.Should().NotBeNull();
+            deletedEvent!.Id.Should().Be(2);
+        }
+    }
 }
