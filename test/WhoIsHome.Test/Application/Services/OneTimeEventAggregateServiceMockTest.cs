@@ -295,7 +295,7 @@ public class EventServiceTest : DbMockTest
             var newDate = new DateOnly(2024, 11, 30);
             var newStartTime = new TimeOnly(18, 00);
             var newEndTime = new TimeOnly(19, 00);
-            var newPresenceType = PresenceType.Late;
+            const PresenceType newPresenceType = PresenceType.Late;
             var newDinnerTime = new TimeOnly(20, 00);
             
             // Act
