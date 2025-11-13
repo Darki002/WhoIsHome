@@ -21,8 +21,7 @@ public class PushUpController(
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] PushUpSettingsDto pushUpSettings, CancellationToken cancellationToken)
     {
-        var language = Convert(pushUpSettings.LanguageCode, CultureInfo.GetCultureInfo("en"));
-        if (language is null)
+        if (TryConvert(pushUpSettings.LanguageCode, out var language))
         {
             return BadRequest(new  { Message = $"Unknown Language Code {pushUpSettings.LanguageCode}." });
         }
@@ -52,22 +51,25 @@ public class PushUpController(
         return Ok("ExpoPushToken is saved.");
     }
 
-    private CultureInfo? Convert(string? languageCode, CultureInfo fallback)
+    private bool TryConvert(string? languageCode, out CultureInfo? cultureInfo)
     {
         try
         {
             if (languageCode is not null)
             {
-                return CultureInfo.GetCultureInfo(languageCode);
+                cultureInfo = CultureInfo.GetCultureInfo(languageCode);
+                return true;
             }
 
-            logger.LogWarning("There was no given language. Using fallback culture.");
-            return fallback;
+            logger.LogInformation("There was no given language. Using fallback culture.");
+            cultureInfo = null;
+            return true;
         }
         catch
         {
             logger.LogError("Failed to create Culture from {Orig}.", languageCode);
-            return null;
+            cultureInfo = null;
+            return false;
         }
     }
 }
