@@ -4,6 +4,7 @@ using WhoIsHome.External.Database;
 using WhoIsHome.Handlers;
 using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
+using WhoIsHome.Validations;
 
 namespace WhoIsHome.Services;
 
@@ -119,6 +120,47 @@ public class EventService(
         if (eventFromToday is not null)
         {
             await eventUpdateHandler.HandleAsync(eventFromToday, EventUpdateHandler.UpdateAction.Delete);
+        }
+    }
+
+    public async Task<ValidationError?> EditSingleInstanceAsync(
+        DateOnly originalDate, 
+        DateOnly date, 
+        TimeOnly startTime, 
+        TimeOnly endTime, 
+        PresenceType presenceType, 
+        TimeOnly dinnerTime,
+        CancellationToken cancellationToken)
+    {
+        var eventInstance = await context.EventInstances
+            .SingleOrDefaultAsync(e => e.Date == originalDate, cancellationToken);
+
+        if (eventInstance is null)
+        {
+            return new ValidationError($"No Event found with date {originalDate}.");
+        }
+        
+        eventInstance.Date = date;
+        eventInstance.StartTime = startTime;
+        eventInstance.EndTime = endTime;
+        eventInstance.PresenceType = presenceType;
+        eventInstance.DinnerTime = dinnerTime;
+        eventInstance.IsOriginal = false;
+
+        context.EventInstances.Update(eventInstance);
+        await context.SaveChangesAsync(cancellationToken);
+        return null;
+    }
+
+    public async Task DeleteSingleInstanceAsync(DateOnly date, CancellationToken cancellationToken)
+    {
+        var eventInstance = await context.EventInstances
+            .SingleOrDefaultAsync(e => e.Date == date, cancellationToken);
+
+        if (eventInstance is not null)
+        {
+            context.EventInstances.Remove(eventInstance);
+            await context.SaveChangesAsync(cancellationToken);
         }
     }
 }

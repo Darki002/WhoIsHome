@@ -6,6 +6,8 @@ namespace WhoIsHome.Services;
 
 public interface IEventGroupService
 {
+    Task<ValidationResult<EventGroup>> GetAsync(int id, CancellationToken cancellationToken);
+    
     Task<EventGroup> CreateAsync(
         string title, 
         DateOnly startDate, 

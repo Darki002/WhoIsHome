@@ -19,6 +19,8 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
     
     public virtual DbSet<PushUpSettings> PushUpSettings { get; set; }
+
+    public WhoIsHomeContext() : this(new DbContextOptions<WhoIsHomeContext>()) { }
     
     private static readonly ValueConverter<TimeOnly, TimeSpan> TimeOnlyConverter = new(
         only => only.ToTimeSpan(),

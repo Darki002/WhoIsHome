@@ -45,19 +45,19 @@ public class EventGroupServiceTest : DbMockTest
             var result = await service.GetAsync(1, CancellationToken.None);
             
             // Assert
-            result.Value.Id.Should().Be(1);
-            result.Value.Title.Should().Be(eventGroup.Title);
+            result.HasErrors.Should().BeFalse();
+            result.Result.Id.Should().Be(1);
+            result.Result.Title.Should().Be(eventGroup.Title);
         }
         
         [Test]
-        public async Task ThrowsNotFoundException_WhenNoEventWithTheGivenIdWasFound()
+        public async Task ReturnsError_WhenEventGroupNotFound()
         {
             // Act
             var result = await service.GetAsync(1, CancellationToken.None);
             
             // Assert
-            result.HasError.Should().BeTrue();
-            result.Error.Should().NotBeNull();
+            result.HasErrors.Should().BeTrue();
         }
     }
     

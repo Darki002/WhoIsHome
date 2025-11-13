@@ -278,7 +278,7 @@ public class EventServiceTest : DbMockTest
     private class EditSingleInstanceAsync : EventServiceTest
     {
         [Test]
-        public async Task DeletesSingleEventInstance()
+        public async Task EditSingleEventInstance()
         {
             // Arrange
             var date = new DateOnly(2024, 11, 29);
@@ -299,15 +299,17 @@ public class EventServiceTest : DbMockTest
             var newDinnerTime = new TimeOnly(20, 00);
             
             // Act
-            await service.EditSingleInstanceAsync(
+            var result = await service.EditSingleInstanceAsync(
                 originalDate: date,
                 date: newDate,
                 startTime: newStartTime,
                 endTime: newEndTime,
                 presenceType: newPresenceType,
-                dinnerTime: newDinnerTime);
+                dinnerTime: newDinnerTime,
+                CancellationToken.None);
             
             // Assert
+            result.Should().BeNull();
             editedEvent.Should().NotBeNull();
             editedEvent!.Id.Should().Be(2);
             editedEvent.OriginalDate.Should().Be(date);
@@ -317,6 +319,32 @@ public class EventServiceTest : DbMockTest
             editedEvent.EndTime.Should().Be(newEndTime);
             editedEvent.PresenceType.Should().Be(newPresenceType);
             editedEvent.DinnerTime.Should().Be(newDinnerTime);
+        }
+        
+        [Test]
+        public async Task ReturnsValidationError_WhenNoEventInstanceMatchesGivenDate()
+        {
+            // Arrange
+            var newDate = new DateOnly(2024, 11, 30);
+            var newStartTime = new TimeOnly(18, 00);
+            var newEndTime = new TimeOnly(19, 00);
+            const PresenceType newPresenceType = PresenceType.Late;
+            var newDinnerTime = new TimeOnly(20, 00);
+            
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([]);
+            
+            // Act
+            var result = await service.EditSingleInstanceAsync(
+                originalDate: new DateOnly(2020, 1, 1),
+                date: newDate,
+                startTime: newStartTime,
+                endTime: newEndTime,
+                presenceType: newPresenceType,
+                dinnerTime: newDinnerTime,
+                CancellationToken.None);
+            
+            // Assert
+            result.Should().NotBeNull();
         }
     }
     
@@ -339,7 +367,7 @@ public class EventServiceTest : DbMockTest
                 .Callback<EventInstance>(r => deletedEvent = r);
             
             // Act
-            await service.DeleteSingleInstanceAsync(date);
+            await service.DeleteSingleInstanceAsync(date, CancellationToken.None);
             
             // Assert
             deletedEvent.Should().NotBeNull();

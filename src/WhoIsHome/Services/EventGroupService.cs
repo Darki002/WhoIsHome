@@ -13,6 +13,16 @@ internal class EventGroupService(
     IUserContext userContext) 
     : IEventGroupService
 {
+    public async Task<ValidationResult<EventGroup>> GetAsync(int id, CancellationToken cancellationToken)
+    {
+        var result = await context.EventGroups
+            .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
+
+        return result is null
+            ? ValidationResult<EventGroup>.Error($"EventGroup with id {id} not found.") 
+            : ValidationResult<EventGroup>.Success(result);
+    }
+    
     public async Task<EventGroup> CreateAsync(
         string title, 
         DateOnly startDate, 
