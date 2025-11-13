@@ -33,7 +33,7 @@ public class PushUpController(
         {
             settings.Token = pushUpSettings.Token;
             settings.Enabled = pushUpSettings.Enable ?? settings.Enabled;
-            settings.LanguageCode = Convert(pushUpSettings.LanguageCode, settings.LanguageCode!);
+            settings.LanguageCode = language;
             context.PushUpSettings.Update(settings);
         }
         else
@@ -43,7 +43,7 @@ public class PushUpController(
                 Enabled = pushUpSettings.Enable ?? true,
                 UserId = userContext.UserId,
                 Token = pushUpSettings.Token,
-                LanguageCode = Convert(pushUpSettings.LanguageCode, CultureInfo.GetCultureInfo("en"))
+                LanguageCode = language
             };
             await context.PushUpSettings.AddAsync(newSettings, cancellationToken);
         }
