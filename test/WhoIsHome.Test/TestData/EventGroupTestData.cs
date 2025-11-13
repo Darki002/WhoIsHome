@@ -6,6 +6,7 @@ namespace WhoIsHome.Test.TestData;
 public static class EventGroupTestData
 {
     public static EventGroup CreateDefaultWithDefaultDateTimes(
+        int id = 1,
         string title = "Test",
         DateOnly? startDate = null,
         DateOnly? endDate = null,
@@ -23,18 +24,19 @@ public static class EventGroupTestData
         dinnerTime ??= new TimeOnly(18, 00, 00);
 
         return new EventGroup(
-            title: title, 
-            startDate: startDate.Value, 
-            endDate: endDate.Value, 
+            title: title,
+            startDate: startDate.Value,
+            endDate: endDate.Value,
             weekDays: weekDays,
-            startTime: startTime.Value, 
+            startTime: startTime.Value,
             endTime: endTime.Value,
             presenceType: presenceType,
             dinnerTime: dinnerTime,
-            userId);
+            userId) { Id = id };
     }
     
     public static EventGroup CreateDefault(
+        int id = 1,
         string title = "Test",
         DateOnly? startDate = null,
         DateOnly? endDate = null,
@@ -58,7 +60,7 @@ public static class EventGroupTestData
             endTime: endTime,
             presenceType: presenceType,
             dinnerTime: dinnerTime,
-            userId);
+            userId) { Id = id };
     }
     
     public static EventGroup NotPresentWithDefaultDateTimes(

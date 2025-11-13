@@ -7,7 +7,7 @@ public class DailyOverviewQueryHandler(
     WhoIsHomeContext context, 
     UserDayOverviewQueryHandler userDayOverviewQueryHandler)
 {
-    public async Task<IReadOnlyCollection<DailyOverview>> HandleAsync(DateOnly date, CancellationToken cancellationToken)
+    public virtual async Task<IReadOnlyCollection<DailyOverview>> HandleAsync(DateOnly date, CancellationToken cancellationToken)
     {
         var userIds = await context.Users.Select(u => u.Id).ToListAsync(cancellationToken);
 

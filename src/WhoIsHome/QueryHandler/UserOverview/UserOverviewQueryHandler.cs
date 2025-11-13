@@ -13,7 +13,7 @@ public class UserOverviewQueryHandler(WhoIsHomeContext context, IDateTimeProvide
 
         var eventList = await context.EventInstances
                 .Where(e => e.Date >= today)
-                .Where(e => e.User.Id == userId)
+                .Where(e => e.UserId == userId)
                 .ToListAsync(cancellationToken);
 
         var todaysEvents = eventList.Where(e => e.Date == dateTimeProvider.CurrentDate)

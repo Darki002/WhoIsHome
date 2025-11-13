@@ -53,11 +53,16 @@ public class EventGroupServiceTest : DbMockTest
         [Test]
         public async Task ReturnsError_WhenEventGroupNotFound()
         {
+            // Arrange
+            var eventGroup = EventGroupTestData.CreateDefault(id: 42);
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+            
             // Act
             var result = await service.GetAsync(1, CancellationToken.None);
             
             // Assert
             result.HasErrors.Should().BeTrue();
+            result.Value.Should().BeNull();
         }
     }
     
@@ -68,20 +73,22 @@ public class EventGroupServiceTest : DbMockTest
         public async Task DeletesEvent_WithTheGivenId()
         {
             // Arrange
-            var eventGroup = EventGroupTestData.CreateDefaultWithDefaultDateTimes();
+            var eventGroup = EventGroupTestData.CreateDefaultWithDefaultDateTimes(id: 42);
             DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
             
             // Act
-            var result = await service.DeleteAsync(1, CancellationToken.None);
+            var result = await service.DeleteAsync(42, CancellationToken.None);
             
             // Assert
-            DbMock.VerifyRemove(c => c.Remove(eventGroup));
-            eventServiceMock.Verify(c => c.DeleteAsync(eventGroup.Id));
+            DbMock.Verify(c => c.EventGroups.Remove(
+                It.Is<EventGroup>(e => e.Id == eventGroup.Id)),
+                Times.Exactly(1));
+            eventServiceMock.Verify(c => c.DeleteAsync(eventGroup.Id), Times.Exactly(1));
             result.Should().BeNull();
         }
         
         [Test]
-        public async Task ReturnsError_WhenNoEventWithTheGivenIdWasFound()
+        public async Task ReturnsNull_WhenNoEventWithTheGivenIdWasFound()
         {
             // Arrange
             DbMock.Setup(c => c.EventGroups).ReturnsDbSet([]);
@@ -90,7 +97,7 @@ public class EventGroupServiceTest : DbMockTest
             var result = await service.DeleteAsync(1, CancellationToken.None);
             
             // Assert
-            result.Should().NotBeNull();
+            result.Should().BeNull();
         }
         
         [Test]
@@ -117,6 +124,9 @@ public class EventGroupServiceTest : DbMockTest
             // Arrange
             const string title = "SaveGivenEventToDb";
             var eventGroup = EventGroupTestData.CreateDefaultWithDefaultDateTimes(title: title);
+            DbMock.AddChangeTrackingWithCt(c => c.EventGroups.AddAsync(
+                It.Is<EventGroup>(e => e.Title == title),
+                It.IsAny<CancellationToken>()));
             
             // Act
             var result = await service.CreateAsync(
@@ -132,7 +142,11 @@ public class EventGroupServiceTest : DbMockTest
             
             // Assert
             result.Title.Should().Be(title);
-            DbMock.VerifyAdd(c => c.AddAsync(eventGroup));
+            DbMock.Verify(
+                c => c.EventGroups.AddAsync(
+                    It.Is<EventGroup>(t => t.Title == title), 
+                    It.IsAny<CancellationToken>()), 
+                Times.Exactly(1));
         }
     }
     
@@ -146,6 +160,8 @@ public class EventGroupServiceTest : DbMockTest
             const string title = "SaveGivenEventToDb";
             var eventGroup = EventGroupTestData.CreateDefaultWithDefaultDateTimes(title: "old-title");
             DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+            DbMock.AddChangeTracking(c => c.EventGroups.Update(
+                    It.Is<EventGroup>(e => e.Title == title)));
             
             // Act
             var result = await service.UpdateAsync(
@@ -164,7 +180,9 @@ public class EventGroupServiceTest : DbMockTest
             result.HasErrors.Should().BeFalse();
             result.Value.Should().NotBeNull();
             result.Result.Title.Should().Be(title);
-            DbMock.Verify(c => c.Update(It.Is<EventGroup>(e => e.Title == title)));
+            DbMock.Verify(
+                c => c.EventGroups.Update(It.Is<EventGroup>(e => e.Title == title)), 
+                Times.Exactly(1));
         }
         
         [Test]
@@ -173,6 +191,7 @@ public class EventGroupServiceTest : DbMockTest
             // Arrange
             const string title = "SaveGivenEventToDb";
             var eventGroup = EventGroupTestData.CreateDefaultWithDefaultDateTimes(title: "old-title");
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
             
             // Act
             var result = await service.UpdateAsync(

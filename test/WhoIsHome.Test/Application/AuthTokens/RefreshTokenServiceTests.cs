@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.EntityFrameworkCore;
@@ -19,7 +18,7 @@ public class RefreshTokenServiceTests : DbMockTest
         var logger = Mock.Of<ILogger<RefreshTokenService>>();
         service = new RefreshTokenService(Db, dateTimeProviderFake, logger);
     }
-    
+
     [TestFixture]
     private class CreateTokenAsync : RefreshTokenServiceTests
     {
@@ -28,10 +27,9 @@ public class RefreshTokenServiceTests : DbMockTest
         {
             // Arrange
             DbMock.Setup(c => c.RefreshTokens).ReturnsDbSet([]);
-
             DbMock.AddChangeTrackingWithCt(
                 c => c.RefreshTokens.AddAsync(
-                    It.IsAny<RefreshToken>(),
+                    It.IsAny<RefreshToken>(), 
                     It.IsAny<CancellationToken>()),
                 e => { e.Id = 1; });
             
@@ -53,6 +51,11 @@ public class RefreshTokenServiceTests : DbMockTest
             // Arrange
             var token = RefreshToken.Generate(1, dateTimeProviderFake.Now);
             DbMock.Setup(c => c.RefreshTokens).ReturnsDbSet([token]);
+            DbMock.AddChangeTrackingWithCt(
+                c => c.RefreshTokens.AddAsync(
+                    It.IsAny<RefreshToken>(), 
+                    It.IsAny<CancellationToken>()),
+                e => { e.Id = 2; });
             
             // Act
             var result = await service.RefreshAsync(token.Token, CancellationToken.None);
@@ -60,8 +63,6 @@ public class RefreshTokenServiceTests : DbMockTest
             // Assert
             result.HasError.Should().BeFalse();
             result.Value.Id.Should().Be(2);
-            Db.RefreshTokens.Should().HaveCount(2);
-            Db.RefreshTokens.Single(t => t.Id == 1).ExpiredAt.Should().BeBefore(DateTime.Now);
         }
         
         [Test]

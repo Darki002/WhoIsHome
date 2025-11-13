@@ -22,9 +22,10 @@ public class DailyOverviewTest : DbMockTest
     public async Task ReturnsDailyOverview_ForEveryUser()
     {
         // Arrange
-        var user1 = UserTestData.CreateDefaultUser(email: "test1@whoishome.dev");
-        var user2 = UserTestData.CreateDefaultUser(email: "test2@whoishome.dev");
+        var user1 = UserTestData.CreateDefaultUser(id: 1, email: "test1@whoishome.dev");
+        var user2 = UserTestData.CreateDefaultUser(id: 2, email: "test2@whoishome.dev");
         DbMock.Setup(c => c.Users).ReturnsDbSet([user1, user2]);
+        DbMock.Setup(c => c.EventInstances).ReturnsDbSet([]);
 
         // Act
         var result = await queryHandler.HandleAsync(dateTimeProviderFake.CurrentDate, CancellationToken.None);

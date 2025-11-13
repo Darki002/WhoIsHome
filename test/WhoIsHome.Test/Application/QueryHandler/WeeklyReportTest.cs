@@ -1,4 +1,5 @@
-﻿using Moq.EntityFrameworkCore;
+﻿using Moq;
+using Moq.EntityFrameworkCore;
 using WhoIsHome.QueryHandler.DailyOverview;
 using WhoIsHome.QueryHandler.WeeklyReports;
 using WhoIsHome.Test.TestData;
@@ -9,15 +10,15 @@ namespace WhoIsHome.Test.Application.QueryHandler;
 public class WeeklyReportTest : DbMockTest
 {
     private readonly DateTimeProviderFake dateTimeProviderFake = new DateTimeProviderFake();
-    
+
+    private Mock<DailyOverviewQueryHandler> dailyOverviewMock;
     private WeeklyReportQueryHandler queryHandler;
     
     [SetUp]
     public void SetUp()
     {
-        var userDayOverviewQueryHandler = new UserDayOverviewQueryHandler(Db);
-        var dailyOverviewQueryHandler = new DailyOverviewQueryHandler(Db, userDayOverviewQueryHandler);
-        queryHandler = new WeeklyReportQueryHandler(dailyOverviewQueryHandler, Db, dateTimeProviderFake);
+        dailyOverviewMock = new Mock<DailyOverviewQueryHandler>(Db, null!);
+        queryHandler = new WeeklyReportQueryHandler(dailyOverviewMock.Object, Db, dateTimeProviderFake);
     }
 
     [Test]
@@ -27,6 +28,12 @@ public class WeeklyReportTest : DbMockTest
         var user1 = UserTestData.CreateDefaultUser(email: "test1@whoishome.dev");
         var user2 = UserTestData.CreateDefaultUser(email: "test2@whoishome.dev");
         DbMock.Setup(c => c.Users).ReturnsDbSet([user1, user2]);
+
+        var overview1 = new DailyOverview { User = user1 };
+        var overview2 = new DailyOverview { User = user2 };
+        dailyOverviewMock
+            .Setup(c => c.HandleAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([overview1, overview2]);
         
         // Act
         var result = await queryHandler.HandleAsync(CancellationToken.None);
@@ -38,7 +45,7 @@ public class WeeklyReportTest : DbMockTest
     }
 
     [Test]
-    public async Task ReturnsExpectedDailyOverview_WithOnlyOneTimeEvents()
+    public async Task ReturnsExpectedDailyOverview_FromGivenEventInstance()
     {
         // Arrange
         var expectedDinnerTime = new TimeOnly(20, 00, 00);
@@ -51,8 +58,12 @@ public class WeeklyReportTest : DbMockTest
             startTime: new TimeOnly(18, 00, 00),
             endTime: new TimeOnly(19, 00, 00), 
             dinnerTime: expectedDinnerTime);
+        evenInstance.User = user;
         
-        DbMock.Setup(c => c.EventInstances).ReturnsDbSet([evenInstance]);
+        var overview = DailyOverview.From(evenInstance);
+        dailyOverviewMock
+            .Setup(c => c.HandleAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([overview]);
         
         // Act
         var result = await queryHandler.HandleAsync(CancellationToken.None);
@@ -72,6 +83,11 @@ public class WeeklyReportTest : DbMockTest
         
         var user = UserTestData.CreateDefaultUser(email: "test@whoishome.dev");
         DbMock.Setup(c => c.Users).ReturnsDbSet([user]);
+        
+        var overview = DailyOverview.Empty(user);
+        dailyOverviewMock
+            .Setup(c => c.HandleAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([overview]);
         
         // Act
         var result = await queryHandler.HandleAsync(CancellationToken.None);

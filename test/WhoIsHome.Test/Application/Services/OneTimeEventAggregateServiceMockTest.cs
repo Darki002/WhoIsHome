@@ -47,8 +47,10 @@ public class EventServiceTest : DbMockTest
             List<EventInstance> result = [];
             
             DbMock.Setup(c =>
-                    c.EventInstances.AddRangeAsync(It.IsAny<List<EventInstance>>(), It.IsAny<CancellationToken>()))
-                .Callback<List<EventInstance>>(r => result = r);
+                    c.EventInstances.AddRangeAsync(
+                        It.IsAny<IEnumerable<EventInstance>>(), 
+                        It.IsAny<CancellationToken>()))
+                .Callback<IEnumerable<EventInstance>, CancellationToken>((r, _) => result = r.ToList());
             
             // Act
             await service.GenerateNewAsync(eventGroup, CancellationToken.None);
@@ -76,6 +78,8 @@ public class EventServiceTest : DbMockTest
                 startDate: dateTimeProvider.CurrentDate, 
                 endDate: dateTimeProvider.CurrentDate.AddDays(3),
                 weekDays: weekDays);
+
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([]);
             
             // Act
             await service.GenerateNewAsync(eventGroup, CancellationToken.None);
@@ -156,11 +160,11 @@ public class EventServiceTest : DbMockTest
 
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([event1, event2]);
             DbMock.Setup(c =>
-                    c.EventInstances.AddRangeAsync(It.IsAny<List<EventInstance>>(), It.IsAny<CancellationToken>()))
-                .Callback<List<EventInstance>>(r => result = r);
+                    c.EventInstances.AddRangeAsync(It.IsAny<IEnumerable<EventInstance>>(), It.IsAny<CancellationToken>()))
+                .Callback<IEnumerable<EventInstance>, CancellationToken>((r, _) => result = r.ToList());
             DbMock.Setup(c =>
-                    c.EventInstances.RemoveRange(It.IsAny<EventInstance[]>()))
-                .Callback<EventInstance[]>(r => deletes = r.ToList());
+                    c.EventInstances.RemoveRange(It.IsAny<IEnumerable<EventInstance>>()))
+                .Callback<IEnumerable<EventInstance>>(r => deletes = r.ToList());
             
             // Act
             await service.GenerateUpdateAsync(eventGroup, CancellationToken.None);
@@ -236,16 +240,16 @@ public class EventServiceTest : DbMockTest
         public async Task DeletesAllOriginalDates_FromGivenEventGroup()
         {
             // Arrange
-            var event1 = EventInstanceTestData.CreateDefault(isOriginal: false);
+            var event1 = EventInstanceTestData.CreateDefault(isOriginal: false, eventGroupId: 1);
             var date = new DateOnly(2024, 11, 29);
-            var event2 = EventInstanceTestData.CreateDefault(date: date);
+            var event2 = EventInstanceTestData.CreateDefault(date: date, eventGroupId: 1);
 
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([event1, event2]);
             
             List<EventInstance> deletes = [];
             DbMock.Setup(c =>
-                    c.EventInstances.RemoveRange(It.IsAny<EventInstance[]>()))
-                .Callback<EventInstance[]>(r => deletes = r.ToList());
+                    c.EventInstances.RemoveRange(It.IsAny<IEnumerable<EventInstance>>()))
+                .Callback<IEnumerable<EventInstance>>(r => deletes = r.ToList());
             
             // Act
             await service.DeleteAsync(1);

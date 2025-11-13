@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Moq;
 using Moq.EntityFrameworkCore;
 using WhoIsHome.Entities;
 using WhoIsHome.Services;
@@ -91,6 +92,7 @@ public class UserServiceTest : DbMockTest
             // Arrange
             var userName = string.Join("", Enumerable.Repeat('a', 40));
             var user = UserTestData.CreateDefaultUser(userName: userName);
+            DbMock.Setup(c => c.Users).ReturnsDbSet([]);
 
             // Act
             var result = await service.CreateUserAsync(
@@ -110,13 +112,18 @@ public class UserServiceTest : DbMockTest
             // Arrange
             const string password = "test";
             var user = UserTestData.CreateDefaultUser(password: password);
+            DbMock.Setup(c => c.Users).ReturnsDbSet([]);
+            DbMock.AddChangeTracking(c => c.Users.Add(It.IsAny<User>()));
 
             // Act
-            await service.CreateUserAsync(user.UserName, user.Email, user.Password, CancellationToken.None);
+            var result = await service.CreateUserAsync(user.UserName, user.Email, user.Password, CancellationToken.None);
 
             // Assert
-            Db.Users.Single().Password.Should().NotBeNullOrEmpty();
-            Db.Users.Single().Password.Should().NotBe(password);
+            var errors = string.Join(", ", result.ValidationErrors.Select(e => e.Message));
+            result.HasErrors.Should().BeFalse("Not expected Validation Errors: {0}", errors);
+            result.Value.Should().NotBeNull();
+            result.Result.Password.Should().NotBeNullOrEmpty();
+            result.Result.Password.Should().NotBe(password);
         }
 
         [Test]
@@ -124,15 +131,18 @@ public class UserServiceTest : DbMockTest
         {
             // Arrange
             var user = UserTestData.CreateDefaultUser();
+            DbMock.Setup(c => c.Users).ReturnsDbSet([]);
+            DbMock.AddChangeTracking(c => c.Users.Add(It.IsAny<User>()), e => { e.Id = 42; });
 
             // Act
-            await service.CreateUserAsync(user.UserName, user.Email, user.Password, CancellationToken.None);
+            var result = await service.CreateUserAsync(user.UserName, user.Email, user.Password, CancellationToken.None);
 
             // Asser
-            var newUser = Db.Users.Single();
-            newUser.Id.Should().Be(1);
-            newUser.UserName.Should().Be(user.UserName);
-            newUser.Email.Should().Be(user.Email);
+            result.HasErrors.Should().BeFalse();
+            result.Value.Should().NotBeNull();
+            result.Result.Id.Should().Be(42);
+            result.Result.UserName.Should().Be(user.UserName);
+            result.Result.Email.Should().Be(user.Email);
         }
     }
 }

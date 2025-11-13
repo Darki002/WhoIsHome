@@ -40,10 +40,9 @@ public class RefreshTokenService(WhoIsHomeContext context, IDateTimeProvider dat
         var newRefreshToken = await CreateTokenAsync(result.Value.UserId, cancellationToken);
 
         context.RefreshTokens.Update(result.Value);
-        var dbToken = await context.RefreshTokens.AddAsync(newRefreshToken, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
         
-        return new ValidRefreshTokenResult(dbToken.Entity, null);
+        return new ValidRefreshTokenResult(newRefreshToken, null);
     }
 
     public async Task LogOutAsync(int userId, CancellationToken cancellationToken)

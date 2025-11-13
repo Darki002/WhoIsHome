@@ -24,6 +24,7 @@ public class UserOverviewTest : DbMockTest
         var user1 = UserTestData.CreateDefaultUser();
         var user2 = UserTestData.CreateDefaultUser(id: 2);
         DbMock.Setup(c => c.Users).ReturnsDbSet([user1, user2]);
+        DbMock.Setup(c => c.EventInstances).ReturnsDbSet([]);
 
         // Act
         var result = await queryHandler.HandleAsync(1, CancellationToken.None);
