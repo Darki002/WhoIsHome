@@ -150,8 +150,8 @@ public class EventServiceTest : DbMockTest
             List<EventInstance> deletes = [];
 
             var event1 = EventInstanceTestData.CreateDefault(
-                date: new DateOnly(2024, 11, 27), 
-                originalDate: new DateOnly(2024, 11, 28), 
+                date: new DateOnly(2024, 11, 28), 
+                originalDate: new DateOnly(2024, 11, 27), 
                 dinnerTime: new TimeOnly(19, 00), 
                 isOriginal: false);
 
@@ -183,6 +183,7 @@ public class EventServiceTest : DbMockTest
             const string newTitle = "new";
             const WeekDay weekDays = WeekDay.Wednesday;
             var eventGroup = EventGroupTestData.CreateDefault(
+                title: newTitle,
                 startDate: dateTimeProvider.CurrentDate,
                 endDate: dateTimeProvider.CurrentDate.AddDays(4),
                 weekDays: weekDays);
