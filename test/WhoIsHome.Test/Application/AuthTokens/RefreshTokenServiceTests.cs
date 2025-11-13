@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.EntityFrameworkCore;
@@ -25,14 +26,23 @@ public class RefreshTokenServiceTests : DbMockTest
         [Test]
         public async Task SaveNewTokenToDb()
         {
+            // Arrange
+            DbMock.Setup(c => c.RefreshTokens).ReturnsDbSet([]);
+
+            DbMock.Setup(c => c.RefreshTokens.AddAsync(It.IsAny<RefreshToken>(), It.IsAny<CancellationToken>()))
+                .Returns<RefreshToken, CancellationToken>((t, _) =>
+                {
+                    var result = new EntityEntryFake<RefreshToken>(t);
+                    t.Id = 1;
+                    return ValueTask.FromResult<EntityEntry<RefreshToken>>(result);
+                });
+            
             // Act
             var result = await service.CreateTokenAsync(1, CancellationToken.None);
             
             // Assert
             result.Id.Should().Be(1);
-            Db.RefreshTokens.Should().HaveCount(1);
-            Db.RefreshTokens.Single().Id.Should().Be(1);
-            Db.RefreshTokens.Single().UserId.Should().Be(1);
+            result.UserId.Should().Be(1);
         }
     }
     
