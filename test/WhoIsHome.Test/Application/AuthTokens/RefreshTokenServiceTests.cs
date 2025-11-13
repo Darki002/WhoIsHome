@@ -29,13 +29,11 @@ public class RefreshTokenServiceTests : DbMockTest
             // Arrange
             DbMock.Setup(c => c.RefreshTokens).ReturnsDbSet([]);
 
-            DbMock.Setup(c => c.RefreshTokens.AddAsync(It.IsAny<RefreshToken>(), It.IsAny<CancellationToken>()))
-                .Returns<RefreshToken, CancellationToken>((t, _) =>
-                {
-                    var result = new EntityEntryFake<RefreshToken>(t);
-                    t.Id = 1;
-                    return ValueTask.FromResult<EntityEntry<RefreshToken>>(result);
-                });
+            DbMock.AddChangeTrackingWithCt(
+                c => c.RefreshTokens.AddAsync(
+                    It.IsAny<RefreshToken>(),
+                    It.IsAny<CancellationToken>()),
+                e => { e.Id = 1; });
             
             // Act
             var result = await service.CreateTokenAsync(1, CancellationToken.None);
