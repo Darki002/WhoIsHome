@@ -282,8 +282,8 @@ public class EventServiceTest : DbMockTest
         {
             // Arrange
             var date = new DateOnly(2024, 11, 29);
-            var event1 = EventInstanceTestData.CreateDefault(id: 1, date: new DateOnly(2024, 11, 28));
-            var event2 = EventInstanceTestData.CreateDefault(id: 2, date: date);
+            var event1 = EventInstanceTestData.CreateDefault(id: 1, date: date, eventGroupId: 3);
+            var event2 = EventInstanceTestData.CreateDefault(id: 2, date: date, eventGroupId: 4);
 
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([event1, event2]);
             
@@ -300,6 +300,7 @@ public class EventServiceTest : DbMockTest
             
             // Act
             var result = await service.EditSingleInstanceAsync(
+                eventGroupId: 4,
                 originalDate: date,
                 date: newDate,
                 startTime: newStartTime,
@@ -335,13 +336,14 @@ public class EventServiceTest : DbMockTest
             
             // Act
             var result = await service.EditSingleInstanceAsync(
+                eventGroupId: 3,
                 originalDate: new DateOnly(2020, 1, 1),
                 date: newDate,
                 startTime: newStartTime,
                 endTime: newEndTime,
                 presenceType: newPresenceType,
                 dinnerTime: newDinnerTime,
-                CancellationToken.None);
+                cancellationToken: CancellationToken.None);
             
             // Assert
             result.Should().NotBeNull();
@@ -356,8 +358,8 @@ public class EventServiceTest : DbMockTest
         {
             // Arrange
             var date = new DateOnly(2024, 11, 29);
-            var event1 = EventInstanceTestData.CreateDefault(id: 1, date: new DateOnly(2024, 11, 28));
-            var event2 = EventInstanceTestData.CreateDefault(id: 2, date: date);
+            var event1 = EventInstanceTestData.CreateDefault(id: 1, date: date, eventGroupId: 3);
+            var event2 = EventInstanceTestData.CreateDefault(id: 2, date: date, eventGroupId: 4);
 
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([event1, event2]);
             
@@ -367,7 +369,7 @@ public class EventServiceTest : DbMockTest
                 .Callback<EventInstance>(r => deletedEvent = r);
             
             // Act
-            await service.DeleteSingleInstanceAsync(date, CancellationToken.None);
+            await service.DeleteSingleInstanceAsync(4, date, CancellationToken.None);
             
             // Assert
             deletedEvent.Should().NotBeNull();

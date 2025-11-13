@@ -13,6 +13,7 @@ public interface IEventService
     Task DeleteAsync(int eventGroupId);
 
     Task<ValidationError?> EditSingleInstanceAsync(
+        int eventGroupId,
         DateOnly originalDate,
         DateOnly date,
         TimeOnly startTime,
@@ -21,5 +22,5 @@ public interface IEventService
         TimeOnly dinnerTime,
         CancellationToken cancellationToken);
 
-    Task DeleteSingleInstanceAsync(DateOnly date, CancellationToken cancellationToken);
+    Task DeleteSingleInstanceAsync(int eventGroupId, DateOnly date, CancellationToken cancellationToken);
 }

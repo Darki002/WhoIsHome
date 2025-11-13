@@ -124,15 +124,17 @@ public class EventService(
     }
 
     public async Task<ValidationError?> EditSingleInstanceAsync(
-        DateOnly originalDate, 
-        DateOnly date, 
-        TimeOnly startTime, 
-        TimeOnly endTime, 
-        PresenceType presenceType, 
+        int eventGroupId, 
+        DateOnly originalDate,
+        DateOnly date,
+        TimeOnly startTime,
+        TimeOnly endTime,
+        PresenceType presenceType,
         TimeOnly dinnerTime,
         CancellationToken cancellationToken)
     {
         var eventInstance = await context.EventInstances
+            .Where(e => e.EventGroupId == eventGroupId)
             .SingleOrDefaultAsync(e => e.Date == originalDate, cancellationToken);
 
         if (eventInstance is null)
@@ -152,9 +154,10 @@ public class EventService(
         return null;
     }
 
-    public async Task DeleteSingleInstanceAsync(DateOnly date, CancellationToken cancellationToken)
+    public async Task DeleteSingleInstanceAsync(int eventGroupId, DateOnly date, CancellationToken cancellationToken)
     {
         var eventInstance = await context.EventInstances
+            .Where(e => e.EventGroupId == eventGroupId)
             .SingleOrDefaultAsync(e => e.Date == date, cancellationToken);
 
         if (eventInstance is not null)
