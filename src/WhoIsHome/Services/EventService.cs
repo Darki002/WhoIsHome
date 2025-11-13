@@ -35,7 +35,7 @@ public class EventService(
             .ToListAsync(cancellationToken);
 
         var forDeletion = existingEvents.Where(e => e.IsOriginal);
-        context.RemoveRange(forDeletion);
+        context.EventInstances.RemoveRange(forDeletion);
 
         var editedEvents = existingEvents
             .Where(e => !e.IsOriginal)
