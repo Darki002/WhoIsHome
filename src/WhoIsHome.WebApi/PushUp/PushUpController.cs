@@ -56,9 +56,13 @@ public class PushUpController(
     {
         try
         {
-            return languageCode is not null
-                ? CultureInfo.GetCultureInfo(languageCode)
-                : fallback;
+            if (languageCode is not null)
+            {
+                return CultureInfo.GetCultureInfo(languageCode);
+            }
+
+            logger.LogWarning("There was no given language. Using fallback culture.");
+            return fallback;
         }
         catch
         {
