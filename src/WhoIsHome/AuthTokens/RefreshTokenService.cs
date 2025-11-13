@@ -16,7 +16,6 @@ public class RefreshTokenService(WhoIsHomeContext context, IDateTimeProvider dat
         {
             refreshToken = RefreshToken.Generate(userId, dateTimeProvider.Now);
             tokenExists = await context.RefreshTokens
-                .AsNoTracking()
                 .AnyAsync(t => t.Token == refreshToken.Token, cancellationToken: cancellationToken);
         } while (tokenExists);
         
@@ -65,7 +64,6 @@ public class RefreshTokenService(WhoIsHomeContext context, IDateTimeProvider dat
     private async Task<ValidRefreshTokenResult> GetValidRefreshToken(string tokenToCheck, CancellationToken cancellationToken)
     {
         var token = await context.RefreshTokens
-            .AsNoTracking()
             .SingleOrDefaultAsync(t => t.Token == tokenToCheck, cancellationToken);
         
         if (token is null)
