@@ -52,7 +52,7 @@ public class EventService(
             await eventUpdateHandler.HandleAsync(eventToday, EventUpdateHandler.UpdateAction.Update);
         }
     }
-
+    
     private List<EventInstance> GenerateFor(EventGroup eventGroup, HashSet<DateOnly> exceptions)
     {
         var endDate = dateTimeProvider.CurrentDate.StartOfWeek().AddDays(DaysToGenerateInAdvance);
@@ -61,17 +61,47 @@ public class EventService(
         {
             endDate = eventGroup.EndDate.Value;
         }
-
-        var result = new List<EventInstance>();
         
-        foreach (var currentDate in GetDatesUntil(eventGroup.StartDate, endDate, eventGroup.WeekDays))
+        return GenerateForDuration(
+            eventGroup: eventGroup, 
+            start: eventGroup.StartDate, 
+            end: endDate, 
+            exceptions: exceptions)
+            .ToList();
+    }
+    
+    public async Task GenerateNextAsync(EventGroup eventGroup, CancellationToken cancellationToken)
+    {
+        var existingEventDates = await context.EventInstances
+            .Where(e => e.EventGroupId == eventGroup.Id)
+            .Where(e => e.Date >= dateTimeProvider.CurrentDate)
+            .Select(e => e.OriginalDate)
+            .ToListAsync(cancellationToken);
+        
+        var today = dateTimeProvider.CurrentDate;
+        var result = GenerateForDuration(
+            eventGroup: eventGroup, 
+            start: today, 
+            end: today.AddDays(14), 
+            exceptions: existingEventDates.ToHashSet());
+        
+        await context.EventInstances.AddRangeAsync(result, cancellationToken);
+        await context.SaveChangesAsync(cancellationToken); 
+    }
+    
+    private static IEnumerable<EventInstance> GenerateForDuration(
+        EventGroup eventGroup, 
+        DateOnly start, 
+        DateOnly end,
+        HashSet<DateOnly> exceptions)
+    {
+        return GetDatesUntil(start, end, eventGroup.WeekDays)
+            .Except(exceptions)
+            .Select(CreateEvent);
+
+        EventInstance CreateEvent(DateOnly currentDate)
         {
-            if (exceptions.Contains(currentDate))
-            {
-                continue;
-            }
-            
-            var instance = new EventInstance
+            return new EventInstance
             {
                 Title = eventGroup.Title,
                 Date = currentDate,
@@ -84,11 +114,7 @@ public class EventService(
                 EventGroupId = eventGroup.Id,
                 UserId = eventGroup.UserId
             };
-
-            result.Add(instance);
         }
-
-        return result;
     }
     
     private static IEnumerable<DateOnly> GetDatesUntil(DateOnly startDate, DateOnly endDate, WeekDay weekDays)
@@ -166,4 +192,6 @@ public class EventService(
             await context.SaveChangesAsync(cancellationToken);
         }
     }
+
+    
 }

@@ -32,19 +32,6 @@ public static class ChangeTrackingExtansions
         });
     }
     
-    public static void AddChangeTrackingWithCt<TEntity>(
-        this Mock<WhoIsHomeContext> mock,
-        Expression<Func<WhoIsHomeContext, EntityEntry<TEntity>>> setup,
-        Action<TEntity>? edit = null) where TEntity : class
-    {
-        mock.Setup(setup).Returns<TEntity, CancellationToken>((t, _) =>
-        {
-            var result = new EntityEntryFake<TEntity>(t);
-            edit?.Invoke(t);
-            return result;
-        });
-    }
-    
     public static void AddChangeTracking<TEntity>(
         this Mock<WhoIsHomeContext> mock,
         Expression<Func<WhoIsHomeContext, ValueTask<EntityEntry<TEntity>>>> setup,

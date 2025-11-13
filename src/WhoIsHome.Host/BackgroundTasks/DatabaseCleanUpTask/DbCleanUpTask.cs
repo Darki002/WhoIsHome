@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using WhoIsHome.External.Database;
-using WhoIsHome.Services;
 using WhoIsHome.Shared.Helper;
 
 namespace WhoIsHome.Host.BackgroundTasks.DatabaseCleanUpTask;
@@ -18,7 +17,7 @@ public class DbCleanUpTask(
         while (!stoppingToken.IsCancellationRequested)
         {
             var now   = DateTime.Now;
-            var nextRun = CalculateNextRun(now, options.DayOfWeek, options.Time);
+            var nextRun = BackgroundTaskHelpers.CalculateNextRun(now, options.DayOfWeek, options.Time);
             var delay   = nextRun - now;
 
             logger.LogInformation("Next scheduled run: {NextRun} (in {Delay}).", nextRun, delay);
@@ -36,16 +35,6 @@ public class DbCleanUpTask(
                 logger.LogError(ex, "Cleanup failed; will retry next week.");
             }
         }
-    }
-    
-    private static DateTime CalculateNextRun(DateTime from, DayOfWeek day, TimeSpan at)
-    {
-        var current = (int)from.DayOfWeek;
-        var target  = (int)day;
-        var daysUntil = (target - current + 7) % 7;
-        if (daysUntil == 0 && from.TimeOfDay >= at) daysUntil = 7;
-
-        return from.Date.AddDays(daysUntil).Add(at);
     }
     
     private async Task RunDatabaseCleanupAsync(CancellationToken stoppingToken)
@@ -74,5 +63,12 @@ public class DbCleanUpTask(
         }
         
         logger.LogInformation("Deleted {Count} Event Groups older than {Cutoff}.", eventGroups.Count, cutoff);
+
+        var deleteCount = await db.EventInstances
+            .Where(e => e.EventGroup.EndDate == null)
+            .Where(e => e.Date < cutoff)
+            .ExecuteDeleteAsync(stoppingToken);
+        
+        logger.LogInformation("Deleted {Count} Event Instances from Event Groups with no end date.", deleteCount);
     }
 }

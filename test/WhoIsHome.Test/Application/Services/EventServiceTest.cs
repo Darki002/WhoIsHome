@@ -58,6 +58,7 @@ public class EventServiceTest : DbMockTest
             // Assert
             result.Should().HaveCount(4);
             result.Should().AllSatisfy(i => i.Date.Should().Be(i.OriginalDate));
+            result.Should().AllSatisfy(i => i.IsOriginal.Should().BeTrue());
             result[0].Date.Should().Be(new DateOnly(2024, 11, 29));
             result[1].Date.Should().Be(new DateOnly(2024, 12, 2));
             result[2].Date.Should().Be(new DateOnly(2024, 12, 6));
@@ -231,6 +232,52 @@ public class EventServiceTest : DbMockTest
                     It.Is<EventInstance>(e => e.Date == dateTimeProvider.CurrentDate), 
                     It.Is<EventUpdateHandler.UpdateAction>(a => a == EventUpdateHandler.UpdateAction.Update))
                 , Times.Exactly(1));
+        }
+    }
+
+    [TestFixture]
+    private class GenerateNextAsync : EventServiceTest
+    {
+        [Test]
+        public async Task GeneratesExpectedEventInstances_ForGivenEventGroup()
+        {
+            // Arrange
+            const WeekDay weekDays = WeekDay.Wednesday | WeekDay.Thursday;
+            var eventGroup = EventGroupTestData.CreateDefault(
+                startDate: dateTimeProvider.CurrentDate.AddDays(-7), 
+                endDate: dateTimeProvider.CurrentDate.AddDays(14), 
+                weekDays: weekDays);
+
+            var date1 = new DateOnly(2024, 11, 20);
+            var date2 = new DateOnly(2024, 11, 21);
+            var date3 = new DateOnly(2024, 11, 27);
+            var date4 = new DateOnly(2024, 11, 28);
+
+            var event1 = EventInstanceTestData.CreateDefault(date: date1);
+            var event2 = EventInstanceTestData.CreateDefault(date: date2);
+            var event3 = EventInstanceTestData.CreateDefault(date: date3.AddDays(-1), isOriginal: false, originalDate: date3);
+            var event4 = EventInstanceTestData.CreateDefault(date: date4);
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([event1, event2, event3, event4]);
+            
+            var expected1 = new DateOnly(2024, 12, 4);
+            var expected2 = new DateOnly(2024, 12, 5);
+            
+            List<EventInstance> result = [];
+            DbMock.Setup(c =>
+                    c.EventInstances.AddRangeAsync(
+                        It.IsAny<IEnumerable<EventInstance>>(), 
+                        It.IsAny<CancellationToken>()))
+                .Callback<IEnumerable<EventInstance>, CancellationToken>((r, _) => result = r.ToList());
+            
+            // Act
+            await service.GenerateNextAsync(eventGroup, CancellationToken.None);
+            
+            // Assert
+            result.Should().HaveCount(2);
+            result.Should().AllSatisfy(i => i.Date.Should().Be(i.OriginalDate));
+            result.Should().AllSatisfy(i => i.IsOriginal.Should().BeTrue());
+            result[0].Date.Should().Be(expected1);
+            result[1].Date.Should().Be(expected2);
         }
     }
 

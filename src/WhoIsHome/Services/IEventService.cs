@@ -10,6 +10,8 @@ public interface IEventService
 
     Task GenerateUpdateAsync(EventGroup eventGroup, CancellationToken cancellationToken);
 
+    Task GenerateNextAsync(EventGroup eventGroup, CancellationToken cancellationToken);
+
     Task DeleteAsync(int eventGroupId);
 
     Task<ValidationError?> EditSingleInstanceAsync(

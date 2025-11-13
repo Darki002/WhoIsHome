@@ -1,4 +1,5 @@
 ﻿using WhoIsHome.Host.BackgroundTasks.DatabaseCleanUpTask;
+using WhoIsHome.Host.BackgroundTasks.EventGeneration;
 using WhoIsHome.Host.BackgroundTasks.QueuedTasks;
 using WhoIsHome.Shared.BackgroundTasks;
 
@@ -13,6 +14,7 @@ public static class BackgroundTaskServiceProviderConfig
         
         services.Configure<DbCleanUpTaskOptions>(configuration.GetSection("DbCleanUp"));
         services.AddHostedService<DbCleanUpTask>();
+        services.AddHostedService<EventGeneratorTask>();
         
         return services;
     }
