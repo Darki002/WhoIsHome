@@ -19,9 +19,9 @@ public static class ServiceProviderConfig
 {
     public static IServiceCollection AddWhoIsHomeServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IEventGroupService, EventGroupService>();
         services.AddScoped<IUserService, UserService>();
-
+        services.AddScoped<IEventService, EventService>();
+        
         services.AddTransient<UserDayOverviewQueryHandler>();
         services.AddTransient<DailyOverviewQueryHandler>();
         services.AddTransient<UserOverviewQueryHandler>();

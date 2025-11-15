@@ -53,7 +53,7 @@ public class EventServiceTest : DbMockTest
                 .Callback<IEnumerable<EventInstance>, CancellationToken>((r, _) => result = r.ToList());
             
             // Act
-            await service.GenerateNewAsync(eventGroup, CancellationToken.None);
+            await service.GenerateNewAsync(eventGroup);
             
             // Assert
             result.Should().HaveCount(4);
@@ -83,7 +83,7 @@ public class EventServiceTest : DbMockTest
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([]);
             
             // Act
-            await service.GenerateNewAsync(eventGroup, CancellationToken.None);
+            await service.GenerateNewAsync(eventGroup);
             
             // Assert
             eventUpdateHandlerMock.Verify(
@@ -122,7 +122,7 @@ public class EventServiceTest : DbMockTest
                 .Callback<IEnumerable<EventInstance>>(r => deletes = r.ToList());
             
             // Act
-            await service.GenerateUpdateAsync(eventGroup, CancellationToken.None);
+            await service.GenerateUpdateAsync(eventGroup);
             
             // Assert
             deletes.Should().HaveCount(2);
@@ -168,7 +168,7 @@ public class EventServiceTest : DbMockTest
                 .Callback<IEnumerable<EventInstance>>(r => deletes = r.ToList());
             
             // Act
-            await service.GenerateUpdateAsync(eventGroup, CancellationToken.None);
+            await service.GenerateUpdateAsync(eventGroup);
             
             // Assert
             deletes.Should().HaveCount(1);
@@ -204,7 +204,7 @@ public class EventServiceTest : DbMockTest
                 .Callback<IEnumerable<EventInstance>, CancellationToken>((r, _) => result = r.ToList());
             
             // Act
-            await service.GenerateUpdateAsync(eventGroup, CancellationToken.None);
+            await service.GenerateUpdateAsync(eventGroup);
             
             // Assert
             result.Should().HaveCount(1);
@@ -224,7 +224,7 @@ public class EventServiceTest : DbMockTest
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([]);
             
             // Act
-            await service.GenerateUpdateAsync(eventGroup, CancellationToken.None);
+            await service.GenerateUpdateAsync(eventGroup);
             
             // Assert
             eventUpdateHandlerMock.Verify(
@@ -323,109 +323,6 @@ public class EventServiceTest : DbMockTest
                     It.Is<EventInstance>(e => e.Date == dateTimeProvider.CurrentDate), 
                     It.Is<EventUpdateHandler.UpdateAction>(a => a == EventUpdateHandler.UpdateAction.Delete))
                 , Times.Exactly(1));
-        }
-    }
-
-    [TestFixture]
-    private class EditSingleInstanceAsync : EventServiceTest
-    {
-        [Test]
-        public async Task EditSingleEventInstance()
-        {
-            // Arrange
-            var date = new DateOnly(2024, 11, 29);
-            var event1 = EventInstanceTestData.CreateDefault(id: 1, date: date, eventGroupId: 3);
-            var event2 = EventInstanceTestData.CreateDefault(id: 2, date: date, eventGroupId: 4);
-
-            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([event1, event2]);
-            
-            EventInstance? editedEvent = null;
-            DbMock.Setup(c =>
-                    c.EventInstances.Update(It.IsAny<EventInstance>()))
-                .Callback<EventInstance>(r => editedEvent = r);
-
-            var newDate = new DateOnly(2024, 11, 30);
-            var newStartTime = new TimeOnly(18, 00);
-            var newEndTime = new TimeOnly(19, 00);
-            const PresenceType newPresenceType = PresenceType.Late;
-            var newDinnerTime = new TimeOnly(20, 00);
-            
-            // Act
-            var result = await service.EditSingleInstanceAsync(
-                eventGroupId: 4,
-                originalDate: date,
-                date: newDate,
-                startTime: newStartTime,
-                endTime: newEndTime,
-                presenceType: newPresenceType,
-                dinnerTime: newDinnerTime,
-                CancellationToken.None);
-            
-            // Assert
-            result.Should().BeNull();
-            editedEvent.Should().NotBeNull();
-            editedEvent!.Id.Should().Be(2);
-            editedEvent.OriginalDate.Should().Be(date);
-            editedEvent.IsOriginal.Should().BeFalse();
-            editedEvent.Date.Should().Be(newDate);
-            editedEvent.StartTime.Should().Be(newStartTime);
-            editedEvent.EndTime.Should().Be(newEndTime);
-            editedEvent.PresenceType.Should().Be(newPresenceType);
-            editedEvent.DinnerTime.Should().Be(newDinnerTime);
-        }
-        
-        [Test]
-        public async Task ReturnsValidationError_WhenNoEventInstanceMatchesGivenDate()
-        {
-            // Arrange
-            var newDate = new DateOnly(2024, 11, 30);
-            var newStartTime = new TimeOnly(18, 00);
-            var newEndTime = new TimeOnly(19, 00);
-            const PresenceType newPresenceType = PresenceType.Late;
-            var newDinnerTime = new TimeOnly(20, 00);
-            
-            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([]);
-            
-            // Act
-            var result = await service.EditSingleInstanceAsync(
-                eventGroupId: 3,
-                originalDate: new DateOnly(2020, 1, 1),
-                date: newDate,
-                startTime: newStartTime,
-                endTime: newEndTime,
-                presenceType: newPresenceType,
-                dinnerTime: newDinnerTime,
-                cancellationToken: CancellationToken.None);
-            
-            // Assert
-            result.Should().NotBeNull();
-        }
-    }
-    
-    [TestFixture]
-    private class DeleteSingleInstanceAsync : EventServiceTest
-    {
-        [Test]
-        public async Task DeletesSingleEventInstance()
-        {
-            // Arrange
-            var date = new DateOnly(2024, 11, 29);
-            var event1 = EventInstanceTestData.CreateDefault(id: 1, date: date, eventGroupId: 3);
-            var event2 = EventInstanceTestData.CreateDefault(id: 2, date: date, eventGroupId: 4);
-
-            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([event1, event2]);
-            
-            EventInstance? deletedEvent = null;
-            DbMock.Setup(c =>
-                    c.EventInstances.Remove(It.IsAny<EventInstance>()))
-                .Callback<EventInstance>(r => deletedEvent = r);
-            
-            // Act
-            await service.DeleteSingleInstanceAsync(4, date, CancellationToken.None);
-            
-            // Assert
-            deletedEvent.Should().NotBeNull();
-            deletedEvent!.Id.Should().Be(2);
         }
     }
 }

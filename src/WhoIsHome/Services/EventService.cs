@@ -15,11 +15,11 @@ public class EventService(
 {
     private const int DaysToGenerateInAdvance = 14;
     
-    public async Task GenerateNewAsync(EventGroup eventGroup, CancellationToken cancellationToken)
+    public async Task GenerateNewAsync(EventGroup eventGroup)
     {
         var newEvents = GenerateFor(eventGroup, []);
-        await context.EventInstances.AddRangeAsync(newEvents, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
+        await context.EventInstances.AddRangeAsync(newEvents);
+        await context.SaveChangesAsync();
 
         var eventToday = newEvents.SingleOrDefault(e => e.Date == dateTimeProvider.CurrentDate);
         if (eventToday is not null)
@@ -28,11 +28,11 @@ public class EventService(
         }
     }
 
-    public async Task GenerateUpdateAsync(EventGroup eventGroup, CancellationToken cancellationToken)
+    public async Task GenerateUpdateAsync(EventGroup eventGroup)
     {
         var existingEvents = await context.EventInstances
             .Where(e => e.EventGroupId == eventGroup.Id)
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
 
         var forDeletion = existingEvents.Where(e => e.IsOriginal);
         context.EventInstances.RemoveRange(forDeletion);
@@ -43,8 +43,8 @@ public class EventService(
             .ToHashSet();
 
         var updatedEvents = GenerateFor(eventGroup, editedEvents);
-        await context.EventInstances.AddRangeAsync(updatedEvents, cancellationToken);
-        await context.SaveChangesAsync(cancellationToken);
+        await context.EventInstances.AddRangeAsync(updatedEvents);
+        await context.SaveChangesAsync();
         
         var eventToday = updatedEvents.SingleOrDefault(e => e.Date == dateTimeProvider.CurrentDate);
         if (eventToday is not null)
@@ -148,50 +148,4 @@ public class EventService(
             await eventUpdateHandler.HandleAsync(eventFromToday, EventUpdateHandler.UpdateAction.Delete);
         }
     }
-
-    public async Task<ValidationError?> EditSingleInstanceAsync(
-        int eventGroupId, 
-        DateOnly originalDate,
-        DateOnly date,
-        TimeOnly startTime,
-        TimeOnly endTime,
-        PresenceType presenceType,
-        TimeOnly dinnerTime,
-        CancellationToken cancellationToken)
-    {
-        var eventInstance = await context.EventInstances
-            .Where(e => e.EventGroupId == eventGroupId)
-            .SingleOrDefaultAsync(e => e.Date == originalDate, cancellationToken);
-
-        if (eventInstance is null)
-        {
-            return new ValidationError($"No Event found with date {originalDate}.");
-        }
-        
-        eventInstance.Date = date;
-        eventInstance.StartTime = startTime;
-        eventInstance.EndTime = endTime;
-        eventInstance.PresenceType = presenceType;
-        eventInstance.DinnerTime = dinnerTime;
-        eventInstance.IsOriginal = false;
-
-        context.EventInstances.Update(eventInstance);
-        await context.SaveChangesAsync(cancellationToken);
-        return null;
-    }
-
-    public async Task DeleteSingleInstanceAsync(int eventGroupId, DateOnly date, CancellationToken cancellationToken)
-    {
-        var eventInstance = await context.EventInstances
-            .Where(e => e.EventGroupId == eventGroupId)
-            .SingleOrDefaultAsync(e => e.Date == date, cancellationToken);
-
-        if (eventInstance is not null)
-        {
-            context.EventInstances.Remove(eventInstance);
-            await context.SaveChangesAsync(cancellationToken);
-        }
-    }
-
-    
 }

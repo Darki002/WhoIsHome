@@ -6,23 +6,11 @@ namespace WhoIsHome.Services;
 
 public interface IEventService
 {
-    Task GenerateNewAsync(EventGroup eventGroup, CancellationToken cancellationToken);
+    Task GenerateNewAsync(EventGroup eventGroup);
 
-    Task GenerateUpdateAsync(EventGroup eventGroup, CancellationToken cancellationToken);
+    Task GenerateUpdateAsync(EventGroup eventGroup);
 
     Task GenerateNextAsync(EventGroup eventGroup, CancellationToken cancellationToken);
 
     Task DeleteAsync(int eventGroupId);
-
-    Task<ValidationError?> EditSingleInstanceAsync(
-        int eventGroupId,
-        DateOnly originalDate,
-        DateOnly date,
-        TimeOnly startTime,
-        TimeOnly endTime,
-        PresenceType presenceType,
-        TimeOnly dinnerTime,
-        CancellationToken cancellationToken);
-
-    Task DeleteSingleInstanceAsync(int eventGroupId, DateOnly date, CancellationToken cancellationToken);
 }
