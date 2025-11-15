@@ -1,11 +1,13 @@
 ﻿using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WhoIsHome.External.Database;
 using WhoIsHome.External.PushUp;
 using WhoIsHome.Shared.Authentication;
+using WhoIsHome.WebApi.Models;
 
 namespace WhoIsHome.WebApi.PushUp;
 
@@ -19,11 +21,13 @@ public class PushUpController(
     : Controller
 {
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Post([FromBody] PushUpSettingsDto pushUpSettings, CancellationToken cancellationToken)
     {
         if (TryConvert(pushUpSettings.LanguageCode, out var language))
         {
-            return BadRequest(new  { Error = $"Unknown Language Code {pushUpSettings.LanguageCode}." });
+            return BadRequest(new ErrorResponse { Errors = [$"Unknown Language Code {pushUpSettings.LanguageCode}."] });
         }
         
         var settings = await context.PushUpSettings.SingleOrDefaultAsync(s => s.UserId == userContext.UserId, cancellationToken);

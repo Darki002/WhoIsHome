@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Extensions.Configuration;
 using WhoIsHome.AuthTokens;
 using WhoIsHome.Entities;
 using WhoIsHome.External.PushUp;
+using WhoIsHome.Shared.Configurations;
 
 namespace WhoIsHome.External.Database;
 
@@ -101,8 +103,19 @@ public class WhoIsHomeContextFactory : IDesignTimeDbContextFactory<WhoIsHomeCont
 {
     public WhoIsHomeContext CreateDbContext(string[] args)
     {
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", false)
+            .AddJsonFile("appsettings.Development.json", true)
+            .Build();
+        
         var optionBuilder = new DbContextOptionsBuilder<WhoIsHomeContext>();
-        optionBuilder.UseMySQL("Server=localhost;Database=local-whoishome;User=root;Password=1234");
+        optionBuilder.UseMySQL(BuildConnectionString(configuration));
         return new WhoIsHomeContext(optionBuilder.Options);
+    }
+    
+    private static string BuildConnectionString(IConfiguration configuration)
+    {
+        var mysql = configuration.GetMySql();
+        return $"Server={mysql.Server};Port={mysql.Port};Database={mysql.Database};User={mysql.User};Password={mysql.Password};";
     }
 }

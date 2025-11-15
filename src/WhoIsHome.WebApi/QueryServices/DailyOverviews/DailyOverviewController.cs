@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.QueryHandler.DailyOverview;
 using WhoIsHome.Shared.Helper;
@@ -10,7 +11,8 @@ namespace WhoIsHome.WebApi.QueryServices.DailyOverviews;
 public class DailyOverviewController(DailyOverviewQueryHandler queryHandler, IDateTimeProvider dateTimeProvider) : Controller
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyCollection<DailyOverviewModel>>> GetAsync(
+    [ProducesResponseType<IReadOnlyCollection<DailyOverviewModel>>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAsync(
         CancellationToken cancellationToken)
     {
         var result = await queryHandler.HandleAsync(dateTimeProvider.CurrentDate, cancellationToken);

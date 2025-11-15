@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.QueryHandler.WeeklyReports;
 
@@ -9,7 +10,8 @@ namespace WhoIsHome.WebApi.QueryServices.WeeklyReports;
 public class WeeklyReportController(WeeklyReportQueryHandler queryHandler) : Controller
 {
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyCollection<WeeklyReportModel>>> GetAsync(CancellationToken cancellationToken)
+    [ProducesResponseType<IReadOnlyCollection<WeeklyReportModel>>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IActionResult>> GetAsync(CancellationToken cancellationToken)
     {
         var result = await queryHandler.HandleAsync(cancellationToken);
         

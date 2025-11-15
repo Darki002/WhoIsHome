@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Entities;
@@ -8,6 +9,7 @@ using WhoIsHome.Services;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
+using WhoIsHome.WebApi.Models;
 using WhoIsHome.WebApi.Models.Dto;
 using WhoIsHome.WebApi.Models.Response;
 
@@ -23,6 +25,8 @@ public class EventGroupController(
     IDateTimeProvider dateTimeProvider) : Controller
 {
     [HttpGet("{id:int}")]
+    [ProducesResponseType<EventGroupModel>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
         var result = await context.EventGroups
@@ -30,13 +34,15 @@ public class EventGroupController(
 
         if (result is null)
         {
-            return BadRequest(new { Error = $"EventGroup with id {id} not found." });
+            return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {id} not found."] });
         }
 
         return Ok(ToModel(result));
     }
     
     [HttpGet("{eventGroupId:int}/instance/{date:datetime}")]
+    [ProducesResponseType<EventInstanceModel>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetByIdAsync(int eventGroupId, DateTime date, CancellationToken cancellationToken)
     {
         var originalDate = DateOnly.FromDateTime(date);
@@ -46,13 +52,15 @@ public class EventGroupController(
 
         if (result is null)
         {
-            return BadRequest(new { Error = $"EventGroup with id {eventGroupId} did not contain a event at {originalDate}." });
+            return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {eventGroupId} did not contain a event at {originalDate}."] });
         }
 
         return Ok(ToModel(result));
     }
     
     [HttpPost]
+    [ProducesResponseType<EventGroupModel>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateEventAsync([FromBody] EventGroupModelDto eventModelDto,
         CancellationToken cancellationToken)
     {
@@ -70,7 +78,7 @@ public class EventGroupController(
         var validationResult = eventGroup.Validate();
         if (validationResult.Count > 0)
         {
-            return BadRequest(new { Error = validationResult.Select(e => e.Message) });
+            return BadRequest(new ErrorResponse { Errors = validationResult.Select(e => e.Message) });
         }
 
         var result = await context.EventGroups.AddAsync(eventGroup, cancellationToken);
@@ -81,6 +89,8 @@ public class EventGroupController(
     }
 
     [HttpPatch("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateEventAsync(
         int id,
         [FromBody] EventGroupModelDto dto,
@@ -90,7 +100,7 @@ public class EventGroupController(
         
         if (eventGroup is null)
         {
-            return BadRequest(new { Error = $"EventGroup with id {id} not found." });
+            return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {id} not found."] });
         }
 
         var regenerateEventInstances = false;
@@ -158,6 +168,8 @@ public class EventGroupController(
     }
 
     [HttpPatch("{eventGroupId:int}/instance/{date:datetime}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> EditEventInstance(
         int eventGroupId, 
         DateTime date, 
@@ -172,7 +184,7 @@ public class EventGroupController(
         
         if (eventInstance is null)
         {
-            return BadRequest(new { Error = $"EventGroup with id {eventGroupId} did not contain a event at {originalDate}." });
+            return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {eventGroupId} did not contain a event at {originalDate}."] });
         }
 
         var sendPushUp = eventInstance.Date == dateTimeProvider.CurrentDate;
@@ -219,6 +231,8 @@ public class EventGroupController(
     }
     
     [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteEventAsync(int id, CancellationToken cancellationToken)
     {
         var result = await context.EventGroups
@@ -226,12 +240,12 @@ public class EventGroupController(
 
         if (result is null)
         {
-            return BadRequest(new { Error = $"EventGroup with id {id} not found." });
+            return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {id} not found."] });
         }
 
         if (!userContext.IsUserPermitted(result.UserId))
         {
-            return BadRequest( new { Error = $"User with ID {result.UserId} is not allowed to delete or modify the content of {id}" });
+            return BadRequest( new ErrorResponse { Errors = [$"User with ID {result.UserId} is not allowed to delete or modify the content of {id}"] });
         }
 
         context.EventGroups.Remove(result);
@@ -241,6 +255,7 @@ public class EventGroupController(
     }
     
     [HttpDelete("{eventGroupId:int}/instance/{date:datetime}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> DeleteEventInstance(
         int eventGroupId, 
         DateTime date,

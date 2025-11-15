@@ -1,22 +1,25 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WhoIsHome.QueryHandler.UserOverview;
 using WhoIsHome.Shared.Authentication;
 
 namespace WhoIsHome.WebApi.QueryServices.UserOverviews;
 
-[Authorize]
-[Route("api/v1/quarries/user-overview")]
+[Authorize] 
+
 public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUserContext userContext) : Controller
 {
     [HttpGet]
-    public async Task<ActionResult<UserOverviewModel>> GetCurrentUserOverviewAsync(CancellationToken cancellationToken)
+    [ProducesResponseType<UserOverviewModel>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCurrentUserOverviewAsync(CancellationToken cancellationToken)
     {
         return await GetUserOverviewAsync(userContext.UserId, cancellationToken);
     }
 
     [HttpGet("{userId:int}")]
-    public async Task<ActionResult<UserOverviewModel>> GetUserOverviewAsync(int userId, CancellationToken cancellationToken)
+    [ProducesResponseType<UserOverviewModel>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetUserOverviewAsync(int userId, CancellationToken cancellationToken)
     {
         var result = await queryHandler.HandleAsync(userId, cancellationToken);
         return Ok(ToModel(result));
