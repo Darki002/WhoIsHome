@@ -36,6 +36,22 @@ public class EventGroupController(
         return Ok(ToModel(result));
     }
     
+    [HttpGet("{eventGroupId:int}/instance/{date:datetime}")]
+    public async Task<IActionResult> GetByIdAsync(int eventGroupId, DateTime date, CancellationToken cancellationToken)
+    {
+        var originalDate = DateOnly.FromDateTime(date);
+        var result = await context.EventInstances
+            .Where(e => e.EventGroupId == eventGroupId)
+            .SingleOrDefaultAsync(e => e.OriginalDate == originalDate, cancellationToken);
+
+        if (result is null)
+        {
+            return BadRequest($"EventGroup with id {eventGroupId} did not contain a event at {originalDate}.");
+        }
+
+        return Ok(ToModel(result));
+    }
+    
     [HttpPost]
     public async Task<IActionResult> CreateEventAsync([FromBody] EventGroupModelDto eventModelDto,
         CancellationToken cancellationToken)
@@ -156,7 +172,7 @@ public class EventGroupController(
         
         if (eventInstance is null)
         {
-            return BadRequest(new { Error = $"No Event found with date {eventGroupId}." });
+            return BadRequest($"EventGroup with id {eventGroupId} did not contain a event at {originalDate}.");
         }
 
         var sendPushUp = eventInstance.Date == dateTimeProvider.CurrentDate;
@@ -250,5 +266,10 @@ public class EventGroupController(
     private static ActionResult<EventGroupModel> ToModel(EventGroup result)
     {
         return EventGroupModel.From(result);
+    }
+    
+    private static ActionResult<EventInstanceModel> ToModel(EventInstance result)
+    {
+        return EventInstanceModel.From(result);
     }
 }
