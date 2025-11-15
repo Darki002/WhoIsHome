@@ -11,7 +11,7 @@ namespace WhoIsHome.External.PushUp;
 
 public class PushUpContext(
     PushApiClient client, 
-    IDbContextFactory<WhoIsHomeContext> contextFactory,
+    WhoIsHomeContext context,
     IConfiguration configuration,
     ITranslationService translation,
     ILogger<PushApiClient> logger) 
@@ -94,8 +94,6 @@ public class PushUpContext(
 
     private async Task<List<TranslationGroup>> GetExpoPushTokens(int[] userIds)
     {
-        var context = await contextFactory.CreateDbContextAsync();
-
         return (await context.PushUpSettings
                 .Where(t => userIds.Contains(t.UserId))
                 .Where(t => t.Token != null)

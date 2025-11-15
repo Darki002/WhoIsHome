@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace WhoIsHome.Host.Authentication;
 
+// ReSharper disable once UnusedType.Global
 public class UserContextActionFilter(UserContext userContext, ILogger<UserContextActionFilter> logger) : IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)

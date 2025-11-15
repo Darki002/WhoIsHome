@@ -43,9 +43,6 @@ app.UseCorsPolicy();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-        
-app.UseMiddleware<ApiKeyMiddleware>();
-app.UseMiddleware<UserContextActionFilter>();
 
 app.UseRouting();
 app.UseRateLimiter();

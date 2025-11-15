@@ -4,15 +4,16 @@ using WhoIsHome.Shared.Configurations;
 
 namespace WhoIsHome.Host.Authentication;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class ApiKeyMiddleware(IConfiguration configuration, ILogger<ApiKeyMiddleware> logger) : IAsyncAuthorizationFilter
 {
     public const string ApiKeyHeaderName = "X-API-KEY";
 
-    public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
+    public Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         if (context.HttpContext.Request.Path.StartsWithSegments("/health"))
         {
-            return;
+            return Task.CompletedTask;
         }
         
         if (!context.HttpContext.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
@@ -26,7 +27,7 @@ public class ApiKeyMiddleware(IConfiguration configuration, ILogger<ApiKeyMiddle
             };
 
             context.Result = new UnauthorizedObjectResult(error);
-            return;
+            return Task.CompletedTask;
         }
 
         var apiKey = configuration.GetApiKey();
@@ -42,5 +43,7 @@ public class ApiKeyMiddleware(IConfiguration configuration, ILogger<ApiKeyMiddle
 
             context.Result = new UnauthorizedObjectResult(error);
         }
+
+        return Task.CompletedTask;
     }
 }
