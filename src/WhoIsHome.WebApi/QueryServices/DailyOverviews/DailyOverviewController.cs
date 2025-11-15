@@ -6,6 +6,7 @@ using WhoIsHome.Shared.Helper;
 namespace WhoIsHome.WebApi.QueryServices.DailyOverviews;
 
 [Authorize]
+[Route("api/v1/quarries/daily-overview")]
 public class DailyOverviewController(DailyOverviewQueryHandler queryHandler, IDateTimeProvider dateTimeProvider) : Controller
 {
     [HttpGet]

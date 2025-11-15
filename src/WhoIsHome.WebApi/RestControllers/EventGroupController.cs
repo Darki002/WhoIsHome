@@ -14,7 +14,7 @@ using WhoIsHome.WebApi.Models.Response;
 namespace WhoIsHome.WebApi.RestControllers;
 
 [Authorize]
-[Route("event-group")]
+[Route("api/v1/event-group")]
 public class EventGroupController(
     IEventService eventService,
     IEventUpdateHandler eventUpdateHandler,
@@ -30,7 +30,7 @@ public class EventGroupController(
 
         if (result is null)
         {
-            return BadRequest($"EventGroup with id {id} not found.");
+            return BadRequest(new { Error = $"EventGroup with id {id} not found." });
         }
 
         return Ok(ToModel(result));
@@ -46,7 +46,7 @@ public class EventGroupController(
 
         if (result is null)
         {
-            return BadRequest($"EventGroup with id {eventGroupId} did not contain a event at {originalDate}.");
+            return BadRequest(new { Error = $"EventGroup with id {eventGroupId} did not contain a event at {originalDate}." });
         }
 
         return Ok(ToModel(result));
@@ -172,7 +172,7 @@ public class EventGroupController(
         
         if (eventInstance is null)
         {
-            return BadRequest($"EventGroup with id {eventGroupId} did not contain a event at {originalDate}.");
+            return BadRequest(new { Error = $"EventGroup with id {eventGroupId} did not contain a event at {originalDate}." });
         }
 
         var sendPushUp = eventInstance.Date == dateTimeProvider.CurrentDate;

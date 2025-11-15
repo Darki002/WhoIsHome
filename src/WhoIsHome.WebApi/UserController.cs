@@ -8,9 +8,10 @@ using WhoIsHome.WebApi.Models;
 namespace WhoIsHome.WebApi;
 
 [Authorize]
+[Route("api/v1/user")]
 public class UserController(IUserContext context, IUserService service) : Controller
 {
-    [HttpGet("Me")]
+    [HttpGet]
     public async Task<ActionResult<UserModel>> GetMe(CancellationToken cancellationToken)
     {
         return await GetUser(context.UserId, cancellationToken);

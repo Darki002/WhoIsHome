@@ -6,6 +6,7 @@ using WhoIsHome.Shared.Authentication;
 namespace WhoIsHome.WebApi.QueryServices.UserOverviews;
 
 [Authorize]
+[Route("api/v1/quarries/user-overview")]
 public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUserContext userContext) : Controller
 {
     [HttpGet]

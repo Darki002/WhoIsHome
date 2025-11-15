@@ -11,7 +11,7 @@ namespace WhoIsHome.WebApi.PushUp;
 
 [Authorize]
 [ApiController]
-[Route("api/v1/[controller]")]
+[Route("api/v1/push-up-settings")]
 public class PushUpController(
     IUserContext userContext,
     WhoIsHomeContext context,
@@ -23,7 +23,7 @@ public class PushUpController(
     {
         if (TryConvert(pushUpSettings.LanguageCode, out var language))
         {
-            return BadRequest(new  { Message = $"Unknown Language Code {pushUpSettings.LanguageCode}." });
+            return BadRequest(new  { Error = $"Unknown Language Code {pushUpSettings.LanguageCode}." });
         }
         
         var settings = await context.PushUpSettings.SingleOrDefaultAsync(s => s.UserId == userContext.UserId, cancellationToken);
@@ -48,7 +48,7 @@ public class PushUpController(
         }
 
         await context.SaveChangesAsync(cancellationToken);
-        return Ok("ExpoPushToken is saved.");
+        return Ok();
     }
 
     private bool TryConvert(string? languageCode, out CultureInfo? cultureInfo)

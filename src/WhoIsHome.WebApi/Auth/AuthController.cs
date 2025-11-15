@@ -10,7 +10,7 @@ using WhoIsHome.Shared.Authentication;
 namespace WhoIsHome.WebApi.Auth;
 
 [ApiController]
-[Route("api/v1/[controller]/[action]")]
+[Route("api/v1/auth")]
 public class AuthController(
     IUserService userService, 
     JwtTokenService jwtTokenService,
@@ -18,7 +18,7 @@ public class AuthController(
     IUserContext userContext,
     ILogger<AuthController> logger) : Controller
 {
-    [HttpPost]
+    [HttpPost("login")]
     [AllowAnonymous]
     public async Task<IActionResult> Login(LoginDto loginDto, CancellationToken cancellationToken)
     {
@@ -45,7 +45,7 @@ public class AuthController(
         return Ok(new { token.JwtToken, RefreshToken = token.RefreshToken });
     }
 
-    [HttpPost]
+    [HttpPost("register")]
     [AllowAnonymous]
     public async Task<IActionResult> Register(RegisterDto registerDto, CancellationToken cancellationToken)
     {
@@ -69,7 +69,7 @@ public class AuthController(
         return Ok(new { result.Result.Id });
     }
 
-    [HttpPost]
+    [HttpPost("refresh")]
     [Authorize]
     public async Task<IActionResult> Refresh([FromHeader(Name = "RefreshToken")] string refreshToken, CancellationToken cancellationToken)
     {
@@ -84,7 +84,7 @@ public class AuthController(
         return Ok(new { result.JwtToken, result.RefreshToken });
     }
 
-    [HttpPost]
+    [HttpPost("logout")]
     [Authorize]
     public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
