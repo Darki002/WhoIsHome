@@ -13,6 +13,8 @@ public record UserOverviewEventModel
     public required TimeOnly StartTime { get; init; }
 
     public TimeOnly? EndTime { get; init; }
+    
+    public bool HasRepetitions { get; set; }
 
     public required int TemplateId { get; init; }
 
@@ -25,7 +27,8 @@ public record UserOverviewEventModel
             Date = userOverviewEvent.NextDate,
             StartTime = userOverviewEvent.StartTime,
             EndTime = userOverviewEvent.EndTime,
-            TemplateId = userOverviewEvent.TemplateId
+            TemplateId = userOverviewEvent.TemplateId,
+            HasRepetitions = userOverviewEvent.HasRepetitions
         };
     }
 }

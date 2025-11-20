@@ -5,7 +5,7 @@ using WhoIsHome.Test.TestData;
 namespace WhoIsHome.Test.Application.QueryHandler;
 
 [TestFixture]
-public class UserOverviewTest : DbMockTest
+public class UserOverviewTest : DbMockTest // TODO: fix the problem with include EventGroup in DB Quarry
 {
     private readonly DateTimeProviderFake dateTimeProviderFake = new DateTimeProviderFake();
     

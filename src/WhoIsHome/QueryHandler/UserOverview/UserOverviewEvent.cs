@@ -12,5 +12,7 @@ public class UserOverviewEvent
     
     public required TimeOnly? EndTime { get; init; }
     
+    public bool HasRepetitions { get; set; }
+    
     public required int TemplateId { get; init; }
 }

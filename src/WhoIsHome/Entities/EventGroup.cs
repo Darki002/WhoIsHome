@@ -45,6 +45,8 @@ public class EventGroup()
 
     public List<EventInstance> Events { get; set; } = [];
     
+    public bool HasRepetitions => StartDate < EndDate;
+    
     public EventGroup(
         string title,
         DateOnly startDate,

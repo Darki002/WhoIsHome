@@ -12,11 +12,13 @@ public class UserOverviewQueryHandler(WhoIsHomeContext context, IDateTimeProvide
         var today = dateTimeProvider.CurrentDate;
 
         var eventList = await context.EventInstances
-                .Where(e => e.Date >= today)
-                .Where(e => e.UserId == userId)
-                .ToListAsync(cancellationToken);
+            .Include(e => e.EventGroup)
+            .Where(e => e.Date >= today)
+            .Where(e => e.UserId == userId)
+            .ToListAsync(cancellationToken);
 
-        var todaysEvents = eventList.Where(e => e.Date == dateTimeProvider.CurrentDate)
+        var todaysEvents = eventList
+            .Where(e => e.Date == dateTimeProvider.CurrentDate)
             .Select(ToUserOverview)
             .ToList();
 
@@ -47,13 +49,14 @@ public class UserOverviewQueryHandler(WhoIsHomeContext context, IDateTimeProvide
     }
 
     private static UserOverviewEvent ToUserOverview(EventInstance e) =>
-        new()
+        new UserOverviewEvent
         {
             Id = e.Id,
             Title = e.Title,
             NextDate = e.Date,
             StartTime = e.StartTime,
             EndTime = e.EndTime,
-            TemplateId = e.EventGroupId
+            TemplateId = e.EventGroupId,
+            HasRepetitions = e.EventGroup.HasRepetitions
         };
 }

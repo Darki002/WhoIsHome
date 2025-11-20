@@ -15,6 +15,36 @@ public class EventGroupTest
     private readonly TimeOnly startTime = new TimeOnly(13, 30, 0);
     private readonly TimeOnly endTime = new TimeOnly(14, 0, 0);
     private const WeekDay WeekDays = WeekDay.Monday | WeekDay.Wednesday;
+
+    [TestFixture]
+    private class HasRepetitions : EventGroupTest
+    {
+        [Test]
+        public void ReturnsFalse_WhenStartAndEndDateIsEqual()
+        {
+            // Arrange
+            var eventGroup = new EventGroup(Title, startDate, startDate, WeekDays, startTime, endTime, PresenceType, null, UserId);
+            
+            // Act
+            var result = eventGroup.HasRepetitions;
+            
+            // Assert
+            result.Should().BeFalse();
+        }
+        
+        [Test]
+        public void ReturnsFalse_WhenStartAndEndDateIsNotEqual()
+        {
+            // Arrange
+            var eventGroup = new EventGroup(Title, startDate, endDate, WeekDays, startTime, endTime, PresenceType, null, UserId);
+            
+            // Act
+            var result = eventGroup.HasRepetitions;
+            
+            // Assert
+            result.Should().BeTrue();
+        }
+    }
     
     [TestFixture]
     private class Validate : EventGroupTest
