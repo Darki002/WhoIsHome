@@ -6,7 +6,7 @@ using WhoIsHome.QueryHandler.WeeklyReports;
 namespace WhoIsHome.WebApi.QueryServices.WeeklyReports;
 
 [Authorize]
-[Route("api/v1/quarries/weekly-overview")]
+[Route("api/v1/quarries/weekly-report")]
 public class WeeklyReportController(WeeklyReportQueryHandler queryHandler) : Controller
 {
     [HttpGet]
