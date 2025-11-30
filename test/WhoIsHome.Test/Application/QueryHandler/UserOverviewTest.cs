@@ -5,7 +5,7 @@ using WhoIsHome.Test.TestData;
 namespace WhoIsHome.Test.Application.QueryHandler;
 
 [TestFixture]
-public class UserOverviewTest : DbMockTest // TODO: fix the problem with include EventGroup in DB Quarry
+public class UserOverviewTest : DbMockTest
 {
     private readonly DateTimeProviderFake dateTimeProviderFake = new DateTimeProviderFake();
     
@@ -39,11 +39,19 @@ public class UserOverviewTest : DbMockTest // TODO: fix the problem with include
         // Arrange
         var user = UserTestData.CreateDefaultUser();
         DbMock.Setup(c => c.Users).ReturnsDbSet([user]);
+
+        var eventGroup = EventGroupTestData.CreateDefault();
         
         var eventInstance1 = EventInstanceTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate);
         var eventInstance2 = EventInstanceTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(-1));
         var eventInstance3 = EventInstanceTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(1));
         var eventInstance4 = EventInstanceTestData.CreateDefault(title: "4", date: dateTimeProviderFake.CurrentDate);
+        
+        eventInstance1.EventGroup = eventGroup;
+        eventInstance2.EventGroup = eventGroup;
+        eventInstance3.EventGroup = eventGroup;
+        eventInstance4.EventGroup = eventGroup;
+        
         DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance1, eventInstance2, eventInstance3, eventInstance4]);
         
         // Act
@@ -62,10 +70,18 @@ public class UserOverviewTest : DbMockTest // TODO: fix the problem with include
         var user = UserTestData.CreateDefaultUser();
         DbMock.Setup(c => c.Users).ReturnsDbSet([user]);
         
+        var eventGroup = EventGroupTestData.CreateDefault();
+        
         var eventInstance1 = EventInstanceTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate);
         var eventInstance2 = EventInstanceTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(1));
         var eventInstance3 = EventInstanceTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(-1));
         var eventInstance4 = EventInstanceTestData.CreateDefault(title: "4", date: dateTimeProviderFake.CurrentDate.AddDays(1));
+        
+        eventInstance1.EventGroup = eventGroup;
+        eventInstance2.EventGroup = eventGroup;
+        eventInstance3.EventGroup = eventGroup;
+        eventInstance4.EventGroup = eventGroup;
+        
         DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance1, eventInstance2, eventInstance3, eventInstance4]);
         
         // Act
@@ -84,9 +100,16 @@ public class UserOverviewTest : DbMockTest // TODO: fix the problem with include
         var user = UserTestData.CreateDefaultUser();
         DbMock.Setup(c => c.Users).ReturnsDbSet([user]);
         
+        var eventGroup = EventGroupTestData.CreateDefault();
+        
         var eventInstance1 = EventInstanceTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate);
         var eventInstance2 = EventInstanceTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(-1));
         var eventInstance3 = EventInstanceTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(8));
+        
+        eventInstance1.EventGroup = eventGroup;
+        eventInstance2.EventGroup = eventGroup;
+        eventInstance3.EventGroup = eventGroup;
+        
         DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance1, eventInstance2, eventInstance3]);
         
         // Act
