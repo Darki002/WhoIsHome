@@ -103,19 +103,8 @@ public class WhoIsHomeContextFactory : IDesignTimeDbContextFactory<WhoIsHomeCont
 {
     public WhoIsHomeContext CreateDbContext(string[] args)
     {
-        var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", false)
-            .AddJsonFile("appsettings.Development.json", true)
-            .Build();
-        
         var optionBuilder = new DbContextOptionsBuilder<WhoIsHomeContext>();
-        optionBuilder.UseMySQL(BuildConnectionString(configuration));
+        optionBuilder.UseMySQL();
         return new WhoIsHomeContext(optionBuilder.Options);
-    }
-    
-    private static string BuildConnectionString(IConfiguration configuration)
-    {
-        var mysql = configuration.GetMySql();
-        return $"Server={mysql.Server};Port={mysql.Port};Database={mysql.Database};User={mysql.User};Password={mysql.Password};";
     }
 }

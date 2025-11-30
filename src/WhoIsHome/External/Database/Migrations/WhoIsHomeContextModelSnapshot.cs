@@ -7,7 +7,7 @@ using WhoIsHome.External.Database;
 
 #nullable disable
 
-namespace WhoIsHome.Migrations
+namespace WhoIsHome.External.Database.Migrations
 {
     [DbContext(typeof(WhoIsHomeContext))]
     partial class WhoIsHomeContextModelSnapshot : ModelSnapshot

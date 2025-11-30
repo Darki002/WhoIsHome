@@ -31,6 +31,7 @@
     
     <ItemGroup>
       <Folder Include="External\" />
+      <Folder Include="External\Database\Migrations\" />
     </ItemGroup>
     
     <ItemGroup>

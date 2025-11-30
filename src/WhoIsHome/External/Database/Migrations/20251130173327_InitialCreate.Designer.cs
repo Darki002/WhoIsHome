@@ -8,11 +8,11 @@ using WhoIsHome.External.Database;
 
 #nullable disable
 
-namespace WhoIsHome.Migrations
+namespace WhoIsHome.External.Database.Migrations
 {
     [DbContext(typeof(WhoIsHomeContext))]
-    [Migration("20251113164640_NewDataBaseSchema")]
-    partial class NewDataBaseSchema
+    [Migration("20251130173327_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

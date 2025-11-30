@@ -4,10 +4,10 @@ using MySql.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace WhoIsHome.Migrations
+namespace WhoIsHome.External.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class NewDataBaseSchema : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
