@@ -88,7 +88,7 @@ namespace WhoIsHome.External.Database.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EventTemplate");
+                    b.ToTable("EventGroup");
                 });
 
             modelBuilder.Entity("WhoIsHome.Entities.EventInstance", b =>

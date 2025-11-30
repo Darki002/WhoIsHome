@@ -32,7 +32,7 @@ namespace WhoIsHome.External.Database.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "EventTemplate",
+                name: "EventGroup",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -49,9 +49,9 @@ namespace WhoIsHome.External.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventTemplate", x => x.Id);
+                    table.PrimaryKey("PK_EventGroup", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EventTemplate_User_UserId",
+                        name: "FK_EventGroup_User_UserId",
                         column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "Id",
@@ -126,9 +126,9 @@ namespace WhoIsHome.External.Database.Migrations
                 {
                     table.PrimaryKey("PK_Event", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Event_EventTemplate_EventGroupId",
+                        name: "FK_Event_EventGroup_EventGroupId",
                         column: x => x.EventGroupId,
-                        principalTable: "EventTemplate",
+                        principalTable: "EventGroup",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -151,8 +151,8 @@ namespace WhoIsHome.External.Database.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_EventTemplate_UserId",
-                table: "EventTemplate",
+                name: "IX_EventGroup_UserId",
+                table: "EventGroup",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -191,7 +191,7 @@ namespace WhoIsHome.External.Database.Migrations
                 name: "RefreshToken");
 
             migrationBuilder.DropTable(
-                name: "EventTemplate");
+                name: "EventGroup");
 
             migrationBuilder.DropTable(
                 name: "User");

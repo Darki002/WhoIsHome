@@ -11,7 +11,7 @@ using WhoIsHome.External.Database;
 namespace WhoIsHome.External.Database.Migrations
 {
     [DbContext(typeof(WhoIsHomeContext))]
-    [Migration("20251130173327_InitialCreate")]
+    [Migration("20251130173426_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -91,7 +91,7 @@ namespace WhoIsHome.External.Database.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EventTemplate");
+                    b.ToTable("EventGroup");
                 });
 
             modelBuilder.Entity("WhoIsHome.Entities.EventInstance", b =>

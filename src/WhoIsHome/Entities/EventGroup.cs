@@ -7,7 +7,7 @@ using WhoIsHome.Validations;
 
 namespace WhoIsHome.Entities;
 
-[Table("EventTemplate")]
+[Table("EventGroup")]
 public class EventGroup()
 {
     [Key]
