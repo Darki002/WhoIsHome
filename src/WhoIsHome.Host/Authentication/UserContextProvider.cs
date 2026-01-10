@@ -4,11 +4,11 @@ using WhoIsHome.External.Database;
 
 namespace WhoIsHome.Host.Authentication;
 
-public class UserContext(WhoIsHomeContext context) : IUserContext
+internal class UserContextProvider(UserContextInfo userContextInfo, WhoIsHomeContext context) : IUserContextProvider
 {
     private AuthenticatedUser? authenticatedUserCache;
 
-    public int UserId { get; internal set; }
+    public int UserId => userContextInfo.UserId;
 
     public async Task<AuthenticatedUser> GetCurrentUserAsync(CancellationToken cancellationToken = default)
     {
@@ -31,4 +31,17 @@ public class UserContext(WhoIsHomeContext context) : IUserContext
     }
 
     public bool IsUserPermitted(int permittedUserId) => UserId == permittedUserId;
+
+    
+}
+
+internal class UserContextInfo
+{
+    private int? userId;
+    public int UserId => userId ?? throw new InvalidOperationException("UserId was not initialized.");
+    
+    internal void Init(int id)
+    {
+        userId = id;
+    }
 }

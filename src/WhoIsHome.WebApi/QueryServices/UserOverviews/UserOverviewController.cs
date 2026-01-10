@@ -8,13 +8,13 @@ namespace WhoIsHome.WebApi.QueryServices.UserOverviews;
 
 [Authorize] 
 [Route("api/v1/quarries/user-overview")]
-public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUserContext userContext) : Controller
+public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUserContextProvider userContextProvider) : Controller
 {
     [HttpGet]
     [ProducesResponseType<UserOverviewModel>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCurrentUserOverviewAsync(CancellationToken cancellationToken)
     {
-        return await GetUserOverviewAsync(userContext.UserId, cancellationToken);
+        return await GetUserOverviewAsync(userContextProvider.UserId, cancellationToken);
     }
 
     [HttpGet("{userId:int}")]

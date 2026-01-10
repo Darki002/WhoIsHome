@@ -52,6 +52,6 @@ public static class ServiceProviderConfig
     private static string BuildConnectionString(IConfiguration configuration)
     {
         var mysql = configuration.GetMySql();
-        return $"Server={mysql.Server};Port={mysql.Port};Database={mysql.Database};User={mysql.User};Password={mysql.Password};";
+        return $"Server={mysql.Server};Port={mysql.Port};Database={mysql.Database};User={mysql.User};Password={mysql.Password};SslMode=PREFERRED;";
     }
 }

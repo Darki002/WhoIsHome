@@ -17,7 +17,7 @@ public class AuthController(
     IUserService userService, 
     JwtTokenService jwtTokenService,
     IPasswordHasher<User> passwordHasher,
-    IUserContext userContext,
+    IUserContextProvider userContextProvider,
     ILogger<AuthController> logger) : Controller
 {
     [HttpPost("login")]
@@ -96,7 +96,7 @@ public class AuthController(
     [Authorize]
     public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
-        await jwtTokenService.LogOutAsync(userContext.UserId, cancellationToken);
+        await jwtTokenService.LogOutAsync(userContextProvider.UserId, cancellationToken);
         return Ok();
     }
 

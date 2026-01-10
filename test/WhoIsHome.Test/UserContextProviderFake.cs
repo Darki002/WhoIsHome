@@ -3,7 +3,7 @@ using WhoIsHome.Shared.Authentication;
 
 namespace WhoIsHome.Test;
 
-public class UserContextFake : IUserContext
+public class UserContextProviderFake : IUserContextProvider
 {
     private AuthenticatedUser authenticatedUser = null!;
 

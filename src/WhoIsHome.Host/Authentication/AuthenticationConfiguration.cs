@@ -6,14 +6,29 @@ using WhoIsHome.Shared.Configurations;
 
 namespace WhoIsHome.Host.Authentication;
 
-public static class JwtAuthentication
+public static class AuthenticationConfiguration
 {
-    public static IServiceCollection AddJwtAuthentication(this IServiceCollection services,
+    public static IServiceCollection AddWihAuthentication(this IServiceCollection services,
         IConfiguration configuration)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
         var secretKey = configuration.GetJwtSecretKey();
+        SetUpJwt(services, jwtSettings, secretKey);
 
+        services.AddScoped<ApiKeyMiddleware>();
+        services.AddScoped<UserContextMiddleware>();
+
+        return services;
+    }
+
+    public static void UseWihAuthentication(this WebApplication app)
+    {
+        app.UseMiddleware<ApiKeyMiddleware>();
+        app.UseMiddleware<UserContextMiddleware>();
+    }
+
+    private static void SetUpJwt(IServiceCollection services, IConfiguration jwtSettings, string secretKey)
+    {
         var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(secretKey));
 
         services.AddAuthentication(options =>
@@ -50,7 +65,5 @@ public static class JwtAuthentication
                     }
                 };
             });
-
-        return services;
     }
 }

@@ -21,7 +21,7 @@ public class EventGroupController(
     IEventService eventService,
     IEventUpdateHandler eventUpdateHandler,
     WhoIsHomeContext context, 
-    IUserContext userContext, 
+    IUserContextProvider userContextProvider, 
     IDateTimeProvider dateTimeProvider) : Controller
 {
     [HttpGet("{id:int}")]
@@ -73,7 +73,7 @@ public class EventGroupController(
             endTime: eventModelDto.EndTime, 
             presenceType: PresenceTypeHelper.FromString(eventModelDto.PresenceType),
             dinnerTime: eventModelDto.DinnerTime,
-            userId: userContext.UserId);
+            userId: userContextProvider.UserId);
 
         var validationResult = eventGroup.Validate();
         if (validationResult.Count > 0)
@@ -243,7 +243,7 @@ public class EventGroupController(
             return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {id} not found."] });
         }
 
-        if (!userContext.IsUserPermitted(result.UserId))
+        if (!userContextProvider.IsUserPermitted(result.UserId))
         {
             return BadRequest( new ErrorResponse { Errors = [$"User with ID {result.UserId} is not allowed to delete or modify the content of {id}"] });
         }

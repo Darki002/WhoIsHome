@@ -1,49 +1,37 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using WhoIsHome.Shared.Configurations;
+﻿using WhoIsHome.Shared.Configurations;
 
 namespace WhoIsHome.Host.Authentication;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class ApiKeyMiddleware(IConfiguration configuration, ILogger<ApiKeyMiddleware> logger) : IAsyncAuthorizationFilter
+public class ApiKeyMiddleware(IConfiguration configuration, ILogger<ApiKeyMiddleware> logger) : IMiddleware
 {
     public const string ApiKeyHeaderName = "X-API-KEY";
 
-    public Task OnAuthorizationAsync(AuthorizationFilterContext context)
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        if (context.HttpContext.Request.Path.StartsWithSegments("/health"))
+        if (context.Request.Path.StartsWithSegments("/health"))
         {
-            return Task.CompletedTask;
+            await next(context);
+            return;
         }
         
-        if (!context.HttpContext.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
+        if (!context.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
         {
             logger.LogWarning("No API Key  in request header!");
-            
-            var error = new
-            {
-                error = "Unauthorized",
-                message = "API Key is missing."
-            };
-
-            context.Result = new UnauthorizedObjectResult(error);
-            return Task.CompletedTask;
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await context.Response.WriteAsync("API Key is missing");
+            return;
         }
 
         var apiKey = configuration.GetApiKey();
         if (!apiKey.Equals(extractedApiKey))
         {
             logger.LogInformation("Unauthorized access with wrong API Key");
-            
-            var error = new
-            {
-                error = "Unauthorized",
-                message = "Unauthorized access (invalid API Key)."
-            };
-
-            context.Result = new UnauthorizedObjectResult(error);
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await context.Response.WriteAsync("Unauthorized access (invalid API Key).");
+            return;
         }
-
-        return Task.CompletedTask;
+        
+        await next(context);
     }
 }

@@ -15,7 +15,7 @@ namespace WhoIsHome.WebApi.PushUp;
 [ApiController]
 [Route("api/v1/push-up-settings")]
 public class PushUpController(
-    IUserContext userContext,
+    IUserContextProvider userContextProvider,
     WhoIsHomeContext context,
     ILogger<PushUpController> logger) 
     : Controller
@@ -30,7 +30,7 @@ public class PushUpController(
             return BadRequest(new ErrorResponse { Errors = [$"Unknown Language Code {pushUpSettings.LanguageCode}."] });
         }
         
-        var settings = await context.PushUpSettings.SingleOrDefaultAsync(s => s.UserId == userContext.UserId, cancellationToken);
+        var settings = await context.PushUpSettings.SingleOrDefaultAsync(s => s.UserId == userContextProvider.UserId, cancellationToken);
 
         if (settings is not null)
         {
@@ -44,7 +44,7 @@ public class PushUpController(
             var newSettings = new PushUpSettings
             {
                 Enabled = pushUpSettings.Enable ?? true,
-                UserId = userContext.UserId,
+                UserId = userContextProvider.UserId,
                 Token = pushUpSettings.Token,
                 LanguageCode = language
             };

@@ -9,12 +9,12 @@ namespace WhoIsHome.WebApi;
 
 [Authorize]
 [Route("api/v1/user")]
-public class UserController(IUserContext context, IUserService service) : Controller
+public class UserController(IUserContextProvider contextProvider, IUserService service) : Controller
 {
     [HttpGet]
     public async Task<ActionResult<UserModel>> GetMe(CancellationToken cancellationToken)
     {
-        return await GetUser(context.UserId, cancellationToken);
+        return await GetUser(contextProvider.UserId, cancellationToken);
     }
     
     [HttpGet("{id:int}")]

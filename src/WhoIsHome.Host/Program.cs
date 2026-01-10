@@ -16,7 +16,7 @@ builder.Services
     .AddCorsPolicy()
     .AddApplicationServices(builder.Configuration)
     .AddDataProtectionKey(builder.Configuration)
-    .AddJwtAuthentication(builder.Configuration);
+    .AddWihAuthentication(builder.Configuration);
 
 builder.Services.AddBackgroundTasks(builder.Configuration);
 builder.Services.Configure<HostOptions>(options =>
@@ -43,6 +43,7 @@ app.UseCorsPolicy();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseWihAuthentication();
 
 app.UseRouting();
 app.UseRateLimiter();
