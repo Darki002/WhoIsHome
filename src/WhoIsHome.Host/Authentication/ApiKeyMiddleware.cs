@@ -17,7 +17,7 @@ public class ApiKeyMiddleware(IConfiguration configuration, ILogger<ApiKeyMiddle
         
         if (!context.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
         {
-            logger.LogWarning("No API Key  in request header!");
+            logger.LogWarning("No API Key in request header!");
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
             await context.Response.WriteAsync("API Key is missing");
             return;

@@ -10,8 +10,8 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.AddLoggers();
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddHealthChecks();
-
 builder.Services
     .AddCorsPolicy()
     .AddApplicationServices(builder.Configuration)

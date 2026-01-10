@@ -14,11 +14,11 @@ internal class UserContextProvider : IUserContextProvider
     
     public int UserId => userId ?? throw new InvalidOperationException("UserId was not initialized.");
 
-    public UserContextProvider(HttpContext httpContext, WhoIsHomeContext whoIsHomeDbContext)
+    public UserContextProvider(IHttpContextAccessor httpContextAccessor, WhoIsHomeContext whoIsHomeDbContext)
     { 
         dbContext = whoIsHomeDbContext;
         
-        var idString = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var idString = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         userId = int.TryParse(idString, out var id) ? id : null;
     }
     
