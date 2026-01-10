@@ -1,15 +1,27 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.External.Database;
 
 namespace WhoIsHome.Host.Authentication;
 
-internal class UserContextProvider(UserContextInfo userContextInfo, WhoIsHomeContext context) : IUserContextProvider
+internal class UserContextProvider : IUserContextProvider
 {
+    private readonly int? userId;
+    private readonly WhoIsHomeContext dbContext;
+    
     private AuthenticatedUser? authenticatedUserCache;
+    
+    public int UserId => userId ?? throw new InvalidOperationException("UserId was not initialized.");
 
-    public int UserId => userContextInfo.UserId;
-
+    public UserContextProvider(HttpContext httpContext, WhoIsHomeContext whoIsHomeDbContext)
+    { 
+        dbContext = whoIsHomeDbContext;
+        
+        var idString = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        userId = int.TryParse(idString, out var id) ? id : null;
+    }
+    
     public async Task<AuthenticatedUser> GetCurrentUserAsync(CancellationToken cancellationToken = default)
     {
         if (authenticatedUserCache is not null)
@@ -17,31 +29,24 @@ internal class UserContextProvider(UserContextInfo userContextInfo, WhoIsHomeCon
             return authenticatedUserCache;
         }
 
-        var user = await context.Users.AsNoTracking().SingleAsync(u => u.Id == UserId, cancellationToken);
+        var user = await dbContext.Users
+            .AsNoTracking()
+            .SingleOrDefaultAsync(u => u.Id == UserId, cancellationToken);
+
+        if (user is null)
+        {
+            throw new InvalidOperationException($"User with id {UserId} not found.");
+        }
 
         authenticatedUserCache = new AuthenticatedUser
         {
             Id = user.Id,
             UserName = user.UserName,
-            Email = user.Email,
-            PasswordHash = user.Password
+            Email = user.Email
         };
         
         return authenticatedUserCache;
     }
 
     public bool IsUserPermitted(int permittedUserId) => UserId == permittedUserId;
-
-    
-}
-
-internal class UserContextInfo
-{
-    private int? userId;
-    public int UserId => userId ?? throw new InvalidOperationException("UserId was not initialized.");
-    
-    internal void Init(int id)
-    {
-        userId = id;
-    }
 }

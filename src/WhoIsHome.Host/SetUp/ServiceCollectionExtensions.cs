@@ -1,5 +1,4 @@
-﻿using WhoIsHome.External;
-using WhoIsHome.Host.Authentication;
+﻿using WhoIsHome.Host.Authentication;
 using WhoIsHome.Shared;
 using WhoIsHome.Shared.Authentication;
 using WhoIsHome.WebApi;
@@ -16,7 +15,6 @@ public static class ServiceCollectionExtensions
         services.AddControllers();
 
         services.AddHttpContextAccessor();
-        services.AddScoped<UserContextInfo>();
         services.AddScoped<IUserContextProvider, UserContextProvider>();
         
         services.AddWhoIsHomeServices(configuration)

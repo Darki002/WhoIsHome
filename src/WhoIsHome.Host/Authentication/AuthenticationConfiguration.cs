@@ -16,7 +16,6 @@ public static class AuthenticationConfiguration
         SetUpJwt(services, jwtSettings, secretKey);
 
         services.AddScoped<ApiKeyMiddleware>();
-        services.AddScoped<UserContextMiddleware>();
 
         return services;
     }
@@ -24,7 +23,6 @@ public static class AuthenticationConfiguration
     public static void UseWihAuthentication(this WebApplication app)
     {
         app.UseMiddleware<ApiKeyMiddleware>();
-        app.UseMiddleware<UserContextMiddleware>();
     }
 
     private static void SetUpJwt(IServiceCollection services, IConfiguration jwtSettings, string secretKey)
