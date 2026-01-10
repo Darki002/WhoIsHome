@@ -30,8 +30,7 @@ public class UserContextProviderFake : IUserContextProvider
         {
             Id = id,
             UserName = user.UserName,
-            Email = user.Email,
-            PasswordHash = user.Password
+            Email = user.Email
         };
     }
 }
