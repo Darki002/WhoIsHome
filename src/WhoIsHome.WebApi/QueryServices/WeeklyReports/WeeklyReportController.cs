@@ -11,7 +11,7 @@ public class WeeklyReportController(WeeklyReportQueryHandler queryHandler) : Con
 {
     [HttpGet]
     [ProducesResponseType<IReadOnlyCollection<WeeklyReportModel>>(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IActionResult>> GetAsync(CancellationToken cancellationToken)
+    public async Task<ActionResult<WeeklyReportModel>> GetAsync(CancellationToken cancellationToken)
     {
         var result = await queryHandler.HandleAsync(cancellationToken);
         
