@@ -3,6 +3,8 @@
     <File Path=".github/workflows/docker-publish.yml" />
     <File Path="Dockerfile" />
     <File Path="README.md" />
+    <File Path="Directory.Packages.props" />
+    <File Path="Directory.Build.props" />
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="test/WhoIsHome.Test/WhoIsHome.Test.csproj" />
