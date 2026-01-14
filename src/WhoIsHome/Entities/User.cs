@@ -6,7 +6,7 @@ using WhoIsHome.Validations;
 
 namespace WhoIsHome.Entities;
 
-[Table("User")]
+[Table("user")]
 [Index(nameof(Email), IsUnique = true)]
 public class User
 {

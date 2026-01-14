@@ -12,7 +12,7 @@ using WhoIsHome.External.Database;
 namespace WhoIsHome.External.Database.Migrations
 {
     [DbContext(typeof(WhoIsHomeContext))]
-    [Migration("20260114184208_InitialCreate")]
+    [Migration("20260114184817_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -98,7 +98,7 @@ namespace WhoIsHome.External.Database.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EventGroup");
+                    b.ToTable("vent_group");
                 });
 
             modelBuilder.Entity("WhoIsHome.Entities.EventInstance", b =>
@@ -147,7 +147,7 @@ namespace WhoIsHome.External.Database.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Event");
+                    b.ToTable("event");
                 });
 
             modelBuilder.Entity("WhoIsHome.Entities.User", b =>
@@ -178,7 +178,7 @@ namespace WhoIsHome.External.Database.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("User");
+                    b.ToTable("user");
                 });
 
             modelBuilder.Entity("WhoIsHome.External.PushUp.PushUpSettings", b =>

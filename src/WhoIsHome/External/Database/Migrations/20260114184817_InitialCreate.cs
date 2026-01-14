@@ -13,7 +13,7 @@ namespace WhoIsHome.External.Database.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "User",
+                name: "user",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -24,34 +24,7 @@ namespace WhoIsHome.External.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EventGroup",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Title = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    WeekDays = table.Column<int>(type: "integer", nullable: false),
-                    StartTime = table.Column<TimeSpan>(type: "interval", nullable: false),
-                    EndTime = table.Column<TimeSpan>(type: "interval", nullable: true),
-                    PresenceType = table.Column<int>(type: "integer", nullable: false),
-                    DinnerTime = table.Column<TimeSpan>(type: "interval", nullable: true),
-                    UserId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EventGroup", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_EventGroup_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_user", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -69,9 +42,9 @@ namespace WhoIsHome.External.Database.Migrations
                 {
                     table.PrimaryKey("PK_PushUpSetting", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PushUpSetting_User_UserId",
+                        name: "FK_PushUpSetting_user_UserId",
                         column: x => x.UserId,
-                        principalTable: "User",
+                        principalTable: "user",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -91,15 +64,42 @@ namespace WhoIsHome.External.Database.Migrations
                 {
                     table.PrimaryKey("PK_RefreshToken", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RefreshToken_User_UserId",
+                        name: "FK_RefreshToken_user_UserId",
                         column: x => x.UserId,
-                        principalTable: "User",
+                        principalTable: "user",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Event",
+                name: "vent_group",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Title = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    WeekDays = table.Column<int>(type: "integer", nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "interval", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "interval", nullable: true),
+                    PresenceType = table.Column<int>(type: "integer", nullable: false),
+                    DinnerTime = table.Column<TimeSpan>(type: "interval", nullable: true),
+                    UserId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_vent_group", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_vent_group_user_UserId",
+                        column: x => x.UserId,
+                        principalTable: "user",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "event",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -117,34 +117,29 @@ namespace WhoIsHome.External.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Event", x => x.Id);
+                    table.PrimaryKey("PK_event", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Event_EventGroup_EventGroupId",
-                        column: x => x.EventGroupId,
-                        principalTable: "EventGroup",
+                        name: "FK_event_user_UserId",
+                        column: x => x.UserId,
+                        principalTable: "user",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Event_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
+                        name: "FK_event_vent_group_EventGroupId",
+                        column: x => x.EventGroupId,
+                        principalTable: "vent_group",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Event_EventGroupId",
-                table: "Event",
+                name: "IX_event_EventGroupId",
+                table: "event",
                 column: "EventGroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Event_UserId",
-                table: "Event",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EventGroup_UserId",
-                table: "EventGroup",
+                name: "IX_event_UserId",
+                table: "event",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -164,17 +159,22 @@ namespace WhoIsHome.External.Database.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_User_Email",
-                table: "User",
+                name: "IX_user_Email",
+                table: "user",
                 column: "Email",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_vent_group_UserId",
+                table: "vent_group",
+                column: "UserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Event");
+                name: "event");
 
             migrationBuilder.DropTable(
                 name: "PushUpSetting");
@@ -183,10 +183,10 @@ namespace WhoIsHome.External.Database.Migrations
                 name: "RefreshToken");
 
             migrationBuilder.DropTable(
-                name: "EventGroup");
+                name: "vent_group");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "user");
         }
     }
 }

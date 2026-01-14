@@ -5,7 +5,7 @@ using WhoIsHome.Shared.Types;
 
 namespace WhoIsHome.Entities;
 
-[Table("Event")]
+[Table("event")]
 public class EventInstance
 {
     [Key]

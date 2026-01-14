@@ -95,7 +95,7 @@ namespace WhoIsHome.External.Database.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("EventGroup");
+                    b.ToTable("vent_group");
                 });
 
             modelBuilder.Entity("WhoIsHome.Entities.EventInstance", b =>
@@ -144,7 +144,7 @@ namespace WhoIsHome.External.Database.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Event");
+                    b.ToTable("event");
                 });
 
             modelBuilder.Entity("WhoIsHome.Entities.User", b =>
@@ -175,7 +175,7 @@ namespace WhoIsHome.External.Database.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("User");
+                    b.ToTable("user");
                 });
 
             modelBuilder.Entity("WhoIsHome.External.PushUp.PushUpSettings", b =>
