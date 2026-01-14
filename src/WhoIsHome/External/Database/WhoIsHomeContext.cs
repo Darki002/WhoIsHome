@@ -104,7 +104,7 @@ public class WhoIsHomeContextFactory : IDesignTimeDbContextFactory<WhoIsHomeCont
     public WhoIsHomeContext CreateDbContext(string[] args)
     {
         var optionBuilder = new DbContextOptionsBuilder<WhoIsHomeContext>();
-        optionBuilder.UseMySQL();
+        optionBuilder.UseNpgsql();
         return new WhoIsHomeContext(optionBuilder.Options);
     }
 }

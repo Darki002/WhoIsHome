@@ -9,7 +9,7 @@ public static class DataProtectionKeyExtension
     public static IServiceCollection AddDataProtectionKey(this IServiceCollection service, IConfiguration configuration)
     {
         var connectionString = BuildConnectionString(configuration);
-        service.AddDbContext<DataProtectionKeyContext>(c => c.UseMySQL(connectionString));
+        service.AddDbContext<DataProtectionKeyContext>(c => c.UseNpgsql(connectionString));
         service.AddDataProtection()
             .PersistKeysToDbContext<DataProtectionKeyContext>();
         
@@ -18,7 +18,7 @@ public static class DataProtectionKeyExtension
     
     private static string BuildConnectionString(IConfiguration configuration)
     {
-        var mysql = configuration.GetMySql();
-        return $"Server={mysql.Server};Port={mysql.Port};Database={mysql.Database};User={mysql.User};Password={mysql.Password};";
+        var mysql = configuration.GetDbConnectionInfo();
+        return $"Host={mysql.Host};Port={mysql.Port};Database={mysql.Database};Username={mysql.User};Password={mysql.Password};";
     }
 }

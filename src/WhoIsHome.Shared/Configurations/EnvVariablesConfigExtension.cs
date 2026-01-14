@@ -25,7 +25,7 @@ public static class EnvVariablesConfigExtension
     /// <summary>
     /// MySql Config Section
     /// </summary>
-    public static MySqlConfigSection GetMySql(this IConfiguration config) => new(config.GetSection("MYSQL"));
+    public static DbConnectionInfo GetDbConnectionInfo(this IConfiguration config) => new(config.GetSection("DB"));
 
     /// <summary>
     /// Key: PUSH_UP_ENABLED

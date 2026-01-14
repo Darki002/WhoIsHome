@@ -85,7 +85,7 @@ public class EventGroupController(
         await context.SaveChangesAsync(cancellationToken);
         
         await eventService.GenerateNewAsync(eventGroup); 
-        return Ok(ToModel(result.Entity));
+        return Ok(new { result.Entity.Id });
     }
 
     [HttpPatch("{id:int}")]

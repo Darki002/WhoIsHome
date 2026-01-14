@@ -39,7 +39,7 @@ public static class ServiceProviderConfig
         IConfiguration configuration)
     {
         var connectionString = BuildConnectionString(configuration);
-        services.AddDbContext<WhoIsHomeContext>(o => o.UseMySQL(connectionString));
+        services.AddDbContext<WhoIsHomeContext>(o => o.UseNpgsql(connectionString));
 
         services.AddSingleton<ITranslationService, TranslationService>();
         
@@ -51,7 +51,7 @@ public static class ServiceProviderConfig
     
     private static string BuildConnectionString(IConfiguration configuration)
     {
-        var mysql = configuration.GetMySql();
-        return $"Server={mysql.Server};Port={mysql.Port};Database={mysql.Database};User={mysql.User};Password={mysql.Password};SslMode=PREFERRED;";
+        var mysql = configuration.GetDbConnectionInfo();
+        return $"Host={mysql.Host};Port={mysql.Port};Database={mysql.Database};Username={mysql.User};Password={mysql.Password};";
     }
 }

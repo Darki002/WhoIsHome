@@ -2,13 +2,13 @@ using Microsoft.Extensions.Configuration;
 
 namespace WhoIsHome.Shared.Configurations;
 
-public class MySqlConfigSection(IConfigurationSection section)
+public class DbConnectionInfo(IConfigurationSection section)
 {
     /// <summary>
     /// Key: MYSQL__SERVER
     /// The SQL Server.
     /// </summary>
-    public string Server => section.GetString("SERVER");
+    public string Host => section.GetString("HOST");
     
     /// <summary>
     /// Key: MYSQL__PORT (optional)
