@@ -1,6 +1,6 @@
-﻿using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
+﻿using Swashbuckle.AspNetCore.SwaggerGen;
 using WhoIsHome.Host.Authentication;
+using Microsoft.OpenApi;
 
 namespace WhoIsHome.Host.SetUp;
 
@@ -16,11 +16,11 @@ public static class SwaggerExtensions
         return services;
     }
 
-    private static void AddJwt(this SwaggerGenOptions c)
+    private static void AddJwt(this SwaggerGenOptions options)
     {
-        c.SwaggerDoc("v1", new OpenApiInfo { Title = "JwtAuthApp API", Version = "v1" });
+        options.SwaggerDoc("v1", new OpenApiInfo { Title = "JwtAuthApp API", Version = "v1" });
 
-        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             Description = """
                           JWT Authorization header using the Bearer scheme. 
@@ -29,34 +29,22 @@ public static class SwaggerExtensions
                           """,
             Name = "Authorization",
             In = ParameterLocation.Header,
-            Type = SecuritySchemeType.ApiKey,
-            Scheme = "Bearer"
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT"
         });
-
-        c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+        
+        options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
         {
-            {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    },
-                    Scheme = "oauth2",
-                    Name = "Bearer",
-                    In = ParameterLocation.Header,
-                },
-                new List<string>()
-            }
+            [new OpenApiSecuritySchemeReference("bearer", document)] = []
         });
     }
 
-    private static void AddApiKey(this SwaggerGenOptions c)
+    private static void AddApiKey(this SwaggerGenOptions options)
     {
-        c.EnableAnnotations();
+        options.EnableAnnotations();
             
-        c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+        options.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
         {
             Description = "API Key needed to access the endpoints. API Key should be passed as a request header.",
             In = ParameterLocation.Header,
@@ -65,20 +53,9 @@ public static class SwaggerExtensions
             Scheme = "ApiKeyScheme"
         });
             
-        c.AddSecurityRequirement(new OpenApiSecurityRequirement
+        options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
         {
-            {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "ApiKey"
-                    },
-                    In = ParameterLocation.Header
-                },
-                new List<string>()
-            }
+            [new OpenApiSecuritySchemeReference("ApiKeyScheme", document)] = []
         });
     }
 }
