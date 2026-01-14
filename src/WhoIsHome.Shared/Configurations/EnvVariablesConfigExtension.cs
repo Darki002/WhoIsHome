@@ -23,7 +23,7 @@ public static class EnvVariablesConfigExtension
     }
 
     /// <summary>
-    /// MySql Config Section
+    /// DB Config Section
     /// </summary>
     public static DbConnectionInfo GetDbConnectionInfo(this IConfiguration config) => new(config.GetSection("DB"));
 

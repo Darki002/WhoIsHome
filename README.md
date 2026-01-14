@@ -14,11 +14,11 @@ For information about Authentication & Authorized read the following Documentati
 |----------------------|------------------------------------------------------------------------------------------------|---------------|
 | `JWT_SECRET_KEY`     | Key used for the JWT Authentication.                                                           | -             |
 | `API_KEY`            | API Key used by the middleware in every request to Authorized.                                 | -             |
-| `MYSQL__SERVER`      | The SQL Server.                                                                                | -             |
-| `MYSQL__PORT`        | Port for the Database.                                                                         | 3306          |
-| `MYSQL__DATABASE`    | Database that will be used by the Application.                                                 | WhoIsHome     |
-| `MYSQL__USER`        | The User that is being used by the app to connect to the db.                                   | root          |
-| `MYSQL__PASSWORD`    | The Password for the user that is being used by the app to connect to the db.                  | -             |
+| `DB__HOST`           | The SQL Server.                                                                                | -             |
+| `DB__PORT`           | Port for the Database.                                                                         | 3306          |
+| `DB__DATABASE`       | Database that will be used by the Application.                                                 | WhoIsHome     |
+| `DB__USER`           | The User that is being used by the app to connect to the db.                                   | root          |
+| `DB__PASSWORD`       | The Password for the user that is being used by the app to connect to the db.                  | -             |
 | `PUSH_UP_ENABLED`    | Enable or Disable the sending of Push Up Notifications                                         | false         |
 | `Sentry__Dsn`        | The Dsn that is used by Sentry Logger. If left empty it will disable Sentry Logger automaticly | empty string  |
 
