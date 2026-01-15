@@ -14,13 +14,13 @@ public class DbConnectionInfo(IConfigurationSection section)
     /// Key: DB__PORT (optional)
     /// Port for the Database.
     /// </summary>
-    public string Port => section.GetStringOrDefault("PORT", "3306");
+    public string Port => section.GetStringOrDefault("PORT", "5432");
     
     /// <summary>
     /// Key: DB__DATABASE (optional)
     /// Database that will be used by the Application.
     /// </summary>
-    public string Database => section.GetStringOrDefault("DATABASE", "WohIsHome");
+    public string Database => section.GetStringOrDefault("DATABASE", "WhoIsHome");
     
     /// <summary>
     /// Key: DB__USER
