@@ -19,6 +19,6 @@ public static class DataProtectionKeyExtension
     private static string BuildConnectionString(IConfiguration configuration)
     {
         var mysql = configuration.GetDbConnectionInfo();
-        return $"Host={mysql.Host};Port={mysql.Port};Database={mysql.Database};Username={mysql.User};Password={mysql.Password};GSSENCMode=Disable";
+        return $"Host={mysql.Host};Port={mysql.Port};Database={mysql.Database};Username={mysql.User};Password={mysql.Password}";
     }
 }
