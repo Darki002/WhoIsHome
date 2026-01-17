@@ -44,7 +44,7 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
         modelBuilder.Entity<EventGroup>()
             .Property(e => e.EndDate)
             .HasConversion(
-                d => d.HasValue ? d.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
+                d => d.HasValue ? d.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc) : (DateTime?)null,
                 d => d.HasValue ? DateOnly.FromDateTime(d.Value) : null);
     
         modelBuilder.Entity<EventGroup>()
