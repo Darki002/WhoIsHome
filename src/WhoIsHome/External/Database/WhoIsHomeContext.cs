@@ -2,11 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Microsoft.Extensions.Configuration;
 using WhoIsHome.AuthTokens;
 using WhoIsHome.Entities;
 using WhoIsHome.External.PushUp;
-using WhoIsHome.Shared.Configurations;
 
 namespace WhoIsHome.External.Database;
 
