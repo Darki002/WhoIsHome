@@ -29,7 +29,7 @@ public class WhoIsHomeContext(DbContextOptions<WhoIsHomeContext> options) : DbCo
         span => TimeOnly.FromTimeSpan(span));
 
     private static readonly ValueConverter<DateOnly, DateTime> DateOnlyConverter = new(
-        only => only.ToDateTime(TimeOnly.MinValue),
+        only => only.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc),
         dt => DateOnly.FromDateTime(dt));
 
     private static readonly ValueConverter<CultureInfo?, string?> CultureConverter = new(
