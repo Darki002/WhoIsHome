@@ -40,16 +40,16 @@ public static class AuthenticationConfiguration
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true, // Keep this to validate the token's Issuer
-                    ValidIssuer = jwtSettings["Issuer"], // Set your valid Issuer here
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings["Issuer"],
 
-                    ValidateAudience = true, // Keep this to validate the Audience
-                    ValidAudience = jwtSettings["Audience"], // Set your valid Audience here
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings["Audience"],
 
-                    ValidateLifetime = true, // Ensure the token has not expired
-                    ValidateIssuerSigningKey = true, // Ensure the signing key is valid and correctly configured
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
 
-                    IssuerSigningKey = new SymmetricSecurityKey(hmac.Key) // The key used for signing the token
+                    IssuerSigningKey = new SymmetricSecurityKey(hmac.Key)
                 };
 
                 // Enable token validation errors to be logged
