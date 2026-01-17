@@ -279,12 +279,12 @@ public class EventGroupController(
         return Ok();
     }
     
-    private static ActionResult<EventGroupModel> ToModel(EventGroup result)
+    private static EventGroupModel ToModel(EventGroup result)
     {
         return EventGroupModel.From(result);
     }
     
-    private static ActionResult<EventInstanceModel> ToModel(EventInstance result)
+    private static EventInstanceModel ToModel(EventInstance result)
     {
         return EventInstanceModel.From(result);
     }
