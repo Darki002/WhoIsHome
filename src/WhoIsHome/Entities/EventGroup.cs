@@ -76,7 +76,7 @@ public class EventGroup()
         {
             validationErrors.Add(new ValidationError("First occurrence must be before the last occurrence."));
         }
-        if (Title.Length >= 50)
+        if (string.IsNullOrWhiteSpace(Title) || Title.Length >= 50)
         {
             validationErrors.Add(new ValidationError("Title must be less then or equal to 50 characters long."));
         }
@@ -87,6 +87,10 @@ public class EventGroup()
         if (EndTime > DinnerTime)
         {
             validationErrors.Add(new ValidationError("Dinner Time must be later then the End Time of the Event."));
+        }
+        if (WeekDays == 0)
+        {
+            validationErrors.Add(new ValidationError("At least one day of the week must be selected."));
         }
 
         ValidatePresence(validationErrors);

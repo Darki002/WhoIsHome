@@ -12,7 +12,7 @@ public class EventGroupModelDto
 
     public TimeOnly? EndTime { get; set; }
     
-    public List<DayOfWeek> WeekDays { get; set; } = null!;
+    public List<DayOfWeek> WeekDays { get; set; } = [];
 
     public string PresenceType { get; set; } = null!;
 

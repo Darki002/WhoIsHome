@@ -61,7 +61,8 @@ public class EventGroupController(
     [HttpPost]
     [ProducesResponseType<EventGroupModel>(StatusCodes.Status200OK)]
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateEventAsync([FromBody] EventGroupModelDto eventModelDto,
+    public async Task<IActionResult> CreateEventAsync(
+        [FromBody] EventGroupModelDto eventModelDto,
         CancellationToken cancellationToken)
     {
         var eventGroup = new EventGroup(
