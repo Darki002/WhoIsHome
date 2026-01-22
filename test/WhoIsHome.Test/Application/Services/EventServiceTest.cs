@@ -325,4 +325,118 @@ public class EventServiceTest : DbMockTest
                 , Times.Exactly(1));
         }
     }
+
+    [TestFixture]
+    private class PredictNextAsync : EventServiceTest
+    {
+        [Test]
+        public async Task ReturnsOnlyEventsFromGivenGroup()
+        {
+            // Arrange
+            var eventGroup = EventGroupTestData.CreateDefault(weekDays: WeekDay.Tuesday);
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+
+            var eventInstance1 = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate);
+            var eventInstance2 = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate.AddDays(7));
+            var eventInstance3 = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate.AddDays(7), eventGroupId: 2);
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1, eventInstance3]);
+            
+            // Act
+            var result = await service.PredictNextAsync(1, 2);
+            
+            // Assert
+            result.Should().HaveCount(2);
+            result[0].Date.Should().Be(dateTimeProvider.CurrentDate);
+            result[1].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(7));
+        }
+        
+        [Test]
+        public async Task ReturnsEventsForNextTwoWeeks()
+        {
+            // Arrange
+            var eventGroup = EventGroupTestData.CreateDefault(weekDays: WeekDay.Tuesday);
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+
+            var eventInstance1 = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate);
+            var eventInstance2 = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate.AddDays(7));
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1]);
+            
+            // Act
+            var result = await service.PredictNextAsync(1, 2);
+            
+            // Assert
+            result.Should().HaveCount(2);
+            result[0].Date.Should().Be(dateTimeProvider.CurrentDate);
+            result[1].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(7));
+        }
+        
+        [Test]
+        public async Task ReturnsEventsForNextTwoWeeks_WhenEventIsModified()
+        {
+            // Arrange
+            var eventGroup = EventGroupTestData.CreateDefault(weekDays: WeekDay.Tuesday);
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+
+            var eventInstance1 = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate);
+            var eventInstance2 = EventInstanceTestData.CreateDefault(
+                date: dateTimeProvider.CurrentDate.AddDays(8), 
+                originalDate: dateTimeProvider.CurrentDate.AddDays(7));
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1]);
+            
+            // Act
+            var result = await service.PredictNextAsync(1, 2);
+            
+            // Assert
+            result.Should().HaveCount(2);
+            result[0].Date.Should().Be(dateTimeProvider.CurrentDate);
+            result[1].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(8));
+        }
+        
+        [Test]
+        public async Task ReturnsEventsForNextFourWeeks_EvenWhenNoInstancesAreInDb()
+        {
+            // Arrange
+            var eventGroup = EventGroupTestData.CreateDefault(weekDays: WeekDay.Tuesday);
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+
+            var eventInstance1 = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate);
+            var eventInstance2 = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate.AddDays(7));
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1]);
+            
+            // Act
+            var result = await service.PredictNextAsync(1, 4);
+            
+            // Assert
+            result.Should().HaveCount(4);
+            result[0].Date.Should().Be(dateTimeProvider.CurrentDate);
+            result[1].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(7));
+            result[2].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(14));
+            result[3].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(21));
+        }
+        
+        [Test]
+        public async Task ReturnsEventsForNextFourWeeks_WithCorrectInstanceWithModifications()
+        {
+            // Arrange
+            var eventGroup = EventGroupTestData.CreateDefault(weekDays: WeekDay.Tuesday);
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+
+            var eventInstance1 = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate);
+            var eventInstance2 = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate.AddDays(7));
+            var eventInstance3 = EventInstanceTestData.CreateDefault(
+                date: dateTimeProvider.CurrentDate.AddDays(22),
+                originalDate: dateTimeProvider.CurrentDate.AddDays(21));
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1, eventInstance3]);
+            
+            // Act
+            var result = await service.PredictNextAsync(1, 4);
+            
+            // Assert
+            result.Should().HaveCount(4);
+            result[0].Date.Should().Be(dateTimeProvider.CurrentDate);
+            result[1].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(7));
+            result[2].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(14));
+            result[3].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(22));
+        }
+    }
 }

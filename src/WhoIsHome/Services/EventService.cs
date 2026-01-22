@@ -148,4 +148,36 @@ public class EventService(
             await eventUpdateHandler.HandleAsync(eventFromToday, EventUpdateHandler.UpdateAction.Delete);
         }
     }
+
+    public async Task<IReadOnlyList<EventInstance>?> PredictNextAsync(int eventGroupId, int weeks)
+    {
+        var eventGroup = await context.EventGroups
+            .SingleOrDefaultAsync(e => e.Id == eventGroupId);
+
+        if (eventGroup is null)
+        {
+            return null; // TODO: what to do with this case...
+        }
+
+        var endDate = dateTimeProvider.CurrentDate.AddDays(7 * weeks);
+        
+        var result = await context.EventInstances
+            .Where(e => e.Date >= dateTimeProvider.CurrentDate)
+            .Where(e => e.Date < endDate)
+            .Where(e => e.EventGroupId == eventGroupId)
+            .OrderBy(e => e.Date)
+            .ToListAsync();
+
+        var dbDates = result.Select(e => e.OriginalDate).ToHashSet();
+        var predictedEvents = GenerateForDuration(
+            eventGroup: eventGroup, 
+            start: dateTimeProvider.CurrentDate, 
+            end: endDate.AddDays(-1),
+            exceptions: dbDates);
+        
+        return result
+            .Concat(predictedEvents)
+            .OrderBy(e => e.Date)
+            .ToList();
+    }
 }

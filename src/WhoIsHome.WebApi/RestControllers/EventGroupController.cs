@@ -39,6 +39,26 @@ public class EventGroupController(
 
         return Ok(ToModel(result));
     }
+
+    [HttpGet("{eventGroupId:int}/instance")]
+    [ProducesResponseType<IReadOnlyList<EventInstanceModel>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetInstancesAsync(
+        int eventGroupId, 
+        CancellationToken cancellationToken, 
+        [FromQuery] int weeks = 2)
+    {
+        if (weeks > 8)
+        {
+            return BadRequest(new ErrorResponse
+            {
+                Errors = ["Weeks query parameter exited limit of 8 weeks."]
+            });
+        }
+
+        var result = await eventService.PredictNextAsync(eventGroupId, weeks);
+        return Ok(/*TODO*/);
+    }
     
     [HttpGet("{eventGroupId:int}/instance/{date:datetime}")]
     [ProducesResponseType<EventInstanceModel>(StatusCodes.Status200OK)]
