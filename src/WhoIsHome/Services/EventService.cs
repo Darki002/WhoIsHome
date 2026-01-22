@@ -149,24 +149,16 @@ public class EventService(
         }
     }
 
-    public async Task<IReadOnlyList<EventInstance>?> PredictNextAsync(int eventGroupId, int weeks)
+    public async Task<IReadOnlyList<EventInstance>> PredictNextAsync(EventGroup eventGroup, int weeks, CancellationToken cancellationToken)
     {
-        var eventGroup = await context.EventGroups
-            .SingleOrDefaultAsync(e => e.Id == eventGroupId);
-
-        if (eventGroup is null)
-        {
-            return null; // TODO: what to do with this case...
-        }
-
         var endDate = dateTimeProvider.CurrentDate.AddDays(7 * weeks);
         
         var result = await context.EventInstances
             .Where(e => e.Date >= dateTimeProvider.CurrentDate)
             .Where(e => e.Date < endDate)
-            .Where(e => e.EventGroupId == eventGroupId)
+            .Where(e => e.EventGroupId == eventGroup.Id)
             .OrderBy(e => e.Date)
-            .ToListAsync();
+            .ToListAsync(cancellationToken: cancellationToken);
 
         var dbDates = result.Select(e => e.OriginalDate).ToHashSet();
         var predictedEvents = GenerateForDuration(

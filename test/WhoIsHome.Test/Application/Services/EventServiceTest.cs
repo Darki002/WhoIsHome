@@ -342,7 +342,7 @@ public class EventServiceTest : DbMockTest
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1, eventInstance3]);
             
             // Act
-            var result = await service.PredictNextAsync(1, 2);
+            var result = await service.PredictNextAsync(eventGroup, 2, CancellationToken.None);
             
             // Assert
             result.Should().HaveCount(2);
@@ -362,7 +362,7 @@ public class EventServiceTest : DbMockTest
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1]);
             
             // Act
-            var result = await service.PredictNextAsync(1, 2);
+            var result = await service.PredictNextAsync(eventGroup, 2, CancellationToken.None);
             
             // Assert
             result.Should().HaveCount(2);
@@ -384,7 +384,7 @@ public class EventServiceTest : DbMockTest
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1]);
             
             // Act
-            var result = await service.PredictNextAsync(1, 2);
+            var result = await service.PredictNextAsync(eventGroup, 2, CancellationToken.None);
             
             // Assert
             result.Should().HaveCount(2);
@@ -404,7 +404,7 @@ public class EventServiceTest : DbMockTest
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1]);
             
             // Act
-            var result = await service.PredictNextAsync(1, 4);
+            var result = await service.PredictNextAsync(eventGroup, 4, CancellationToken.None);
             
             // Assert
             result.Should().HaveCount(4);
@@ -429,7 +429,7 @@ public class EventServiceTest : DbMockTest
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1, eventInstance3]);
             
             // Act
-            var result = await service.PredictNextAsync(1, 4);
+            var result = await service.PredictNextAsync(eventGroup, 4, CancellationToken.None);
             
             // Assert
             result.Should().HaveCount(4);

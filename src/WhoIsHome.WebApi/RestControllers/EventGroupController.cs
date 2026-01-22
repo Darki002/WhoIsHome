@@ -56,8 +56,17 @@ public class EventGroupController(
             });
         }
 
-        var result = await eventService.PredictNextAsync(eventGroupId, weeks);
-        return Ok(/*TODO*/);
+        var eventGroup = await context.EventGroups
+            .SingleOrDefaultAsync(e => e.Id == eventGroupId, cancellationToken);
+        
+        if (eventGroup is null)
+        {
+            return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {eventGroupId} not found."] });
+        }
+        
+        var result = await eventService.PredictNextAsync(eventGroup, weeks, cancellationToken);
+        var model = result.Select(ToModel).ToList();
+        return Ok(model);
     }
     
     [HttpGet("{eventGroupId:int}/instance/{date:datetime}")]

@@ -14,5 +14,5 @@ public interface IEventService
 
     Task DeleteAsync(int eventGroupId);
     
-    Task<IReadOnlyList<EventInstance>?> PredictNextAsync(int eventGroupId, int weeks);
+    Task<IReadOnlyList<EventInstance>> PredictNextAsync(EventGroup eventGroup, int weeks, CancellationToken cancellationToken);
 }
