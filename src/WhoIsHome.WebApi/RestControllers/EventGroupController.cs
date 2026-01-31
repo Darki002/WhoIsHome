@@ -45,9 +45,12 @@ public class EventGroupController(
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetInstancesAsync(
         int eventGroupId, 
-        CancellationToken cancellationToken, 
+        CancellationToken cancellationToken,
+        [FromQuery] DateOnly? start = null,
         [FromQuery] int weeks = 2)
     {
+        start ??= dateTimeProvider.CurrentDate;
+        
         if (weeks > 8)
         {
             return BadRequest(new ErrorResponse
@@ -64,7 +67,7 @@ public class EventGroupController(
             return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {eventGroupId} not found."] });
         }
         
-        var result = await eventService.PredictNextAsync(eventGroup, weeks, cancellationToken);
+        var result = await eventService.PredictNextAsync(eventGroup, start.Value, weeks, cancellationToken);
         var model = result.Select(ToModel).ToList();
         return Ok(model);
     }

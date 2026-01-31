@@ -342,7 +342,7 @@ public class EventServiceTest : DbMockTest
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1, eventInstance3]);
             
             // Act
-            var result = await service.PredictNextAsync(eventGroup, 2, CancellationToken.None);
+            var result = await service.PredictNextAsync(eventGroup, dateTimeProvider.CurrentDate, 2, CancellationToken.None);
             
             // Assert
             result.Should().HaveCount(2);
@@ -362,7 +362,7 @@ public class EventServiceTest : DbMockTest
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1]);
             
             // Act
-            var result = await service.PredictNextAsync(eventGroup, 2, CancellationToken.None);
+            var result = await service.PredictNextAsync(eventGroup, dateTimeProvider.CurrentDate, 2, CancellationToken.None);
             
             // Assert
             result.Should().HaveCount(2);
@@ -384,7 +384,7 @@ public class EventServiceTest : DbMockTest
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1]);
             
             // Act
-            var result = await service.PredictNextAsync(eventGroup, 2, CancellationToken.None);
+            var result = await service.PredictNextAsync(eventGroup, dateTimeProvider.CurrentDate, 2, CancellationToken.None);
             
             // Assert
             result.Should().HaveCount(2);
@@ -404,7 +404,7 @@ public class EventServiceTest : DbMockTest
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1]);
             
             // Act
-            var result = await service.PredictNextAsync(eventGroup, 4, CancellationToken.None);
+            var result = await service.PredictNextAsync(eventGroup, dateTimeProvider.CurrentDate, 4, CancellationToken.None);
             
             // Assert
             result.Should().HaveCount(4);
@@ -429,7 +429,7 @@ public class EventServiceTest : DbMockTest
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1, eventInstance3]);
             
             // Act
-            var result = await service.PredictNextAsync(eventGroup, 4, CancellationToken.None);
+            var result = await service.PredictNextAsync(eventGroup, dateTimeProvider.CurrentDate, 4, CancellationToken.None);
             
             // Assert
             result.Should().HaveCount(4);
@@ -437,6 +437,33 @@ public class EventServiceTest : DbMockTest
             result[1].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(7));
             result[2].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(14));
             result[3].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(22));
+        }
+        
+        [Test]
+        public async Task ReturnsEventsForFourWeeks_StartingFromGivenDate_WithCorrectInstanceWithModifications()
+        {
+            // Arrange
+            var eventGroup = EventGroupTestData.CreateDefault(weekDays: WeekDay.Tuesday);
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+
+            var eventInstance1 = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate);
+            var eventInstance2 = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate.AddDays(7));
+            var eventInstance3 = EventInstanceTestData.CreateDefault(
+                date: dateTimeProvider.CurrentDate.AddDays(22),
+                originalDate: dateTimeProvider.CurrentDate.AddDays(21));
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance2, eventInstance1, eventInstance3]);
+            
+            // Act
+            var result = await service.PredictNextAsync(
+                eventGroup: eventGroup, 
+                start: dateTimeProvider.CurrentDate.AddDays(14),
+                weeks: 2,
+                cancellationToken: CancellationToken.None);
+            
+            // Assert
+            result.Should().HaveCount(2);
+            result[0].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(14));
+            result[1].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(22));
         }
     }
 }

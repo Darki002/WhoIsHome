@@ -4,7 +4,6 @@ using WhoIsHome.External.Database;
 using WhoIsHome.Handlers;
 using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
-using WhoIsHome.Validations;
 
 namespace WhoIsHome.Services;
 
@@ -149,12 +148,16 @@ public class EventService(
         }
     }
 
-    public async Task<IReadOnlyList<EventInstance>> PredictNextAsync(EventGroup eventGroup, int weeks, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<EventInstance>> PredictNextAsync(
+        EventGroup eventGroup, 
+        DateOnly start, 
+        int weeks,
+        CancellationToken cancellationToken)
     {
-        var endDate = dateTimeProvider.CurrentDate.AddDays(7 * weeks);
+        var endDate = start.AddDays(7 * weeks);
         
         var result = await context.EventInstances
-            .Where(e => e.Date >= dateTimeProvider.CurrentDate)
+            .Where(e => e.Date >= start)
             .Where(e => e.Date < endDate)
             .Where(e => e.EventGroupId == eventGroup.Id)
             .OrderBy(e => e.Date)
@@ -163,7 +166,7 @@ public class EventService(
         var dbDates = result.Select(e => e.OriginalDate).ToHashSet();
         var predictedEvents = GenerateForDuration(
             eventGroup: eventGroup, 
-            start: dateTimeProvider.CurrentDate, 
+            start: start, 
             end: endDate.AddDays(-1),
             exceptions: dbDates);
         
