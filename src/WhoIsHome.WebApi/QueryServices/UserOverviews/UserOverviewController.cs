@@ -30,9 +30,7 @@ public class UserOverviewController(UserOverviewQueryHandler queryHandler, IUser
         return new UserOverviewModel
         {
             UserId = data.User.Id,
-            Today = data.Today.Select(UserOverviewEventModel.From).ToList(),
-            ThisWeek = data.ThisWeek.Select(UserOverviewEventModel.From).ToList(),
-            FutureEvents = data.FutureEvents.Select(UserOverviewEventModel.From).ToList()
+            Events = data.Events.Select(UserOverviewEventModel.From).ToList(),
         };
     }
 }

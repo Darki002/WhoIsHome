@@ -24,18 +24,6 @@ public class EventGroupController(
     IUserContextProvider userContextProvider, 
     IDateTimeProvider dateTimeProvider) : Controller
 {
-    [HttpGet("active")]
-    [ProducesResponseType<IEnumerable<EventGroupModel>>(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken)
-    {
-        var result = await context.EventGroups
-            .Where(e => e.UserId == userContextProvider.UserId)
-            .Where(e => e.EndDate >= dateTimeProvider.CurrentDate)
-            .ToListAsync(cancellationToken);
-
-        return Ok(result.Select(ToModel));
-    }
-    
     [HttpGet("{id:int}")]
     [ProducesResponseType<EventGroupModel>(StatusCodes.Status200OK)]
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]

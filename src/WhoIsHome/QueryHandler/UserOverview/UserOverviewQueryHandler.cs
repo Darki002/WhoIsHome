@@ -11,30 +11,11 @@ public class UserOverviewQueryHandler(WhoIsHomeContext context, IDateTimeProvide
     {
         var today = dateTimeProvider.CurrentDate;
 
-        var eventList = await context.EventInstances
-            .Include(e => e.EventGroup)
-            .Where(e => e.Date >= today)
+        var eventList = await context.EventGroups
+            .Include(e => e.Events)
+            .Where(e => e.EndDate >= today)
             .Where(e => e.UserId == userId)
             .ToListAsync(cancellationToken);
-
-        var todaysEvents = eventList
-            .Where(e => e.Date == dateTimeProvider.CurrentDate)
-            .Select(ToUserOverview)
-            .ToList();
-
-        var futureEvents = eventList
-            .Where(e => e.Date > dateTimeProvider.CurrentDate)
-            .ToList();
-
-        var thisWeeksEvents = futureEvents
-            .Where(e => e.Date.IsSameWeek(dateTimeProvider.Now))
-            .Select(ToUserOverview)
-            .ToList();
-
-        var eventsAfterThisWeek = futureEvents
-            .Where(e => !e.Date.IsSameWeek(dateTimeProvider.Now))
-            .Select(ToUserOverview)
-            .ToList();
 
         var user = await context.Users
             .SingleAsync(u => u.Id == userId, cancellationToken);
@@ -42,21 +23,22 @@ public class UserOverviewQueryHandler(WhoIsHomeContext context, IDateTimeProvide
         return new UserOverview
         {
             User = user,
-            Today = todaysEvents,
-            ThisWeek = thisWeeksEvents,
-            FutureEvents = eventsAfterThisWeek
+            Events = eventList.Select(ToUserOverview).ToList()
         };
     }
 
-    private static UserOverviewEvent ToUserOverview(EventInstance e) =>
-        new UserOverviewEvent
+    private static UserOverviewEvent ToUserOverview(EventGroup eventGroup)
+    {
+        var nextDate = eventGroup.Events.MaxBy(e => e.Date)!.Date;
+
+        return new UserOverviewEvent
         {
-            Id = e.Id,
-            Title = e.Title,
-            NextDate = e.Date,
-            StartTime = e.StartTime,
-            EndTime = e.EndTime,
-            TemplateId = e.EventGroupId,
-            HasRepetitions = e.EventGroup.HasRepetitions
+            GroupId = eventGroup.Id,
+            Title = eventGroup.Title,
+            NextDate = nextDate,
+            StartTime = eventGroup.StartTime,
+            EndTime = eventGroup.EndTime,
+            HasRepetitions = eventGroup.HasRepetitions
         };
+    }
 }

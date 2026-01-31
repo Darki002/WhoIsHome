@@ -4,7 +4,7 @@ namespace WhoIsHome.WebApi.QueryServices.UserOverviews;
 
 public record UserOverviewEventModel
 {
-    public required int Id { get; init; }
+    public required int GroupId { get; init; }
 
     public required string Title { get; init; }
 
@@ -16,18 +16,15 @@ public record UserOverviewEventModel
     
     public bool HasRepetitions { get; set; }
 
-    public required int TemplateId { get; init; }
-
     public static UserOverviewEventModel From(UserOverviewEvent userOverviewEvent)
     {
         return new UserOverviewEventModel
         {
-            Id = userOverviewEvent.Id,
+            GroupId = userOverviewEvent.GroupId,
             Title = userOverviewEvent.Title,
             Date = userOverviewEvent.NextDate,
             StartTime = userOverviewEvent.StartTime,
             EndTime = userOverviewEvent.EndTime,
-            TemplateId = userOverviewEvent.TemplateId,
             HasRepetitions = userOverviewEvent.HasRepetitions
         };
     }
