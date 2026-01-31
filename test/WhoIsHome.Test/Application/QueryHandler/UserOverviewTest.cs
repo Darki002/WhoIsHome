@@ -24,7 +24,7 @@ public class UserOverviewTest : DbMockTest
         var user1 = UserTestData.CreateDefaultUser();
         var user2 = UserTestData.CreateDefaultUser(id: 2);
         DbMock.Setup(c => c.Users).ReturnsDbSet([user1, user2]);
-        DbMock.Setup(c => c.EventInstances).ReturnsDbSet([]);
+        DbMock.Setup(c => c.EventGroups).ReturnsDbSet([]);
 
         // Act
         var result = await queryHandler.HandleAsync(1, CancellationToken.None);
@@ -34,73 +34,13 @@ public class UserOverviewTest : DbMockTest
     }
 
     [Test]
-    public async Task ReturnsOverview_WithExpectedEvents_ForToday()
-    {
-        // Arrange
-        var user = UserTestData.CreateDefaultUser();
-        DbMock.Setup(c => c.Users).ReturnsDbSet([user]);
-
-        var eventGroup = EventGroupTestData.CreateDefault();
-        
-        var eventInstance1 = EventInstanceTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate);
-        var eventInstance2 = EventInstanceTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(-1));
-        var eventInstance3 = EventInstanceTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(1));
-        var eventInstance4 = EventInstanceTestData.CreateDefault(title: "4", date: dateTimeProviderFake.CurrentDate);
-        
-        eventInstance1.EventGroup = eventGroup;
-        eventInstance2.EventGroup = eventGroup;
-        eventInstance3.EventGroup = eventGroup;
-        eventInstance4.EventGroup = eventGroup;
-        
-        DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance1, eventInstance2, eventInstance3, eventInstance4]);
-        
-        // Act
-        var result = await queryHandler.HandleAsync(1, CancellationToken.None);
-        
-        // Assert
-        result.Today.Should().HaveCount(2);
-        result.Today.Should().ContainSingle(e => e.Title == "1");
-        result.Today.Should().ContainSingle(e => e.Title == "4");
-    }
-    
-    [Test]
-    public async Task ReturnsOverview_WithExpectedEvents_ForThisWeek()
+    public async Task ReturnsOverview_WithExpectedEvents()
     {
         // Arrange
         var user = UserTestData.CreateDefaultUser();
         DbMock.Setup(c => c.Users).ReturnsDbSet([user]);
         
-        var eventGroup = EventGroupTestData.CreateDefault();
-        
-        var eventInstance1 = EventInstanceTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate);
-        var eventInstance2 = EventInstanceTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(1));
-        var eventInstance3 = EventInstanceTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(-1));
-        var eventInstance4 = EventInstanceTestData.CreateDefault(title: "4", date: dateTimeProviderFake.CurrentDate.AddDays(1));
-        
-        eventInstance1.EventGroup = eventGroup;
-        eventInstance2.EventGroup = eventGroup;
-        eventInstance3.EventGroup = eventGroup;
-        eventInstance4.EventGroup = eventGroup;
-        
-        DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance1, eventInstance2, eventInstance3, eventInstance4]);
-        
-        // Act
-        var result = await queryHandler.HandleAsync(1, CancellationToken.None);
-        
-        // Assert
-        result.ThisWeek.Should().HaveCount(2);
-        result.ThisWeek.Should().ContainSingle(e => e.Title == "2");
-        result.ThisWeek.Should().ContainSingle(e => e.Title == "4");
-    }
-    
-    [Test]
-    public async Task ReturnsOverview_WithExpectedEvents_ForFutureEvents()
-    {
-        // Arrange
-        var user = UserTestData.CreateDefaultUser();
-        DbMock.Setup(c => c.Users).ReturnsDbSet([user]);
-        
-        var eventGroup = EventGroupTestData.CreateDefault();
+        var eventGroup = EventGroupTestData.CreateDefault(endDate: dateTimeProviderFake.CurrentDate.AddDays(8));
         
         var eventInstance1 = EventInstanceTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate);
         var eventInstance2 = EventInstanceTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(-1));
@@ -110,13 +50,85 @@ public class UserOverviewTest : DbMockTest
         eventInstance2.EventGroup = eventGroup;
         eventInstance3.EventGroup = eventGroup;
         
-        DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance1, eventInstance2, eventInstance3]);
+        eventGroup.Events = [eventInstance1, eventInstance2, eventInstance3];
+        DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
         
         // Act
         var result = await queryHandler.HandleAsync(1, CancellationToken.None);
         
         // Assert
-        result.FutureEvents.Should().HaveCount(1);
-        result.FutureEvents.Should().ContainSingle(e => e.Title == "3");
+        result.Events.Should().HaveCount(1);
+        result.Events.Should().ContainSingle(e => e.Title == eventGroup.Title);
+    }
+    
+    [Test]
+    public async Task ReturnsOverview_OnlyFromEventGroupsThatDidNotEndedYet()
+    {
+        // Arrange
+        var user = UserTestData.CreateDefaultUser();
+        DbMock.Setup(c => c.Users).ReturnsDbSet([user]);
+
+        var eventGroup = EventGroupTestData.CreateDefault(endDate: dateTimeProviderFake.CurrentDate.AddDays(1));
+        var eventGroup2 = EventGroupTestData.CreateDefault(endDate: dateTimeProviderFake.CurrentDate.AddDays(-1));
+
+        eventGroup.Events = [EventInstanceTestData.CreateDefault()];
+        
+        DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup, eventGroup2]);
+        
+        // Act
+        var result = await queryHandler.HandleAsync(1, CancellationToken.None);
+        
+        // Assert
+        result.Events.Should().HaveCount(1);
+        result.Events.Should().ContainSingle(e => e.Title == eventGroup.Title);
+    }
+    
+    [Test]
+    public async Task ReturnsOverview_WithNextDate_IsExpectedDate()
+    {
+        // Arrange
+        var user = UserTestData.CreateDefaultUser();
+        DbMock.Setup(c => c.Users).ReturnsDbSet([user]);
+        
+        var eventGroup = EventGroupTestData.CreateDefault(endDate: dateTimeProviderFake.CurrentDate.AddDays(8));
+        
+        var eventInstance1 = EventInstanceTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate);
+        var eventInstance2 = EventInstanceTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(-1));
+        var eventInstance3 = EventInstanceTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(8));
+        
+        eventGroup.Events = [eventInstance1, eventInstance2, eventInstance3];
+        DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+        
+        // Act
+        var result = await queryHandler.HandleAsync(1, CancellationToken.None);
+        
+        // Assert
+        result.Events.Should().HaveCount(1);
+        result.Events.Should().ContainSingle(e => e.Title == eventGroup.Title);
+        result.Events.Single().NextDate.Should().Be(dateTimeProviderFake.CurrentDate.AddDays(8));
+        result.Events.Single().HasRepetitions.Should().BeTrue();
+    }
+    
+    [Test]
+    public async Task ReturnsOverview_HasRepetitionIsFalse_WhenStartAndEndDateAreEqual()
+    {
+        // Arrange
+        var user = UserTestData.CreateDefaultUser();
+        DbMock.Setup(c => c.Users).ReturnsDbSet([user]);
+        
+        var eventGroup = EventGroupTestData.CreateDefault(startDate: dateTimeProviderFake.CurrentDate, endDate: dateTimeProviderFake.CurrentDate);
+        
+        var eventInstance1 = EventInstanceTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate);
+        
+        eventGroup.Events = [eventInstance1];
+        DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+        
+        // Act
+        var result = await queryHandler.HandleAsync(1, CancellationToken.None);
+        
+        // Assert
+        result.Events.Should().HaveCount(1);
+        result.Events.Should().ContainSingle(e => e.Title == eventGroup.Title);
+        result.Events.Single().HasRepetitions.Should().BeFalse();
     }
 }
