@@ -27,9 +27,11 @@ public class UserOverviewQueryHandler(WhoIsHomeContext context, IDateTimeProvide
         };
     }
 
-    private static UserOverviewEvent ToUserOverview(EventGroup eventGroup)
+    private UserOverviewEvent ToUserOverview(EventGroup eventGroup)
     {
-        var nextDate = eventGroup.Events.MaxBy(e => e.Date)!.Date;
+        var nextDate = eventGroup.Events
+            .Where(e => e.Date >= dateTimeProvider.CurrentDate)
+            .MinBy(e => e.Date)!.Date;
 
         return new UserOverviewEvent
         {

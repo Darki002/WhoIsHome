@@ -92,8 +92,8 @@ public class UserOverviewTest : DbMockTest
         
         var eventGroup = EventGroupTestData.CreateDefault(endDate: dateTimeProviderFake.CurrentDate.AddDays(8));
         
-        var eventInstance1 = EventInstanceTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate);
-        var eventInstance2 = EventInstanceTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(-1));
+        var eventInstance1 = EventInstanceTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate.AddDays(-1));
+        var eventInstance2 = EventInstanceTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(4));
         var eventInstance3 = EventInstanceTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(8));
         
         eventGroup.Events = [eventInstance1, eventInstance2, eventInstance3];
@@ -105,7 +105,7 @@ public class UserOverviewTest : DbMockTest
         // Assert
         result.Events.Should().HaveCount(1);
         result.Events.Should().ContainSingle(e => e.Title == eventGroup.Title);
-        result.Events.Single().NextDate.Should().Be(dateTimeProviderFake.CurrentDate.AddDays(8));
+        result.Events.Single().NextDate.Should().Be(dateTimeProviderFake.CurrentDate.AddDays(4));
         result.Events.Single().HasRepetitions.Should().BeTrue();
     }
     
