@@ -110,8 +110,8 @@ public class EventServiceTest : DbMockTest
             List<EventInstance> result = [];
             List<EventInstance> deletes = [];
 
-            var event1 = EventInstanceTestData.CreateDefault(date: new DateOnly(2024, 11, 25));
-            var event2 = EventInstanceTestData.CreateDefault(date: new DateOnly(2024, 11, 26));
+            var event1 = EventInstanceTestData.CreateDefault(date: new DateOnly(2024, 11, 25), eventGroupId: eventGroup.Id);
+            var event2 = EventInstanceTestData.CreateDefault(date: new DateOnly(2024, 11, 26), eventGroupId: eventGroup.Id);
 
             DbMock.Setup(c => c.EventInstances).ReturnsDbSet([event1, event2]);
             DbMock.Setup(c =>

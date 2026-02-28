@@ -71,7 +71,7 @@ public class UserOverviewTest : DbMockTest
         var eventGroup = EventGroupTestData.CreateDefault(endDate: dateTimeProviderFake.CurrentDate.AddDays(1));
         var eventGroup2 = EventGroupTestData.CreateDefault(endDate: dateTimeProviderFake.CurrentDate.AddDays(-1));
 
-        eventGroup.Events = [EventInstanceTestData.CreateDefault()];
+        eventGroup.Events = [EventInstanceTestData.CreateDefault(date: dateTimeProviderFake.CurrentDate.AddDays(1))];
         
         DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup, eventGroup2]);
         

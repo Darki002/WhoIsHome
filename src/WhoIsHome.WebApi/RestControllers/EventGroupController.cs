@@ -195,6 +195,11 @@ public class EventGroupController(
         
         if (ModelState.ContainsKey(nameof(dto.PresenceType)))
         {
+            if (!PresenceTypeHelper.IsDefined(dto.PresenceType))
+            {
+                return BadRequest(new ErrorResponse { Errors = [$"Invalid presence type {dto.PresenceType}!"] });
+            }
+            
             eventGroup.PresenceType = PresenceTypeHelper.FromString(dto.PresenceType);
         }
         
@@ -237,9 +242,7 @@ public class EventGroupController(
         
         if (eventInstance is null)
         {
-
-            var eventGroup = await context.EventGroups
-                .SingleOrDefaultAsync(g => g.Id == eventGroupId, cancellationToken);
+            var eventGroup = await context.EventGroups.SingleOrDefaultAsync(g => g.Id == eventGroupId, cancellationToken);
 
             if (eventGroup is null)
             {
@@ -265,25 +268,21 @@ public class EventGroupController(
         
         if (ModelState.ContainsKey(nameof(dto.Date)))
         {
-            if (dto.Date < dateTimeProvider.CurrentDate)
+            var result = eventInstance.UpdateDate(dto.Date, dateTimeProvider.CurrentDate);
+            if (result is not null)
             {
-                return BadRequest(new  ErrorResponse { Errors = ["Date can not set into the past."] });
+                return BadRequest(new  ErrorResponse { Errors = [result.Message] });
             }
-            
-            eventInstance.Date = dto.Date;
-            eventInstance.IsOriginal = false;
         }
         
         if (ModelState.ContainsKey(nameof(dto.StartTime)))
         {
-            eventInstance.StartTime = dto.StartTime;
-            eventInstance.IsOriginal = false;
+            eventInstance.UpdateStartTime(dto.StartTime);
         }
         
         if (ModelState.ContainsKey(nameof(dto.EndTime)))
         {
-            eventInstance.EndTime = dto.EndTime;
-            eventInstance.IsOriginal = false;
+            eventInstance.UpdateEndTime(dto.EndTime);
         }
         
         if (ModelState.ContainsKey(nameof(dto.PresenceType)))
@@ -293,14 +292,12 @@ public class EventGroupController(
                 return BadRequest(new ErrorResponse { Errors = [$"Invalid presence type {dto.PresenceType}!"] });
             }
             
-            eventInstance.PresenceType = PresenceTypeHelper.FromString(dto.PresenceType);
-            eventInstance.IsOriginal = false;
+            eventInstance.UpdatePresenceType(PresenceTypeHelper.FromString(dto.PresenceType));
         }
         
         if (ModelState.ContainsKey(nameof(dto.DinnerTime)))
         {
-            eventInstance.DinnerTime = dto.DinnerTime;
-            eventInstance.IsOriginal = false;
+            eventInstance.UpdateDinnerTime(eventInstance.DinnerTime);
         }
         
         var validationResult = eventInstance.Validate();

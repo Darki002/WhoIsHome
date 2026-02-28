@@ -51,6 +51,42 @@ public class EventInstance
 
     public bool IsAtHome => PresenceType != PresenceType.NotPresent;
     
+    public ValidationError? UpdateDate(DateOnly date, DateOnly currentDate)
+    {
+        if (date < currentDate)
+        {
+            return new ValidationError("Date must be before Start Date.");
+        }
+        
+        Date = date;
+        IsOriginal = false;
+        return null;
+    }
+
+    public void UpdateStartTime(TimeOnly startTime)
+    {
+        StartTime = startTime;
+        IsOriginal = false;
+    }
+
+    public void UpdateEndTime(TimeOnly? endTime)
+    {
+        EndTime = endTime;
+        IsOriginal = false;
+    }
+
+    public void UpdatePresenceType(PresenceType presenceType)
+    {
+        PresenceType = presenceType;
+        IsOriginal = false;
+    }
+
+    public void UpdateDinnerTime(TimeOnly? dinnerTime)
+    {
+        DinnerTime = dinnerTime;
+        IsOriginal = false;
+    }
+    
     public List<ValidationError> Validate()
     {
         List<ValidationError> validationErrors = [];

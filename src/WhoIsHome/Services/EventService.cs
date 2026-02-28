@@ -38,10 +38,15 @@ public class EventService(
 
         var editedEvents = existingEvents
             .Where(e => !e.IsOriginal)
-            .Select(e => e.OriginalDate)
             .ToHashSet();
+        context.EventInstances.UpdateRange(editedEvents);
+        
+        foreach (var eventInstance in editedEvents)
+        {
+            eventInstance.Title = eventGroup.Title;
+        }
 
-        var updatedEvents = GenerateFor(eventGroup, editedEvents);
+        var updatedEvents = GenerateFor(eventGroup, editedEvents.Select(e => e.OriginalDate).ToHashSet());
         await context.EventInstances.AddRangeAsync(updatedEvents);
         await context.SaveChangesAsync();
         
