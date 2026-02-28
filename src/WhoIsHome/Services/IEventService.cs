@@ -13,6 +13,8 @@ public interface IEventService
     Task GenerateNextAsync(EventGroup eventGroup, CancellationToken cancellationToken);
 
     Task DeleteAsync(int eventGroupId);
+
+    Task<EventInstance?> FindEventInstance(int eventGroupId, DateOnly originalDate);
     
     Task<IReadOnlyList<EventInstance>> PredictNextAsync(
         EventGroup eventGroup, 

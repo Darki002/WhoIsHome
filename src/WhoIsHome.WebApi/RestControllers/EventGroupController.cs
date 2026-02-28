@@ -242,26 +242,12 @@ public class EventGroupController(
         
         if (eventInstance is null)
         {
-            var eventGroup = await context.EventGroups.SingleOrDefaultAsync(g => g.Id == eventGroupId, cancellationToken);
+            eventInstance = await eventService.FindEventInstance(eventGroupId, originalDate);
 
-            if (eventGroup is null)
+            if (eventInstance is null)
             {
-                return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {eventGroupId} not found."] });
+                return BadRequest(new ErrorResponse { Errors = [$"EventGroup has not Event on {originalDate.ToString("d")}."] });
             }
-
-            eventInstance = new EventInstance
-            {
-                Title = eventGroup.Title,
-                Date = originalDate,
-                StartTime = eventGroup.StartTime,
-                EndTime = eventGroup.EndTime,
-                PresenceType = eventGroup.PresenceType,
-                DinnerTime = eventGroup.DinnerTime,
-                IsOriginal = true,
-                OriginalDate = originalDate,
-                UserId = eventGroup.UserId,
-                EventGroupId = eventGroupId,
-            };
         }
 
         var sendPushUp = eventInstance.Date == dateTimeProvider.CurrentDate;

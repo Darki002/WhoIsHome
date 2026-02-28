@@ -327,6 +327,63 @@ public class EventServiceTest : DbMockTest
     }
 
     [TestFixture]
+    private class FindEventInstance : EventServiceTest
+    {
+        [Test]
+        public async Task ReturnsNull_WhenEventGroupHasNoInstanceOnGivenDate()
+        {
+            var eventGroup = EventGroupTestData.CreateDefault(startDate: dateTimeProvider.CurrentDate, weekDays: WeekDay.Tuesday);
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+
+            var result = await service.FindEventInstance(eventGroup.Id, dateTimeProvider.CurrentDate.AddDays(1));
+
+            result.Should().BeNull();
+        }
+
+        [Test]
+        public async Task ReturnsNull_WhenEventGroupHasEditedInstanceOnGivenDateButNotOriginalDate()
+        {
+            var eventGroup = EventGroupTestData.CreateDefault(startDate: dateTimeProvider.CurrentDate, weekDays: WeekDay.Tuesday);
+            var instance = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate.AddDays(1), originalDate: dateTimeProvider.CurrentDate, eventGroupId: eventGroup.Id);
+            eventGroup.Events = [instance];
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+            
+            var result = await service.FindEventInstance(eventGroup.Id, dateTimeProvider.CurrentDate.AddDays(1));
+
+            result.Should().BeNull();
+        }
+        
+        [Test]
+        public async Task ReturnsEventInstance_WhenEventGroupHasEditedInstanceOnGivenOriginalDate()
+        {
+            var eventGroup = EventGroupTestData.CreateDefault(startDate: dateTimeProvider.CurrentDate, weekDays: WeekDay.Tuesday);
+            var instance = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate.AddDays(1), originalDate: dateTimeProvider.CurrentDate, eventGroupId: eventGroup.Id);
+            eventGroup.Events = [instance];
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+            
+            var result = await service.FindEventInstance(eventGroup.Id, dateTimeProvider.CurrentDate);
+
+            result.Should().NotBeNull();
+            result.Date.Should().Be(instance.Date);
+        }
+        
+        [Test]
+        public async Task ReturnsEventInstance_WhenEventGroupHasInstanceOnGivenDate()
+        {
+            var eventGroup = EventGroupTestData.CreateDefault(startDate: dateTimeProvider.CurrentDate, weekDays: WeekDay.Tuesday);
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+
+            var instance = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate.AddDays(7), eventGroupId: eventGroup.Id);
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([instance]);
+
+            var result = await service.FindEventInstance(eventGroup.Id, dateTimeProvider.CurrentDate.AddDays(7));
+
+            result.Should().NotBeNull();
+            result.Date.Should().Be(instance.Date);
+        }
+    }
+    
+    [TestFixture]
     private class PredictNextAsync : EventServiceTest
     {
         [Test]

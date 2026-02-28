@@ -153,6 +153,43 @@ public class EventService(
         }
     }
 
+    public async Task<EventInstance?> FindEventInstance(int eventGroupId, DateOnly originalDate)
+    {
+        var eventGroup = await context.EventGroups
+            .Include(e => e.Events)
+            .SingleOrDefaultAsync(e => e.Id == eventGroupId);
+
+        if (eventGroup is null)
+        {
+            return null;
+        }
+
+        var result = eventGroup.Events.SingleOrDefault(e => e.OriginalDate == originalDate);
+
+        if (result is null)
+        {
+            var isWeekDayOfGroup = eventGroup.WeekDays.ToDayOfWeekList().Contains(originalDate.DayOfWeek);
+            if (isWeekDayOfGroup)
+            {
+                result = new EventInstance
+                {
+                    Title = eventGroup.Title,
+                    Date = originalDate,
+                    StartTime = eventGroup.StartTime,
+                    EndTime = eventGroup.EndTime,
+                    PresenceType = eventGroup.PresenceType,
+                    DinnerTime = eventGroup.DinnerTime,
+                    IsOriginal = true,
+                    OriginalDate = originalDate,
+                    UserId = eventGroup.UserId,
+                    EventGroupId = eventGroupId,
+                };
+            }
+        }
+        
+        return result;
+    }
+
     public async Task<IReadOnlyList<EventInstance>> PredictNextAsync(
         EventGroup eventGroup, 
         DateOnly start, 
