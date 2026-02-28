@@ -2,8 +2,6 @@
 
 public class EventInstanceDto
 {
-    public string Title { get; set; } = null!;
-    
     public DateOnly Date { get; set; }
     
     public TimeOnly StartTime { get; set; }

@@ -75,7 +75,7 @@ public class EventGroupController(
     [HttpGet("{eventGroupId:int}/instance/{date:datetime}")]
     [ProducesResponseType<EventInstanceModel>(StatusCodes.Status200OK)]
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetByIdAsync(int eventGroupId, DateTime date, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetInstanceByDateAsync(int eventGroupId, DateTime date, CancellationToken cancellationToken)
     {
         var originalDate = DateOnly.FromDateTime(date);
         var result = await context.EventInstances
@@ -84,7 +84,27 @@ public class EventGroupController(
 
         if (result is null)
         {
-            return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {eventGroupId} did not contain a event at {originalDate}."] });
+            var eventGroup = await context.EventGroups.SingleOrDefaultAsync(e => e.Id == eventGroupId, cancellationToken);
+
+            if (eventGroup is null)
+            {
+                return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {eventGroupId} not found."] });
+            }
+            
+            result = new EventInstance
+            {
+                Id = 0,
+                Title = eventGroup.Title,
+                Date = originalDate,
+                StartTime = eventGroup.StartTime,
+                EndTime = eventGroup.EndTime,
+                PresenceType = eventGroup.PresenceType,
+                DinnerTime = eventGroup.DinnerTime,
+                IsOriginal = true,
+                OriginalDate = originalDate,
+                UserId = eventGroup.UserId,
+                EventGroupId = eventGroupId,
+            };
         }
 
         return Ok(ToModel(result));
@@ -183,14 +203,14 @@ public class EventGroupController(
             eventGroup.DinnerTime = dto.DinnerTime;
         }
         
-        context.EventGroups.Update(eventGroup);
-        await context.SaveChangesAsync(cancellationToken);
-
         var validationResult = eventGroup.Validate();
         if (validationResult.Count > 0)
         {
             return BadRequest(new { Error = validationResult.Select(e => e.Message) });
         }
+        
+        context.EventGroups.Update(eventGroup);
+        await context.SaveChangesAsync(cancellationToken);
 
         if (regenerateEventInstances)
         {
@@ -217,39 +237,77 @@ public class EventGroupController(
         
         if (eventInstance is null)
         {
-            return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {eventGroupId} did not contain a event at {originalDate}."] });
+
+            var eventGroup = await context.EventGroups
+                .SingleOrDefaultAsync(g => g.Id == eventGroupId, cancellationToken);
+
+            if (eventGroup is null)
+            {
+                return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {eventGroupId} not found."] });
+            }
+
+            eventInstance = new EventInstance
+            {
+                Title = eventGroup.Title,
+                Date = originalDate,
+                StartTime = eventGroup.StartTime,
+                EndTime = eventGroup.EndTime,
+                PresenceType = eventGroup.PresenceType,
+                DinnerTime = eventGroup.DinnerTime,
+                IsOriginal = true,
+                OriginalDate = originalDate,
+                UserId = eventGroup.UserId,
+                EventGroupId = eventGroupId,
+            };
         }
 
         var sendPushUp = eventInstance.Date == dateTimeProvider.CurrentDate;
         
-        if (ModelState.ContainsKey(nameof(dto.Title)))
-        {
-            eventInstance.Title = dto.Title;
-        }
-        
         if (ModelState.ContainsKey(nameof(dto.Date)))
         {
+            if (dto.Date < dateTimeProvider.CurrentDate)
+            {
+                return BadRequest(new  ErrorResponse { Errors = ["Date can not set into the past."] });
+            }
+            
             eventInstance.Date = dto.Date;
+            eventInstance.IsOriginal = false;
         }
         
         if (ModelState.ContainsKey(nameof(dto.StartTime)))
         {
             eventInstance.StartTime = dto.StartTime;
+            eventInstance.IsOriginal = false;
         }
         
         if (ModelState.ContainsKey(nameof(dto.EndTime)))
         {
             eventInstance.EndTime = dto.EndTime;
+            eventInstance.IsOriginal = false;
         }
         
         if (ModelState.ContainsKey(nameof(dto.PresenceType)))
         {
+            if (!PresenceTypeHelper.IsDefined(dto.PresenceType))
+            {
+                return BadRequest(new ErrorResponse { Errors = [$"Invalid presence type {dto.PresenceType}!"] });
+            }
+            
             eventInstance.PresenceType = PresenceTypeHelper.FromString(dto.PresenceType);
+            eventInstance.IsOriginal = false;
         }
         
         if (ModelState.ContainsKey(nameof(dto.DinnerTime)))
         {
             eventInstance.DinnerTime = dto.DinnerTime;
+            eventInstance.IsOriginal = false;
+        }
+        
+        var validationResult = eventInstance.Validate();
+
+        if (validationResult.Count > 0)
+        {
+            return BadRequest(new { Error = validationResult.Select(e => e.Message) });
         }
         
         context.EventInstances.Update(eventInstance);

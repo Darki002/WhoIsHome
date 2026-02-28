@@ -4,6 +4,18 @@ namespace WhoIsHome.Shared.Helper;
 
 public static class PresenceTypeHelper
 {
+    public static bool IsDefined(string str)
+    {
+        return str switch
+        {
+            nameof(PresenceType.Unknown) => true,
+            nameof(PresenceType.Default) => true,
+            nameof(PresenceType.Late) => true,
+            nameof(PresenceType.NotPresent) => true,
+            _ => false
+        };
+    }
+    
     public static PresenceType FromString(string str)
     {
         return str switch
