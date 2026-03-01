@@ -312,10 +312,7 @@ public class EventGroupController(
         var result = await context.EventGroups
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
-        if (result is null)
-        {
-            return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {id} not found."] });
-        }
+        if (result is null) return Ok();
 
         if (!userContextProvider.IsUserPermitted(result.UserId))
         {
@@ -339,10 +336,10 @@ public class EventGroupController(
         var eventInstance = await context.EventInstances
             .Where(e => e.EventGroupId == eventGroupId)
             .SingleOrDefaultAsync(e => e.OriginalDate == originalDate, cancellationToken);
-
+        
         if (eventInstance is null) return Ok();
         context.EventInstances.Remove(eventInstance);
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken); // TODO: soft delete, so we can see that it was deleted and do not have to regenerate it later on. Else this will cause some strange unexpected behaviour for the user.
             
         if (eventInstance.Date == dateTimeProvider.CurrentDate)
         {
