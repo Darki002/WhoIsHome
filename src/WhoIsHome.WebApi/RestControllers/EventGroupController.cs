@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WhoIsHome.Entities;
@@ -29,6 +30,7 @@ public class EventGroupController(
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
+        
         var result = await context.EventGroups
             .SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
 
@@ -153,7 +155,7 @@ public class EventGroupController(
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateEventAsync(
         int id,
-        [FromBody] EventGroupModelDto dto,
+        [FromBody] JsonPatchDocument<EventGroupModelDto> patchDocument,
         CancellationToken cancellationToken)
     {
         var eventGroup = await context.EventGroups.SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
@@ -168,57 +170,16 @@ public class EventGroupController(
             return BadRequest( new ErrorResponse { Errors = [$"User with ID {eventGroup.UserId} is not allowed to delete or modify the content of {id}"] });
         }
 
-        var regenerateEventInstances = false;
+        var dto = EventGroupModelDto.FromEntity(eventGroup);
+        
+        patchDocument.ApplyTo(dto);
 
-        if (ModelState.ContainsKey(nameof(dto.Title)))
+        if (!PresenceTypeHelper.IsDefined(dto.PresenceType))
         {
-            eventGroup.Title = dto.Title;
+            return BadRequest(new ErrorResponse { Errors = [$"Invalid presence type {dto.PresenceType}!"] });
         }
         
-        if (ModelState.ContainsKey(nameof(dto.StartDate)))
-        {
-            eventGroup.StartDate = dto.StartDate;
-            regenerateEventInstances = true;
-        }
-        
-        if (ModelState.ContainsKey(nameof(dto.EndDate)))
-        {
-            eventGroup.EndDate = dto.EndDate;
-            regenerateEventInstances = true;
-        }
-        
-        if (ModelState.ContainsKey(nameof(dto.StartTime)))
-        {
-            eventGroup.StartTime = dto.StartTime;
-            regenerateEventInstances = true;
-        }
-        
-        if (ModelState.ContainsKey(nameof(dto.EndTime)))
-        {
-            eventGroup.EndTime = dto.EndTime;
-            regenerateEventInstances = true;
-        }
-        
-        if (ModelState.ContainsKey(nameof(dto.WeekDays)))
-        {
-            eventGroup.WeekDays = dto.WeekDays.ToWeekDays();
-            regenerateEventInstances = true;
-        }
-        
-        if (ModelState.ContainsKey(nameof(dto.PresenceType)))
-        {
-            if (!PresenceTypeHelper.IsDefined(dto.PresenceType))
-            {
-                return BadRequest(new ErrorResponse { Errors = [$"Invalid presence type {dto.PresenceType}!"] });
-            }
-            
-            eventGroup.PresenceType = PresenceTypeHelper.FromString(dto.PresenceType);
-        }
-        
-        if (ModelState.ContainsKey(nameof(dto.DinnerTime)))
-        {
-            eventGroup.DinnerTime = dto.DinnerTime;
-        }
+        dto.ApplyUpdate(eventGroup);
         
         var validationResult = eventGroup.Validate();
         if (validationResult.Count > 0)
@@ -228,11 +189,7 @@ public class EventGroupController(
         
         context.EventGroups.Update(eventGroup);
         await context.SaveChangesAsync(cancellationToken);
-
-        if (regenerateEventInstances)
-        {
-            await eventService.GenerateUpdateAsync(eventGroup);
-        }
+        await eventService.GenerateUpdateAsync(eventGroup);
         
         return Ok();
     }
@@ -243,68 +200,55 @@ public class EventGroupController(
     public async Task<IActionResult> EditEventInstance(
         int eventGroupId, 
         DateTime date, 
-        [FromBody] EventInstanceDto dto, 
+        [FromBody] JsonPatchDocument<EventInstanceDto> patchDocument, 
         CancellationToken cancellationToken)
     {
         var originalDate = DateOnly.FromDateTime(date);
-        
         var eventInstance = await eventService.FindEventInstance(eventGroupId, originalDate);
+        
         if (eventInstance is null)
         {
-            return BadRequest(new ErrorResponse { Errors = [$"EventGroup has not Event on {originalDate.ToString("d")}."] });
+            return BadRequest(new ErrorResponse { Errors = [$"EventGroup has no Event on {originalDate.ToString("d")}."] });
         }
         
         if (!userContextProvider.IsUserPermitted(eventInstance.UserId))
         {
-            return BadRequest( new ErrorResponse { Errors = [$"User with ID {eventInstance.UserId} is not allowed to delete or modify the content of Instance {eventInstance.Id}"] });
+            return BadRequest(new ErrorResponse { Errors = [$"User with ID {eventInstance.UserId} is not allowed to modify Instance {eventInstance.Id}"] });
         }
 
-        var sendPushUp = eventInstance.Date == dateTimeProvider.CurrentDate;
+        var dto = EventInstanceDto.FromEntity(eventInstance);
         
-        if (ModelState.ContainsKey(nameof(dto.Date)))
+        patchDocument.ApplyTo(dto);
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        if (!PresenceTypeHelper.IsDefined(dto.PresenceType))
         {
-            var result = eventInstance.UpdateDate(dto.Date, dateTimeProvider.CurrentDate);
-            if (result is not null)
-            {
-                return BadRequest(new  ErrorResponse { Errors = [result.Message] });
-            }
+            return BadRequest(new ErrorResponse { Errors = [$"Invalid presence type {dto.PresenceType}!"] });
         }
         
-        if (ModelState.ContainsKey(nameof(dto.StartTime)))
+        dto.ApplyUpdate(eventInstance);
+
+        var result = eventInstance.ValidUpdatedDate(dateTimeProvider.CurrentDate);
+        if (result is not null)
         {
-            eventInstance.UpdateStartTime(dto.StartTime);
-        }
-        
-        if (ModelState.ContainsKey(nameof(dto.EndTime)))
-        {
-            eventInstance.UpdateEndTime(dto.EndTime);
-        }
-        
-        if (ModelState.ContainsKey(nameof(dto.PresenceType)))
-        {
-            if (!PresenceTypeHelper.IsDefined(dto.PresenceType))
-            {
-                return BadRequest(new ErrorResponse { Errors = [$"Invalid presence type {dto.PresenceType}!"] });
-            }
-            
-            eventInstance.UpdatePresenceType(PresenceTypeHelper.FromString(dto.PresenceType));
-        }
-        
-        if (ModelState.ContainsKey(nameof(dto.DinnerTime)))
-        {
-            eventInstance.UpdateDinnerTime(eventInstance.DinnerTime);
+            return BadRequest(new ErrorResponse { Errors = [result.Message] });
         }
         
         var validationResult = eventInstance.Validate();
-
         if (validationResult.Count > 0)
         {
             return BadRequest(new { Error = validationResult.Select(e => e.Message) });
         }
+
+        if (patchDocument.Operations.Count > 0)
+        {
+            eventInstance.MarkModified();
+        }
         
         context.EventInstances.Update(eventInstance);
         await context.SaveChangesAsync(cancellationToken);
-
+        
+        var sendPushUp = eventInstance.Date == dateTimeProvider.CurrentDate;
         if (sendPushUp)
         {
             await eventUpdateHandler.HandleAsync(eventInstance, EventUpdateHandler.UpdateAction.Update);

@@ -1,6 +1,8 @@
-﻿using WhoIsHome.Host.Authentication;
+﻿using System.Text.Json.Serialization;
+using WhoIsHome.Host.Authentication;
 using WhoIsHome.Shared;
 using WhoIsHome.Shared.Authentication;
+using WhoIsHome.Shared.Types;
 using WhoIsHome.WebApi;
 
 namespace WhoIsHome.Host.SetUp;
@@ -15,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddControllers().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter<PresenceType>());
         });
 
         services.AddHttpContextAccessor();

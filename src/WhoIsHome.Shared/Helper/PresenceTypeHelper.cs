@@ -16,6 +16,18 @@ public static class PresenceTypeHelper
         };
     }
     
+    public static string ToEnumString(this PresenceType presenceType)
+    {
+        return presenceType switch
+        {
+            PresenceType.Unknown => nameof(PresenceType.Unknown),
+            PresenceType.Late => nameof(PresenceType.Late),
+            PresenceType.NotPresent => nameof(PresenceType.NotPresent),
+            PresenceType.Default => nameof(PresenceType.Default),
+            _ => throw new ArgumentOutOfRangeException(nameof(presenceType), presenceType, null)
+        };
+    }
+    
     public static PresenceType FromString(string str)
     {
         return str switch
