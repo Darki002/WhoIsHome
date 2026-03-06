@@ -11,7 +11,7 @@
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
             <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <IncludeAssets>runtime; build; native; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
     
