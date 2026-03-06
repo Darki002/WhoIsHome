@@ -5,9 +5,6 @@ WORKDIR /app
 # Copy everything
 COPY . .
 
-# DEBUG: List the files to see if they actually exist in the container
-RUN find . -name "Resource.resx"
-
 WORKDIR ./src/WhoIsHome.Host
 # Restore as distinct layers
 RUN dotnet restore
