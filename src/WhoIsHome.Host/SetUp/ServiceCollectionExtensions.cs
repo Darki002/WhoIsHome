@@ -12,7 +12,10 @@ public static class ServiceCollectionExtensions
     {
         services.AddEndpointsApiExplorer();
         services.AddSwagger();
-        services.AddControllers();
+        services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        });
 
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContextProvider, UserContextProvider>();
