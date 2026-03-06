@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using WhoIsHome.Shared.Helper;
 using WhoIsHome.Shared.Types;
 using WhoIsHome.Validations;
 
