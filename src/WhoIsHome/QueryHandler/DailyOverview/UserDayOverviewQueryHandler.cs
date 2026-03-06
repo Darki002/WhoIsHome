@@ -18,6 +18,7 @@ public class UserDayOverviewQueryHandler(WhoIsHomeContext context)
         }
 
         var eventList = await context.EventInstances
+            .Where(e => e.DeleteDate == null)
             .Where(e => e.UserId == id)
             .Where(e => e.PresenceType != PresenceType.Unknown)
             .Where(e => e.Date == date)

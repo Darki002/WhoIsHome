@@ -68,6 +68,7 @@ public class EventUpdateHandler(
     private async Task<List<EventInstance>> GetUserEventsFromTodayAsync(EventInstance updatedEvent, CancellationToken cancellationToken)
     {
         return await context.EventInstances
+            .Where(e => e.DeleteDate == null)
             .Where(e => e.UserId == updatedEvent.UserId)
             .Where(e => e.PresenceType != PresenceType.Unknown)
             .Where(e => e.Date == dateTimeProvider.CurrentDate)

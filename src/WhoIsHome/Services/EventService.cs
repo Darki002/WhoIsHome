@@ -39,12 +39,12 @@ public class EventService(
         var editedEvents = existingEvents
             .Where(e => !e.IsOriginal)
             .ToHashSet();
-        context.EventInstances.UpdateRange(editedEvents);
         
         foreach (var eventInstance in editedEvents)
         {
             eventInstance.Title = eventGroup.Title;
         }
+        context.EventInstances.UpdateRange(editedEvents);
 
         var updatedEvents = GenerateFor(eventGroup, editedEvents.Select(e => e.OriginalDate).ToHashSet());
         await context.EventInstances.AddRangeAsync(updatedEvents);
@@ -166,6 +166,11 @@ public class EventService(
 
         var result = eventGroup.Events.SingleOrDefault(e => e.OriginalDate == originalDate);
 
+        if (result is not null && result.DeleteDate.HasValue)
+        {
+            return null;
+        }
+        
         if (result is null)
         {
             var isWeekDayOfGroup = eventGroup.WeekDays.ToDayOfWeekList().Contains(originalDate.DayOfWeek);
@@ -213,6 +218,7 @@ public class EventService(
             exceptions: dbDates);
         
         return result
+            .Where(e => e.DeleteDate == null)
             .Concat(predictedEvents)
             .OrderBy(e => e.Date)
             .ToList();

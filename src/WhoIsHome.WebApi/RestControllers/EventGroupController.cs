@@ -82,30 +82,37 @@ public class EventGroupController(
             .Where(e => e.EventGroupId == eventGroupId)
             .SingleOrDefaultAsync(e => e.OriginalDate == originalDate, cancellationToken);
 
-        if (result is null)
+        if (result is not null)
         {
-            var eventGroup = await context.EventGroups.SingleOrDefaultAsync(e => e.Id == eventGroupId, cancellationToken);
-
-            if (eventGroup is null)
+            if (result.DeleteDate != null)
             {
-                return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {eventGroupId} not found."] });
+                return BadRequest(new ErrorResponse { Errors = [$"Event not in EventGroup {eventGroupId} found at {date:d}"] });
             }
             
-            result = new EventInstance
-            {
-                Id = 0,
-                Title = eventGroup.Title,
-                Date = originalDate,
-                StartTime = eventGroup.StartTime,
-                EndTime = eventGroup.EndTime,
-                PresenceType = eventGroup.PresenceType,
-                DinnerTime = eventGroup.DinnerTime,
-                IsOriginal = true,
-                OriginalDate = originalDate,
-                UserId = eventGroup.UserId,
-                EventGroupId = eventGroupId,
-            };
+            return Ok(ToModel(result));
         }
+        
+        var eventGroup = await context.EventGroups.SingleOrDefaultAsync(e => e.Id == eventGroupId, cancellationToken);
+
+        if (eventGroup is null)
+        {
+            return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {eventGroupId} not found."] });
+        }
+            
+        result = new EventInstance
+        {
+            Id = 0,
+            Title = eventGroup.Title,
+            Date = originalDate,
+            StartTime = eventGroup.StartTime,
+            EndTime = eventGroup.EndTime,
+            PresenceType = eventGroup.PresenceType,
+            DinnerTime = eventGroup.DinnerTime,
+            IsOriginal = true,
+            OriginalDate = originalDate,
+            UserId = eventGroup.UserId,
+            EventGroupId = eventGroupId,
+        };
 
         return Ok(ToModel(result));
     }
@@ -154,6 +161,11 @@ public class EventGroupController(
         if (eventGroup is null)
         {
             return BadRequest(new ErrorResponse { Errors = [$"EventGroup with id {id} not found."] });
+        }
+        
+        if (!userContextProvider.IsUserPermitted(eventGroup.UserId))
+        {
+            return BadRequest( new ErrorResponse { Errors = [$"User with ID {eventGroup.UserId} is not allowed to delete or modify the content of {id}"] });
         }
 
         var regenerateEventInstances = false;
@@ -236,18 +248,15 @@ public class EventGroupController(
     {
         var originalDate = DateOnly.FromDateTime(date);
         
-        var eventInstance = await context.EventInstances
-            .Where(e => e.EventGroupId == eventGroupId)
-            .SingleOrDefaultAsync(e => e.OriginalDate == originalDate, cancellationToken);
-        
+        var eventInstance = await eventService.FindEventInstance(eventGroupId, originalDate);
         if (eventInstance is null)
         {
-            eventInstance = await eventService.FindEventInstance(eventGroupId, originalDate);
-
-            if (eventInstance is null)
-            {
-                return BadRequest(new ErrorResponse { Errors = [$"EventGroup has not Event on {originalDate.ToString("d")}."] });
-            }
+            return BadRequest(new ErrorResponse { Errors = [$"EventGroup has not Event on {originalDate.ToString("d")}."] });
+        }
+        
+        if (!userContextProvider.IsUserPermitted(eventInstance.UserId))
+        {
+            return BadRequest( new ErrorResponse { Errors = [$"User with ID {eventInstance.UserId} is not allowed to delete or modify the content of Instance {eventInstance.Id}"] });
         }
 
         var sendPushUp = eventInstance.Date == dateTimeProvider.CurrentDate;
@@ -334,12 +343,20 @@ public class EventGroupController(
     {
         var originalDate = DateOnly.FromDateTime(date);
         var eventInstance = await context.EventInstances
+            .Where(e => e.DeleteDate == null)
             .Where(e => e.EventGroupId == eventGroupId)
             .SingleOrDefaultAsync(e => e.OriginalDate == originalDate, cancellationToken);
         
         if (eventInstance is null) return Ok();
-        context.EventInstances.Remove(eventInstance);
-        await context.SaveChangesAsync(cancellationToken); // TODO: soft delete, so we can see that it was deleted and do not have to regenerate it later on. Else this will cause some strange unexpected behaviour for the user.
+        
+        if (!userContextProvider.IsUserPermitted(eventInstance.UserId))
+        {
+            return BadRequest( new ErrorResponse { Errors = [$"User with ID {eventInstance.UserId} is not allowed to delete or modify the content of Instance {eventInstance.Id}"] });
+        }
+
+        eventInstance.SetDeleteDate(dateTimeProvider.Now);
+        context.EventInstances.Update(eventInstance);
+        await context.SaveChangesAsync(cancellationToken);
             
         if (eventInstance.Date == dateTimeProvider.CurrentDate)
         {

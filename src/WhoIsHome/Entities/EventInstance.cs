@@ -37,6 +37,8 @@ public class EventInstance
     [Required]
     public DateOnly OriginalDate { get; set; }
     
+    public DateTimeOffset? DeleteDate { get; set; }
+    
     [Required]
     public int EventGroupId { get; set; }
 
@@ -84,6 +86,12 @@ public class EventInstance
     public void UpdateDinnerTime(TimeOnly? dinnerTime)
     {
         DinnerTime = dinnerTime;
+        IsOriginal = false;
+    }
+    
+    public void SetDeleteDate(DateTime now)
+    {
+        DeleteDate = now;
         IsOriginal = false;
     }
     
