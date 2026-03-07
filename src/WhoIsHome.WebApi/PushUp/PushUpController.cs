@@ -25,9 +25,9 @@ public class PushUpController(
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Post([FromBody] PushUpSettingsDto pushUpSettings, CancellationToken cancellationToken)
     {
-        if (TryConvert(pushUpSettings.LanguageCode, out var language))
+        if (!TryConvert(pushUpSettings.LanguageCode, out var language))
         {
-            return BadRequest(new ErrorResponse { Errors = [$"Unknown Language Code {pushUpSettings.LanguageCode}."] });
+            return BadRequest(new ErrorResponse { Errors = [$"Unknown Language Code '{pushUpSettings.LanguageCode}'."] });
         }
         
         var settings = await context.PushUpSettings.SingleOrDefaultAsync(s => s.UserId == userContextProvider.UserId, cancellationToken);
@@ -65,7 +65,6 @@ public class PushUpController(
                 return true;
             }
 
-            logger.LogInformation("There was no given language. Using fallback culture.");
             cultureInfo = null;
             return true;
         }
