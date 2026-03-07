@@ -208,7 +208,7 @@ public class EventGroupController(
         
         if (eventInstance is null)
         {
-            return BadRequest(new ErrorResponse { Errors = [$"EventGroup has no Event on {originalDate.ToString("d")}."] });
+            return BadRequest(new ErrorResponse { Errors = [$"EventGroup has no Event on {originalDate.ToString("dd/MM/yyyy")}."] });
         }
         
         if (!userContextProvider.IsUserPermitted(eventInstance.UserId))

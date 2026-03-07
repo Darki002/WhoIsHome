@@ -1,6 +1,4 @@
 ﻿using WhoIsHome.Entities;
-using WhoIsHome.Shared.Types;
-using WhoIsHome.Validations;
 
 namespace WhoIsHome.Services;
 

@@ -13,7 +13,7 @@ public class EventInstanceDto
     
     public string PresenceType { get; set; } = null!;
 
-    public TimeOnly? DinnerTime { get; set; } = null;
+    public TimeOnly? DinnerTime { get; set; }
 
     public static EventInstanceDto FromEntity(EventInstance eventInstance)
     {
