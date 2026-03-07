@@ -50,7 +50,6 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseHttpsRedirection();
 
 app.MapHealthChecks("/health").AllowAnonymous();
 
