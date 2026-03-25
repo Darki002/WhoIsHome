@@ -1,5 +1,5 @@
 # WhoIsHome
-This is the Backend Service used for the Mobile App of the WhoIsHome project. See the Documentation there for how to run/download the mobile app: https://github.com/Darki002/WhoIsHome.App
+This is the Backend Service used for the Mobile App of the WhoIsHome project. See the Documentation there for how to run/download the mobile app: https://github.com/LlynBaum/WhoIsHome.App
 
 # API
 
