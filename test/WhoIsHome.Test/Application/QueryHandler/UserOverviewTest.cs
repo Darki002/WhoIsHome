@@ -151,4 +151,30 @@ public class UserOverviewTest : DbMockTest
         result.Events.Should().ContainSingle(e => e.Title == eventGroup.Title);
         result.Events.Single().HasRepetitions.Should().BeFalse();
     }
+    
+    
+    [Test]
+    public async Task ReturnsOverview_DoesNotIncludeDeletedEvents()
+    {
+        // Arrange
+        var user = UserTestData.CreateDefaultUser();
+        DbMock.Setup(c => c.Users).ReturnsDbSet([user]);
+        
+        var eventGroup = EventGroupTestData.CreateDefault(endDate: dateTimeProviderFake.CurrentDate.AddDays(8));
+        
+        var eventInstance1 = EventInstanceTestData.CreateDefault(title: "1", date: dateTimeProviderFake.CurrentDate.AddDays(-1));
+        var eventInstance2 = EventInstanceTestData.CreateDefault(title: "2", date: dateTimeProviderFake.CurrentDate.AddDays(4));
+        eventInstance2.DeleteDate = new DateTimeOffset(DateTime.UtcNow);
+        var eventInstance3 = EventInstanceTestData.CreateDefault(title: "3", date: dateTimeProviderFake.CurrentDate.AddDays(8));
+        
+        eventGroup.Events = [eventInstance1, eventInstance2, eventInstance3];
+        DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+        
+        // Act
+        var result = await queryHandler.HandleAsync(1, CancellationToken.None);
+        
+        // Assert
+        result.Events.Should().HaveCount(1);
+        result.Events.Single().NextDate.Should().Be(eventInstance3.Date);
+    }
 }
