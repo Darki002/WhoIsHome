@@ -62,6 +62,26 @@ public class UserOverviewTest : DbMockTest
     }
     
     [Test]
+    public async Task ReturnsOverview_NextDateIsEventGroupStartDate_WhenEventGroupHasNotEvents()
+    {
+        // Arrange
+        var user = UserTestData.CreateDefaultUser();
+        DbMock.Setup(c => c.Users).ReturnsDbSet([user]);
+        
+        var eventGroup = EventGroupTestData.CreateDefault(endDate: dateTimeProviderFake.CurrentDate.AddDays(8));
+        eventGroup.Events = [];
+        DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+        
+        // Act
+        var result = await queryHandler.HandleAsync(1, CancellationToken.None);
+        
+        // Assert
+        result.Events.Should().HaveCount(1);
+        result.Events.Should().ContainSingle(e => e.Title == eventGroup.Title);
+        result.Events.Single().NextDate.Should().Be(eventGroup.StartDate);
+    }
+    
+    [Test]
     public async Task ReturnsOverview_OnlyFromEventGroupsThatDidNotEndedYet()
     {
         // Arrange
