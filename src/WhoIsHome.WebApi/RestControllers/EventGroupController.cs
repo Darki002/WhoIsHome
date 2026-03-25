@@ -146,7 +146,7 @@ public class EventGroupController(
         var result = await context.EventGroups.AddAsync(eventGroup, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
         
-        await eventService.GenerateNewAsync(eventGroup); 
+        await eventService.GenerateNewAsync(eventGroup);
         return Ok(new { result.Entity.Id });
     }
 
@@ -171,7 +171,6 @@ public class EventGroupController(
         }
 
         var dto = EventGroupModelDto.FromEntity(eventGroup);
-        
         patchDocument.ApplyTo(dto);
 
         if (!PresenceTypeHelper.IsDefined(dto.PresenceType))
@@ -217,8 +216,8 @@ public class EventGroupController(
         }
 
         var dto = EventInstanceDto.FromEntity(eventInstance);
-        
         patchDocument.ApplyTo(dto);
+        
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
         if (!PresenceTypeHelper.IsDefined(dto.PresenceType))

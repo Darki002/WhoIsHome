@@ -61,7 +61,7 @@ public class EventService(
     {
         var endDate = dateTimeProvider.CurrentDate.StartOfWeek().AddDays(DaysToGenerateInAdvance);
 
-        if (eventGroup.EndDate.HasValue && endDate > eventGroup.EndDate)
+        if (eventGroup.EndDate.HasValue && eventGroup.EndDate < endDate)
         {
             endDate = eventGroup.EndDate.Value;
         }

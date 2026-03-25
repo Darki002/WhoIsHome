@@ -64,10 +64,80 @@ public class EventServiceTest : DbMockTest
             result[2].Date.Should().Be(new DateOnly(2024, 12, 6));
             result[3].Date.Should().Be(new DateOnly(2024, 12, 9));
             eventUpdateHandlerMock.Verify(
-                void (x) => x.HandleAsync(
+                x => x.HandleAsync(
                     It.IsAny<EventInstance>(), 
-                    It.IsAny<EventUpdateHandler.UpdateAction>())
-                , Times.Never);
+                    It.IsAny<EventUpdateHandler.UpdateAction>()),
+                Times.Never);
+        }
+        
+        [Test]
+        public async Task GeneratesExpectedEvents_FromGivenEventGroup_WithNoEndDate()
+        {
+            // Arrange
+            const WeekDay weekDays = WeekDay.Monday | WeekDay.Friday;
+            var eventGroup = EventGroupTestData.CreateDefault(
+                startDate: dateTimeProvider.CurrentDate, 
+                endDate: null, 
+                weekDays: weekDays);
+            
+            List<EventInstance> result = [];
+            
+            DbMock.Setup(c =>
+                    c.EventInstances.AddRangeAsync(
+                        It.IsAny<IEnumerable<EventInstance>>(), 
+                        It.IsAny<CancellationToken>()))
+                .Callback<IEnumerable<EventInstance>, CancellationToken>((r, _) => result = r.ToList());
+            
+            // Act
+            await service.GenerateNewAsync(eventGroup);
+            
+            // Assert
+            result.Should().HaveCount(4);
+            result.Should().AllSatisfy(i => i.Date.Should().Be(i.OriginalDate));
+            result.Should().AllSatisfy(i => i.IsOriginal.Should().BeTrue());
+            result[0].Date.Should().Be(new DateOnly(2024, 11, 29));
+            result[1].Date.Should().Be(new DateOnly(2024, 12, 2));
+            result[2].Date.Should().Be(new DateOnly(2024, 12, 6));
+            result[3].Date.Should().Be(new DateOnly(2024, 12, 9));
+            eventUpdateHandlerMock.Verify(
+                x => x.HandleAsync(
+                    It.IsAny<EventInstance>(), 
+                    It.IsAny<EventUpdateHandler.UpdateAction>()),
+                Times.Never);
+        }
+        
+        [Test]
+        public async Task GeneratesExpectedEvents_FromGivenEventGroup_WithShortEndDate()
+        {
+            // Arrange
+            const WeekDay weekDays = WeekDay.Monday | WeekDay.Friday;
+            var eventGroup = EventGroupTestData.CreateDefault(
+                startDate: dateTimeProvider.CurrentDate, 
+                endDate: dateTimeProvider.CurrentDate.AddDays(7), 
+                weekDays: weekDays);
+            
+            List<EventInstance> result = [];
+            
+            DbMock.Setup(c =>
+                    c.EventInstances.AddRangeAsync(
+                        It.IsAny<IEnumerable<EventInstance>>(), 
+                        It.IsAny<CancellationToken>()))
+                .Callback<IEnumerable<EventInstance>, CancellationToken>((r, _) => result = r.ToList());
+            
+            // Act
+            await service.GenerateNewAsync(eventGroup);
+            
+            // Assert
+            result.Should().HaveCount(2);
+            result.Should().AllSatisfy(i => i.Date.Should().Be(i.OriginalDate));
+            result.Should().AllSatisfy(i => i.IsOriginal.Should().BeTrue());
+            result[0].Date.Should().Be(new DateOnly(2024, 11, 29));
+            result[1].Date.Should().Be(new DateOnly(2024, 12, 2));
+            eventUpdateHandlerMock.Verify(
+                x => x.HandleAsync(
+                    It.IsAny<EventInstance>(), 
+                    It.IsAny<EventUpdateHandler.UpdateAction>()),
+                Times.Never);
         }
         
         [Test]
@@ -87,7 +157,7 @@ public class EventServiceTest : DbMockTest
             
             // Assert
             eventUpdateHandlerMock.Verify(
-                void (x) => x.HandleAsync(
+                x => x.HandleAsync(
                     It.Is<EventInstance>(e => e.Date == dateTimeProvider.CurrentDate), 
                     It.Is<EventUpdateHandler.UpdateAction>(a => a == EventUpdateHandler.UpdateAction.Create))
                 , Times.Exactly(1));
@@ -131,7 +201,7 @@ public class EventServiceTest : DbMockTest
             result[0].Date.Should().Be(new DateOnly(2024, 11, 27));
             result[1].Date.Should().Be(new DateOnly(2024, 11, 28));
             eventUpdateHandlerMock.Verify(
-                void (x) => x.HandleAsync(
+                x => x.HandleAsync(
                     It.IsAny<EventInstance>(), 
                     It.IsAny<EventUpdateHandler.UpdateAction>())
                 , Times.Never);
