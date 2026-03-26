@@ -202,7 +202,16 @@ public class EventService(
         CancellationToken cancellationToken)
     {
         var endDate = start.AddDays(7 * weeks);
-        
+        if (eventGroup.EndDate.HasValue && endDate > eventGroup.EndDate)
+        {
+            endDate = eventGroup.EndDate.Value;
+        }
+
+        if (endDate < eventGroup.StartDate)
+        {
+            return [];
+        }
+
         var result = await context.EventInstances
             .Where(e => e.Date >= start)
             .Where(e => e.Date < endDate)
@@ -210,16 +219,25 @@ public class EventService(
             .OrderBy(e => e.Date)
             .ToListAsync(cancellationToken: cancellationToken);
 
-        var dbDates = result.Select(e => e.OriginalDate).ToHashSet();
-        var predictedEvents = GenerateForDuration(
-            eventGroup: eventGroup, 
-            start: start, 
-            end: endDate.AddDays(-1),
-            exceptions: dbDates);
+        var startDate = start;
+        if (startDate < eventGroup.StartDate)
+        {
+            startDate = eventGroup.StartDate;
+        }
+
+        if (startDate < endDate)
+        {
+            var dbDates = result.Select(e => e.OriginalDate).ToHashSet();
+            var predictedEvents = GenerateForDuration(
+                eventGroup: eventGroup, 
+                start: startDate, 
+                end: endDate.AddDays(-1),
+                exceptions: dbDates);
+            result.AddRange(predictedEvents);
+        }
         
         return result
             .Where(e => e.DeleteDate == null)
-            .Concat(predictedEvents)
             .OrderBy(e => e.Date)
             .ToList();
     }

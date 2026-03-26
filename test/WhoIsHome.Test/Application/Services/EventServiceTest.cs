@@ -457,6 +457,20 @@ public class EventServiceTest : DbMockTest
     private class PredictNextAsync : EventServiceTest
     {
         [Test]
+        public async Task ReturnsEmptyList_WhenStartDatePlusWeek_IsLessThenStartDateOfGroup()
+        {
+            // Arrange
+            var eventGroup = EventGroupTestData.CreateDefault(weekDays: WeekDay.Tuesday, startDate: dateTimeProvider.CurrentDate.AddDays(7 * 3));
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+            
+            // Act
+            var result = await service.PredictNextAsync(eventGroup, dateTimeProvider.CurrentDate, 2, CancellationToken.None);
+            
+            // Assert
+            result.Should().BeEmpty();
+        }
+        
+        [Test]
         public async Task ReturnsOnlyEventsFromGivenGroup()
         {
             // Arrange
@@ -591,6 +605,42 @@ public class EventServiceTest : DbMockTest
             result.Should().HaveCount(2);
             result[0].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(14));
             result[1].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(22));
+        }
+        
+        [Test]
+        public async Task ReturnsEvents_ThatAreWithInStartDate()
+        {
+            // Arrange
+            var eventGroup = EventGroupTestData.CreateDefault(weekDays: WeekDay.Tuesday, startDate: dateTimeProvider.CurrentDate.AddDays(7 * 2));
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([]);
+            
+            // Act
+            var result = await service.PredictNextAsync(eventGroup, dateTimeProvider.CurrentDate.AddDays(7), 2, CancellationToken.None);
+            
+            // Assert
+            result.Should().HaveCount(1);
+            result[0].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(7 * 2));
+        }
+        
+        [Test]
+        public async Task ReturnsEvents_ThatAreWithInEndDate()
+        {
+            // Arrange
+            var eventGroup = EventGroupTestData.CreateDefault(
+                weekDays: WeekDay.Tuesday, 
+                startDate: dateTimeProvider.CurrentDate.AddDays(7), 
+                endDate: dateTimeProvider.CurrentDate.AddDays(7 * 2));
+            
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([]);
+            
+            // Act
+            var result = await service.PredictNextAsync(eventGroup, dateTimeProvider.CurrentDate.AddDays(7), 3, CancellationToken.None);
+            
+            // Assert
+            result.Should().HaveCount(1);
+            result[0].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(7));
         }
     }
 }
