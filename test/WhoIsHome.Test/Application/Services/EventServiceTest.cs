@@ -639,6 +639,29 @@ public class EventServiceTest : DbMockTest
             var result = await service.PredictNextAsync(eventGroup, dateTimeProvider.CurrentDate.AddDays(7), 3, CancellationToken.None);
             
             // Assert
+            result.Should().HaveCount(2);
+            result[0].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(7));
+            result[1].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(7 * 2));
+        }
+        
+        [Test]
+        public async Task ReturnsEvent_ThatIsAtTheDate_OfTheEndDateOfEventGroup_WhenStartDatePlusWeek_IsLessThenStartDateOfGroup()
+        {
+            // Arrange
+            var eventGroup = EventGroupTestData.CreateDefault(
+                weekDays: WeekDay.Tuesday,
+                startDate: dateTimeProvider.CurrentDate.AddDays(1),
+                endDate: dateTimeProvider.CurrentDate.AddDays(7));
+            
+            var eventInstance = EventInstanceTestData.CreateDefault(date: dateTimeProvider.CurrentDate.AddDays(7));
+            
+            DbMock.Setup(c => c.EventGroups).ReturnsDbSet([eventGroup]);
+            DbMock.Setup(c => c.EventInstances).ReturnsDbSet([eventInstance]);
+            
+            // Act
+            var result = await service.PredictNextAsync(eventGroup, dateTimeProvider.CurrentDate, 2, CancellationToken.None);
+            
+            // Assert
             result.Should().HaveCount(1);
             result[0].Date.Should().Be(dateTimeProvider.CurrentDate.AddDays(7));
         }

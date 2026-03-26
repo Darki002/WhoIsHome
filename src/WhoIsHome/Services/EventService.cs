@@ -204,7 +204,7 @@ public class EventService(
         var endDate = start.AddDays(7 * weeks);
         if (eventGroup.EndDate.HasValue && endDate > eventGroup.EndDate)
         {
-            endDate = eventGroup.EndDate.Value;
+            endDate = eventGroup.EndDate.Value.AddDays(1);
         }
 
         if (endDate < eventGroup.StartDate)
