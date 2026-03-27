@@ -4,5 +4,5 @@ namespace WhoIsHome.Handlers;
 
 public interface IEventUpdateHandler
 {
-    Task HandleAsync(EventInstance updatedEvent, EventUpdateHandler.UpdateAction updateAction);
+    Task HandleAsync(int userId, IEnumerable<EventInstance> updatedEvents, EventUpdateHandler.UpdateAction updateAction);
 }

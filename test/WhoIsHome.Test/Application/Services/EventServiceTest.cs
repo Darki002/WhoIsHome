@@ -63,11 +63,6 @@ public class EventServiceTest : DbMockTest
             result[1].Date.Should().Be(new DateOnly(2024, 12, 2));
             result[2].Date.Should().Be(new DateOnly(2024, 12, 6));
             result[3].Date.Should().Be(new DateOnly(2024, 12, 9));
-            eventUpdateHandlerMock.Verify(
-                x => x.HandleAsync(
-                    It.IsAny<EventInstance>(), 
-                    It.IsAny<EventUpdateHandler.UpdateAction>()),
-                Times.Never);
         }
         
         [Test]
@@ -99,11 +94,6 @@ public class EventServiceTest : DbMockTest
             result[1].Date.Should().Be(new DateOnly(2024, 12, 2));
             result[2].Date.Should().Be(new DateOnly(2024, 12, 6));
             result[3].Date.Should().Be(new DateOnly(2024, 12, 9));
-            eventUpdateHandlerMock.Verify(
-                x => x.HandleAsync(
-                    It.IsAny<EventInstance>(), 
-                    It.IsAny<EventUpdateHandler.UpdateAction>()),
-                Times.Never);
         }
         
         [Test]
@@ -133,11 +123,6 @@ public class EventServiceTest : DbMockTest
             result.Should().AllSatisfy(i => i.IsOriginal.Should().BeTrue());
             result[0].Date.Should().Be(new DateOnly(2024, 11, 29));
             result[1].Date.Should().Be(new DateOnly(2024, 12, 2));
-            eventUpdateHandlerMock.Verify(
-                x => x.HandleAsync(
-                    It.IsAny<EventInstance>(), 
-                    It.IsAny<EventUpdateHandler.UpdateAction>()),
-                Times.Never);
         }
         
         [Test]
@@ -158,7 +143,8 @@ public class EventServiceTest : DbMockTest
             // Assert
             eventUpdateHandlerMock.Verify(
                 x => x.HandleAsync(
-                    It.Is<EventInstance>(e => e.Date == dateTimeProvider.CurrentDate), 
+                    It.IsAny<int>(),
+                    It.Is<IEnumerable<EventInstance>>(events => events.Any(e => e.Date == dateTimeProvider.CurrentDate)), 
                     It.Is<EventUpdateHandler.UpdateAction>(a => a == EventUpdateHandler.UpdateAction.Create))
                 , Times.Exactly(1));
         }
@@ -200,11 +186,6 @@ public class EventServiceTest : DbMockTest
             result.Should().AllSatisfy(i => i.Date.Should().Be(i.OriginalDate));
             result[0].Date.Should().Be(new DateOnly(2024, 11, 27));
             result[1].Date.Should().Be(new DateOnly(2024, 11, 28));
-            eventUpdateHandlerMock.Verify(
-                x => x.HandleAsync(
-                    It.IsAny<EventInstance>(), 
-                    It.IsAny<EventUpdateHandler.UpdateAction>())
-                , Times.Never);
         }
         
         [Test]
@@ -299,7 +280,8 @@ public class EventServiceTest : DbMockTest
             // Assert
             eventUpdateHandlerMock.Verify(
                 void (x) => x.HandleAsync(
-                    It.Is<EventInstance>(e => e.Date == dateTimeProvider.CurrentDate), 
+                    It.IsAny<int>(),
+                    It.Is<IEnumerable<EventInstance>>(events => events.Any(e => e.Date == dateTimeProvider.CurrentDate)), 
                     It.Is<EventUpdateHandler.UpdateAction>(a => a == EventUpdateHandler.UpdateAction.Update))
                 , Times.Exactly(1));
         }
@@ -390,7 +372,8 @@ public class EventServiceTest : DbMockTest
             // Assert
             eventUpdateHandlerMock.Verify(
                 void (x) => x.HandleAsync(
-                    It.Is<EventInstance>(e => e.Date == dateTimeProvider.CurrentDate), 
+                    It.IsAny<int>(),
+                    It.Is<IEnumerable<EventInstance>>(events => events.Any(e => e.Date == dateTimeProvider.CurrentDate)), 
                     It.Is<EventUpdateHandler.UpdateAction>(a => a == EventUpdateHandler.UpdateAction.Delete))
                 , Times.Exactly(1));
         }

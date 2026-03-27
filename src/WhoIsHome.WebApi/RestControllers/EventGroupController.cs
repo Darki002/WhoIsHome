@@ -247,11 +247,7 @@ public class EventGroupController(
         context.EventInstances.Update(eventInstance);
         await context.SaveChangesAsync(cancellationToken);
         
-        var sendPushUp = eventInstance.Date == dateTimeProvider.CurrentDate;
-        if (sendPushUp)
-        {
-            await eventUpdateHandler.HandleAsync(eventInstance, EventUpdateHandler.UpdateAction.Update);
-        }
+        await eventUpdateHandler.HandleAsync(eventInstance.UserId, [eventInstance], EventUpdateHandler.UpdateAction.Update);
         
         return Ok();
     }
@@ -301,10 +297,7 @@ public class EventGroupController(
         context.EventInstances.Update(eventInstance);
         await context.SaveChangesAsync(cancellationToken);
             
-        if (eventInstance.Date == dateTimeProvider.CurrentDate)
-        {
-            await eventUpdateHandler.HandleAsync(eventInstance, EventUpdateHandler.UpdateAction.Update);
-        }
+        await eventUpdateHandler.HandleAsync(eventInstance.UserId, [eventInstance], EventUpdateHandler.UpdateAction.Delete);
 
         return Ok();
     }

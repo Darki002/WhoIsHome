@@ -20,11 +20,7 @@ public class EventService(
         await context.EventInstances.AddRangeAsync(newEvents);
         await context.SaveChangesAsync();
 
-        var eventToday = newEvents.SingleOrDefault(e => e.Date == dateTimeProvider.CurrentDate);
-        if (eventToday is not null)
-        {
-            await eventUpdateHandler.HandleAsync(eventToday, EventUpdateHandler.UpdateAction.Create);
-        }
+        await eventUpdateHandler.HandleAsync(eventGroup.UserId, newEvents, EventUpdateHandler.UpdateAction.Create);
     }
 
     public async Task GenerateUpdateAsync(EventGroup eventGroup)
@@ -50,11 +46,7 @@ public class EventService(
         await context.EventInstances.AddRangeAsync(updatedEvents);
         await context.SaveChangesAsync();
         
-        var eventToday = updatedEvents.SingleOrDefault(e => e.Date == dateTimeProvider.CurrentDate);
-        if (eventToday is not null)
-        {
-            await eventUpdateHandler.HandleAsync(eventToday, EventUpdateHandler.UpdateAction.Update);
-        }
+        await eventUpdateHandler.HandleAsync(eventGroup.UserId, updatedEvents, EventUpdateHandler.UpdateAction.Update);
     }
     
     private List<EventInstance> GenerateFor(EventGroup eventGroup, HashSet<DateOnly> exceptions)
@@ -141,16 +133,17 @@ public class EventService(
             .Where(e => e.EventGroupId == eventGroupId)
             .Where(e => e.IsOriginal)
             .ToListAsync();
-
-        var eventFromToday = events.SingleOrDefault(e => e.Date == dateTimeProvider.CurrentDate);
         
         context.EventInstances.RemoveRange(events);
         await context.SaveChangesAsync();
 
-        if (eventFromToday is not null)
+        var eventInstance = events.FirstOrDefault();
+        if (eventInstance is null)
         {
-            await eventUpdateHandler.HandleAsync(eventFromToday, EventUpdateHandler.UpdateAction.Delete);
+            return;
         }
+        
+        await eventUpdateHandler.HandleAsync(eventInstance.UserId, events, EventUpdateHandler.UpdateAction.Delete);
     }
 
     public async Task<EventInstance?> FindEventInstance(int eventGroupId, DateOnly originalDate)

@@ -34,7 +34,7 @@ public class EventUpdateHandlerTest : DbMockTest
         var handler = new EventUpdateHandler(Db, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
 
         // Act
-        await handler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Create);
+        await handler.HandleAsync(updatedEvent.UserId, [updatedEvent], EventUpdateHandler.UpdateAction.Create);
         backgroundTaskQueueFake.Queue.Should().HaveCount(1);
         await backgroundTaskQueueFake.Queue.First().Invoke(CancellationToken.None);
 
@@ -63,7 +63,7 @@ public class EventUpdateHandlerTest : DbMockTest
         var handler = new EventUpdateHandler(Db, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
 
         // Act
-        await handler.HandleAsync(updatedEvent, EventUpdateHandler.UpdateAction.Create);
+        await handler.HandleAsync(updatedEvent.UserId, [updatedEvent], EventUpdateHandler.UpdateAction.Create);
         backgroundTaskQueueFake.Queue.Should().HaveCount(1);
         await (await backgroundTaskQueueFake.DequeueAsync(CancellationToken.None)).Invoke(CancellationToken.None);
 
@@ -89,7 +89,7 @@ public class EventUpdateHandlerTest : DbMockTest
         var handler = new EventUpdateHandler(Db, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
 
         // Act
-        await handler.HandleAsync(deletedEvent, EventUpdateHandler.UpdateAction.Delete);
+        await handler.HandleAsync(deletedEvent.UserId, [deletedEvent], EventUpdateHandler.UpdateAction.Delete);
         
         backgroundTaskQueueFake.Queue.Should().HaveCount(1);
         await (await backgroundTaskQueueFake.DequeueAsync(CancellationToken.None)).Invoke(CancellationToken.None);
@@ -100,5 +100,26 @@ public class EventUpdateHandlerTest : DbMockTest
         pushUpClientFake.Command.Body.Value.Should().Be("UserHasUpdated");
         pushUpClientFake.Command.Body.Args.Should().BeEquivalentTo(["Darki"]);
         pushUpClientFake.Command.UserIds.Should().BeEquivalentTo([2, 3]);
+    }
+    
+    [Test]
+    public async Task CallsPusUpClient_SkipsEventsNotToday()
+    {
+        // Arrange
+        var pushUpClientFake = new PushUpContextFake();
+        var backgroundTaskQueueFake = new BackgroundTaskQueueFake();
+        
+        var updatedEvent = EventInstanceTestData.CreateDefault(id: 1, userId: 1, date: dateTimeProviderFake.CurrentDate.AddDays(1));
+
+        DbMock.Setup(c => c.EventInstances).ReturnsDbSet([updatedEvent]);
+        DbMock.Setup(c => c.Users).ReturnsDbSet(userModels);
+        
+        var handler = new EventUpdateHandler(Db, pushUpClientFake, dateTimeProviderFake, backgroundTaskQueueFake, logger);
+
+        // Act
+        await handler.HandleAsync(updatedEvent.UserId, [updatedEvent], EventUpdateHandler.UpdateAction.Delete);
+
+        // Assert
+        backgroundTaskQueueFake.Queue.Should().HaveCount(0);
     }
 }
